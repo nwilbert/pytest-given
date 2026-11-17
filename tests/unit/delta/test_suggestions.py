@@ -5,7 +5,8 @@ import time
 import pytest
 
 from pytest_given import given, scenario, then, when
-from pytest_given.delta import DeltaInputs, DeltaResult, build_delta, suggestions
+from pytest_given.delta import DeltaInputs, build_delta, suggestions
+from pytest_given.delta.build import DeltaResult
 from pytest_given.model import (
     DeltaData,
     IdentityPair,

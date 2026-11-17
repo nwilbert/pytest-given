@@ -12,7 +12,7 @@ __lazy_modules__ = ['jinja2', 'markupsafe']
 import base64
 import json
 import re
-from collections.abc import Callable, Collection
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol, TypedDict
@@ -586,13 +586,23 @@ def build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
     return color_map
 
 
+# Both take the delta page's `side`, which the shared macros always pass, and
+# ignore it: a filter built here serves one side.
 class _SourceUrlFilter(Protocol):
-    def __call__(self, source: SourceLocation | None, /) -> str | None: ...
+    def __call__(
+        self, source: SourceLocation | None, side: Side | None = None, /
+    ) -> str | None: ...
 
 
 class _NarrationFilter(Protocol):
     def __call__(
-        self, narration: Narration, /, *, before: str = '', after: str = ''
+        self,
+        narration: Narration,
+        side: Side | None = None,
+        /,
+        *,
+        before: str = '',
+        after: str = '',
     ) -> Markup: ...
 
 
@@ -607,8 +617,7 @@ def make_source_url_filter(
 
     Returns None when source linking is disabled or the source is absent — the
     template reads that as "render a plain `<span>`". The template itself is
-    validated and parsed once here, not per location. The `side` the shared
-    macros pass is ignored: this filter serves one side.
+    validated and parsed once here, not per location.
     """
     substitute = (
         None
@@ -618,7 +627,9 @@ def make_source_url_filter(
         )
     )
 
-    def _filter(source: SourceLocation | None) -> str | None:
+    def _filter(
+        source: SourceLocation | None, _side: Side | None = None, /
+    ) -> str | None:
         if source is None or substitute is None:
             return None
         return substitute(source)
@@ -626,26 +637,42 @@ def make_source_url_filter(
     return _filter
 
 
+@dataclass(frozen=True)
+class TermRefTarget:
+    """Where a term ref points: `tip`, the key of the term its tooltip shows in
+    the page's glossary data, and `entry`, the Glossary card it opens, or None
+    for a ref with no card to open."""
+
+    tip: str
+    entry: str | None
+
+
+type TermRefTargets = Callable[[TermId], TermRefTarget]
+
+
 def make_narration_filter(
     param_color_map: ParamColorMap | None,
     glossary: Glossary | None,
     *,
-    term_side: Side | None = None,
-    linked_terms: Collection[TermId] | None = None,
+    ref_targets: TermRefTargets | None = None,
 ) -> _NarrationFilter:
     """Jinja filter: renders a `Narration` to HTML, piece by piece.
 
-    Without a colour map no placeholder is coloured. `term_side` stamps each
-    term ref with the side whose glossary it was read against. Given
-    `linked_terms`, a ref to any other term has its tooltip but no link.
-    `before` and `after` flank a stretch of a longer line.
+    Without a colour map no placeholder is coloured. Without `ref_targets` a
+    term ref points at its own term's tooltip and card. `before` and `after`
+    flank a stretch of a longer line.
     """
 
-    def _render(narration: Narration, *, before: str = '', after: str = '') -> Markup:
+    def _render(
+        narration: Narration,
+        _side: Side | None = None,
+        /,
+        *,
+        before: str = '',
+        after: str = '',
+    ) -> Markup:
         out = [
-            _render_narration_piece(
-                piece, param_color_map, glossary, term_side, linked_terms
-            )
+            _render_narration_piece(piece, param_color_map, glossary, ref_targets)
             for piece in read_narration(narration, before=before, after=after)
         ]
         return Markup(''.join(out))
@@ -657,8 +684,7 @@ def _render_narration_piece(
     part: NarrationPiece,
     param_color_map: ParamColorMap | None,
     glossary: Glossary | None,
-    term_side: Side | None,
-    linked_terms: Collection[TermId] | None,
+    ref_targets: TermRefTargets | None,
 ) -> str:
     """Render one `NarrationPiece` to an HTML fragment."""
     match part:
@@ -695,7 +721,7 @@ def _render_narration_piece(
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():
-            return _render_term_ref(part, glossary, term_side, linked_terms)
+            return _render_term_ref(part, glossary, ref_targets)
 
 
 def _phrase_attributes(part: NarrationPlaceholder) -> str:
@@ -735,39 +761,41 @@ def _unknown_term_span(display: str) -> str:
     return f'<span class="term-ref-unknown">{escape(display)}</span>'
 
 
-def _term_ref_span(
-    term: GlossaryTerm,
-    term_id: TermId,
-    display: str,
-    side: Side | None = None,
-    linked: bool = True,
-) -> str:
+def _term_ref_span(term: GlossaryTerm, display: str, target: TermRefTarget) -> str:
     """One term reference the glossary holds.
 
     The tooltip's name and definition are *not* written here — `app.js` looks
-    them up by id in the glossary `_app_data` already ships, which is what
-    keeps a term used 900 times from carrying 900 copies of its definition.
+    them up by `data-term-id` in the glossary `_app_data` already ships, which
+    is what keeps a term used 900 times from carrying 900 copies of its
+    definition. A card that is not the tooltip's key is named apart.
     """
-    link = ' term-ref--link' if linked else ''
+    link = '' if target.entry is None else ' term-ref--link'
     classes = f'{_term_kind_class(term.kind)}{link} has-term-tip'
-    sided = '' if side is None else f' data-term-side="{side}"'
+    entry = (
+        ''
+        if target.entry in (None, target.tip)
+        else f' data-term-entry="{escape(target.entry)}"'
+    )
     return (
-        f'<span class="{classes}" data-term-id="{escape(term_id)}"{sided}>'
+        f'<span class="{classes}" data-term-id="{escape(target.tip)}"{entry}>'
         f'{escape(display)}</span>'
     )
+
+
+def _own_target(term_id: TermId) -> TermRefTarget:
+    return TermRefTarget(tip=term_id, entry=term_id)
 
 
 def _render_term_ref(
     part: NarrationTermRef,
     glossary: Glossary | None,
-    side: Side | None,
-    linked_terms: Collection[TermId] | None,
+    ref_targets: TermRefTargets | None,
 ) -> str:
     term = glossary.get(part.term_id) if glossary is not None else None
     if term is None:
         return str(escape(part.display))
-    linked = linked_terms is None or part.term_id in linked_terms
-    return _term_ref_span(term, part.term_id, part.display, side, linked)
+    target = (ref_targets or _own_target)(part.term_id)
+    return _term_ref_span(term, part.display, target)
 
 
 def _make_definition_filter(glossary: Glossary) -> Callable[[GlossaryTerm], Markup]:
@@ -797,7 +825,7 @@ def _definition_piece_html(
         return definition_span_html(piece)
     if piece.term_id == term_id:
         return definition_html(definition_part_text(piece))
-    return _render_term_ref(piece, glossary, None, None)
+    return _render_term_ref(piece, glossary, None)
 
 
 def _make_clause_part_filter(
@@ -814,7 +842,7 @@ def _make_clause_part_filter(
                 term = glossary.get(term_id) if glossary is not None else None
                 if term is None:
                     return Markup(_unknown_term_span(display))
-                return Markup(_term_ref_span(term, term_id, display))
+                return Markup(_term_ref_span(term, display, _own_target(term_id)))
             case ClauseWord(text=text):
                 return Markup(f'<span class="clause-word">{escape(text)}</span>')
 

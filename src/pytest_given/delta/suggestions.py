@@ -28,7 +28,14 @@ from ..model import (
     scenario_identity,
     walk_step_deltas,
 )
-from .narration import Reading, Token, WordKey, reading_words, word_counts
+from .narration import (
+    Reading,
+    Token,
+    WordKey,
+    bag_similarity,
+    reading_words,
+    word_counts,
+)
 from .table import CellKey, cells_of
 from .terms import kinds_pair
 
@@ -134,9 +141,9 @@ def _case_suggestions(scenarios: Sequence[ScenarioDelta]) -> list[Suggestion]:
             column.id for column in before.parameters.columns if column.kind == 'param'
         }
         shared = [
-            (column.before, column.after)
-            for column in item.parameters.columns
-            if column.before in param_ids and column.after is not None
+            (before_id, after_id)
+            for before_id, after_id in item.parameters.column_of.items()
+            if before_id in param_ids
         ]
         removed = [
             case.before
@@ -332,12 +339,7 @@ def _mutual_best(
         for index_after in candidates:
             if not comparable(index_before, index_after):
                 continue
-            counts_after = after_counts[index_after]
-            score = (
-                2
-                * (counts_before & counts_after).total()
-                / (counts_before.total() + counts_after.total())
-            )
+            score = bag_similarity(counts_before, after_counts[index_after])
             if score >= SUGGESTION_SIMILARITY:
                 scores[index_before, index_after] = score
     best_after = _best(scores, by_before=True)

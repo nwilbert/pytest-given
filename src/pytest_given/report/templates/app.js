@@ -256,9 +256,10 @@ function reportApp() {
   let visibleCache = null;
   let termCountCache = null;
   // One row per Glossary card, keyed by its term: what the filters and the
-  // group counts read. The search matches the name and the avoided words, one
-  // per line, so a query never matches across two of them.
-  const termRows = glossaryTerms.map(t => ({
+  // group counts read, and what a `#term=` link may open. The search matches
+  // the name and the avoided words, one per line, so a query never matches
+  // across two of them. The delta page ships its own, a row per card.
+  const termRows = data.term_rows || glossaryTerms.map(t => ({
     key: t.id,
     kind: t.kind || 'kindless',
     section: t.section_key,
@@ -389,7 +390,7 @@ function reportApp() {
     // Whether a term's card survives the search and definition filters. The
     // section selection and the kind checkboxes hide whole groups instead.
     termShown(key) {
-      return this._termMatches(this._termRow(key));
+      return this._termMatches(termRowsByKey.get(key));
     },
     // One rule for a card's own visibility and its group's count, which have
     // to agree. `row` is a `termRows` row.
@@ -414,19 +415,13 @@ function reportApp() {
       const key = this._termFilterState().join('\u0000');
       if (termCountCache && termCountCache.key === key) return termCountCache.value;
       const counts = { kind: {}, section: new Map() };
-      for (const row of this._termRows()) {
+      for (const row of termRows) {
         if (!this._termMatches(row)) continue;
         counts.kind[row.kind] = (counts.kind[row.kind] || 0) + 1;
         if (row.section) counts.section.set(row.section, (counts.section.get(row.section) || 0) + 1);
       }
       termCountCache = { key, value: counts };
       return counts;
-    },
-    _termRows() {
-      return termRows;
-    },
-    _termRow(key) {
-      return termRowsByKey.get(key);
     },
     _termFilterState() {
       return [this.glossarySearch, this.glossaryDefinitionFilter];
@@ -758,7 +753,7 @@ function reportApp() {
     },
     goToTerm(id) {
       // A stale `#term=` link would otherwise open an empty Glossary tab.
-      if (!this._hasTermEntry(id)) return;
+      if (!termRowsByKey.has(id)) return;
       this.mainView = 'glossary';
       if (expandableTermIds.has(id)) this.expandedTerms[id] = true;
       // Navigation, not refinement: Glossary filters that hide the term give
@@ -778,7 +773,7 @@ function reportApp() {
       });
     },
     _termFiltered(key) {
-      const row = this._termRow(key);
+      const row = termRowsByKey.get(key);
       if (!this._termMatches(row)) return true;
       if (this.glossaryGrouping === 'section') return !this.sectionShown(row.section);
       return !this.glossaryKindFilter[row.kind];
@@ -1110,7 +1105,8 @@ function reportApp() {
         const pill = event.target.closest('.term-ref--link[data-term-id]');
         if (!pill) return;
         event.stopPropagation();
-        this.goToTerm(this._refEntry(pill));
+        // A ref names its card apart where it is not the tooltip's term.
+        this.goToTerm(pill.dataset.termEntry || pill.dataset.termId);
       }, true);
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-sentence-id]');
@@ -1243,19 +1239,6 @@ function reportApp() {
         wrap.appendChild(outline);
       }
     },
-    // The term a ref's tooltip shows; the delta page reads some refs against
-    // its before glossary.
-    _tipTerm(pill) {
-      return termsById.get(pill.dataset.termId);
-    },
-    // A Glossary entry is a term, keyed by its id; the delta page keys its
-    // cards by change, and a ref finds its card by the side it was read on.
-    _hasTermEntry(id) {
-      return Object.hasOwn(termNames, id);
-    },
-    _refEntry(pill) {
-      return pill.dataset.termId;
-    },
     // One shared tooltip for every term ref, positioned `fixed` from the
     // ref's bounding box rather than done in CSS: term refs live inside
     // `overflow: hidden` collapsible bodies, which would clip an absolutely
@@ -1269,7 +1252,7 @@ function reportApp() {
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) { return; }
-        const term = this._tipTerm(pill);
+        const term = termsById.get(pill.dataset.termId);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
         const def = term.definition_html || '';
@@ -1343,7 +1326,7 @@ function reportApp() {
       const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
       if (targetSlug && !targetScenario) stale.push({ kind: 'scenario', value: targetSlug });
       const targetTerm = params.get('term');
-      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => this._hasTermEntry(id)).length;
+      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => termRowsByKey.has(id)).length;
       if (termKnown) {
         this.goToTerm(targetTerm);
       } else if (targetScenario) {

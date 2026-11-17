@@ -1,10 +1,10 @@
 {#
-  What the delta page adds to the report's macros: the Change filter, a
-  changed scenario's two sides (the report's phase blocks and step lines,
-  each step's change marked on its side, styled as `.delta-step`, and the
-  parameter tables), and a listed term's card.
+  What the delta page adds to the report's macros: the Change and Changed in
+  filters, a changed scenario's two sides (the report's phase blocks and
+  step lines, each step's change marked on its side, styled as
+  `.delta-step`, and the parameter tables), and a listed term's card.
 #}
-  {%- from '_macros.html.j2' import source_link, anchor_link, term_disclosure, render_step, step_text, step_children, step_attachments, scenario_steps, param_table, attachment_cell, case_extras, status_dot with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, term_disclosure, render_step, step_text, step_children, scenario_steps, param_table, attachment_cell, attachment_icon, expandable_attachment, case_extras, case_error_row, attachment_panel_row, status_dot with context -%}
 
   {#- The Change filter's pills, each disabled at zero, and how many items
       matched with no change. `model` is the Alpine property the pills
@@ -19,6 +19,23 @@
       </div>
       <div class="delta-unchanged">{{ unchanged_count }} unchanged</div>
     </div>
+  {%- endmacro -%}
+
+  {#- The Changed in filter: a box per changed part, the report's kind
+      filter rows in the changed colour, each disabled at zero, and the
+      whole group while the Changed pill is off. -#}
+  {%- macro changed_in_filter(counts) -%}
+    <fieldset class="delta-changed-in" :disabled="!shownChanges.changed">
+      <legend class="sidebar-label">Changed in</legend>
+      {%- for part, count in counts.items() %}
+      <label class="kind-filter-row{% if not count %} delta-part-empty{% endif %}">
+        <input type="checkbox" x-model="shownParts.{{ part }}"{% if not count %} disabled{% endif %}>
+        <span class="kind-swatch"></span>
+        <span>{{ part | capitalize }}</span>
+        <span class="nav-group-count">{{ count }}</span>
+      </label>
+      {%- endfor %}
+    </fieldset>
   {%- endmacro -%}
 
   {#- A listed term's card, a row as the report's Glossary entry is: its
@@ -63,7 +80,7 @@
                         {%- if form.change == 'removed' %}
                         <del class="use-chip use-chip--static delta-form" data-change="removed" title="Removed form">{{ form.text }}</del>
                         {%- elif form.change == 'added' %}
-                        <span class="use-chip use-chip--static delta-form" data-change="added" title="Added form">+{{ form.text }}</span>
+                        <span class="use-chip use-chip--static delta-form" data-change="added" title="Added form">{{ change_glyph['added'] }}{{ form.text }}</span>
                         {%- else %}
                         <span class="use-chip use-chip--static">{{ form.text }}</span>
                         {%- endif %}
@@ -188,19 +205,95 @@
           {%- endfor -%}
         {%- endcall -%}
       {%- endif -%}
-      {% if line.step.attachments %}{{ step_attachments(line.step, step_id) }}{% endif %}
+      {% if row.attachments %}{{ delta_attachments(row, side, step_id) }}{% endif %}
     {%- endif -%}
     </div>
   {%- endmacro -%}
 
+  {#- A paired step's attachments, a row each with a hatched one where the
+      side lacks it, for `delta.js` to line up as it does steps. An
+      attachment's key, the same on both sides, opens it on both. -#}
+  {%- macro delta_attachments(row, side, step_id) -%}
+    <div class="step-attachments">
+    {%- for attachment_row in row.attachments -%}
+    {%- set key = step_id ~ '_att_' ~ loop.index0 -%}
+    {%- set att = attachment_row.attachment(side) -%}
+    {%- set change = attachment_row.change if attachment_row.change != 'equal' else none -%}
+    {%- if att is none -%}
+    {{ step_gap(key) }}
+    {%- elif att is attachment_ref -%}
+    <div data-row="{{ key }}">
+      <span class="attachment-badge attachment-badge--static" data-param="{{ att.column_id }}"{% if change %} data-change="{{ change }}"{% endif %}>{{ badge_lead(change) }}{{ attachment_icon(att.content_type) }}{{ badge_label(att, change) }}</span>
+    </div>
+    {%- elif attachment_row.rows -%}
+    <div data-row="{{ key }}">
+      {% call expandable_attachment(key, badge_label(att, change), att.content, att.content_type, change, badge_lead(change)) %}{{ diff_panel(attachment_row.rows, side, key) }}{% endcall %}
+    </div>
+    {%- else -%}
+    <div data-row="{{ key }}">
+      {{ expandable_attachment(key, badge_label(att, change), att.content, att.content_type, change, badge_lead(change)) }}
+    </div>
+    {%- endif -%}
+    {%- endfor -%}
+    </div>
+  {%- endmacro -%}
+
+  {#- A changed attachment's glyph, which leads its badge's icon. -#}
+  {%- macro badge_lead(change) -%}
+    {%- if change %}<span class="delta-badge-lead">{{ change_glyph[change] }}</span>{% endif -%}
+  {%- endmacro -%}
+
+  {%- macro badge_label(att, change) -%}
+    {%- if change == 'removed' %}<del>{{ att.label }}</del>{% else %}{{ att.label }}{% endif -%}
+  {%- endmacro -%}
+
+  {#- A changed payload's line diff on one side: a line per row, unwrapped, a
+      hatched one where the side lacks the line, so the two sides' lines stay
+      level by themselves. A fold's key is shared too, so it opens on both.
+      `data-scroll-pair` names the panel the other side scrolls along. -#}
+  {%- macro diff_panel(rows, side, key) -%}
+    <div class="attachment-content delta-diff" data-scroll-pair="{{ key }}">
+      <div class="delta-diff-lines">
+      {%- for diff_row in rows -%}
+        {%- if diff_row is fold_row -%}
+        {%- set fold_key = key ~ '_fold' ~ loop.index0 %}
+        <div class="delta-fold" :class="{ expanded: expandedAttachments['{{ fold_key }}'] }">
+          <button type="button" class="btn-reset delta-fold-toggle"
+                  :aria-expanded="!!expandedAttachments['{{ fold_key }}']"
+                  @click="toggleAttachment('{{ fold_key }}')"><span>&hellip; {{ diff_row.rows | length }} unchanged lines</span></button>
+          <div class="delta-fold-lines">
+            {%- for line in diff_row.rows %}{{ diff_line(line, side) }}{% endfor -%}
+          </div>
+        </div>
+        {%- else -%}
+        {{ diff_line(diff_row, side) }}
+        {%- endif -%}
+      {%- endfor -%}
+      </div>
+    </div>
+  {%- endmacro -%}
+
+  {%- macro diff_line(line, side) -%}
+    {%- set text = line.before if side == 'before' else line.after -%}
+    {%- if text is none -%}
+    <div class="delta-line-gap" aria-hidden="true"></div>
+    {%- else -%}
+    <div class="delta-line"{% if line.change != 'equal' %} data-change="{{ line.change }}"{% endif %}>
+      {%- if line.words %}{{ line.words | text_diff(side) }}{% else %}{{ text }}{% endif -%}
+    </div>
+    {%- endif -%}
+  {%- endmacro -%}
+
   {#- A changed parameter table: each side's table whole, in its side's
       column, the rows lined up by case with a hatched row where a side lacks
-      one. A band, the header or a case with the rows under it, is what
-      `delta.js` evens out across the two tables. -#}
+      one. A band, the header or a case with the rows under it (its changed
+      attachment cells' rows a band of their own), is what `delta.js` evens
+      out across the two tables. -#}
   {%- macro param_table_delta(view, scenario_idx) -%}
         {%- for table in view.sides %}
         {%- set col_blocks = table.column_blocks %}
         {%- set table_width = table.columns | length + 2 %}
+        {%- set has_attachments = 'attachment' in table.parameters.columns | map(attribute='kind') %}
         <div class="delta-table" data-side="{{ table.side }}">
           <div class="param-table-scroll">
           <table class="param-table">
@@ -211,7 +304,7 @@
                 {%- set col = column.column %}
                 <th data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if column.change %} data-change="{{ column.change }}"{% endif %}>
                   {%- if column.change == 'removed' %}<del>{{ col.name }}</del>
-                  {%- elif column.change == 'added' %}+{{ col.name }}
+                  {%- elif column.change == 'added' %}{{ change_glyph['added'] }}{{ col.name }}
                   {%- else %}{{ col.name }}{% endif %}
                   {%- if column.was %}<span class="delta-was">was <del>{{ column.was }}</del></span>{% endif -%}
                 </th>
@@ -222,6 +315,11 @@
             {%- for row in view.rows %}
             {%- set case = row.case(table.side) %}
             {%- set cell_prefix = 's' ~ scenario_idx ~ '_' ~ table.side ~ '_case' ~ loop.index0 ~ '_col' %}
+            {#- A changed attachment cell's key leaves out the side, so it opens
+                on both: its place among the row's diffs, alike on both sides,
+                never the column ID, which is report data. -#}
+            {%- set diff_prefix = 's' ~ scenario_idx ~ '_case' ~ loop.index0 ~ '_diff' %}
+            {%- set diff_columns = row.attachment_diffs | list %}
             <tbody data-band="{{ loop.index0 }}">
               {%- if case %}
               <tr data-case-row{% if row.change in ('added', 'removed') %} data-change="{{ row.change }}"{% endif %}>
@@ -230,18 +328,48 @@
                   {%- if row.change == 'removed' %}<del>{{ case.id | case_id }}</del>{% else %}{{ case.id | case_id }}{% endif -%}
                 </th>
                 {%- for col, val, block, change in table.cells(case, row.pair) %}
-                {% if col.kind == 'attachment' %}{{ attachment_cell(col, val, cell_prefix ~ loop.index0, block, change) }}{% else %}{{ col | value_cell(val, block, change, col.id in table.repr_columns) }}{% endif %}
+                {% if col.kind == 'attachment' %}{{ attachment_cell(col, val, diff_prefix ~ diff_columns.index(col.id) if col.id in diff_columns else cell_prefix ~ loop.index0, block, change) }}{% else %}{{ col | value_cell(val, block, change, col.id in table.repr_columns) }}{% endif %}
                 {%- endfor %}
                 <td class="param-status" data-block="frame"{% if row.pair.status_changed %} data-change="{{ table.mark }}"{% endif %}>{{ status_dot(case.status) }}</td>
               </tr>
-              {% if case.error or 'attachment' in table.parameters.columns | map(attribute='kind') %}{{ case_extras(table.parameters, case, cell_prefix, table_width) }}{% endif %}
+              {% if not diff_columns and (case.error or has_attachments) %}{{ case_extras(table.parameters, case, cell_prefix, table_width) }}{% endif %}
               {%- else %}
               <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="{{ table_width }}"></td></tr>
               {%- endif %}
             </tbody>
+            {%- if diff_columns %}
+            <tbody data-band="{{ loop.index0 }}-diff">
+              {{ delta_case_extras(table, case, row, diff_columns, cell_prefix, diff_prefix, table_width) }}
+            </tbody>
+            {%- endif %}
             {%- endfor %}
           </table>
           </div>
         </div>
         {%- endfor %}
+  {%- endmacro -%}
+
+  {#- A case's rows under it when an attachment cell of it changed, in a band
+      of their own, so the case row above them is evened out first: the
+      changed cells' diffs, which both sides have, keyed as their badges are,
+      then the rows only one side may have, its error and its other
+      payloads. A diff shows on a side whose cell is empty too, all hatched.
+      A cell changed in content type alone has no lines to diff, so it shows
+      its payload. -#}
+  {%- macro delta_case_extras(table, case, row, diff_columns, cell_prefix, diff_prefix, table_width) -%}
+          {%- for column_id in diff_columns %}
+          {%- set col = table.parameters.columns | selectattr('id', 'equalto', column_id) | first %}
+          {%- set key = diff_prefix ~ loop.index0 %}
+          {%- set diff = row.attachment_diffs[column_id] %}
+          {% call attachment_panel_row(key, col.name, table_width) %}
+          {%- if diff %}{{ diff_panel(diff, table.side, key) }}
+          {%- else %}{% for cell_col, val in table.parameters.cells(case) if cell_col.id == column_id %}<div class="attachment-content"><pre>{{ val.content }}</pre></div>{% endfor %}{% endif -%}
+          {% endcall %}
+          {%- endfor %}
+          {% if case.error %}{{ case_error_row(case, table_width) }}{% endif %}
+          {%- for col, val in table.parameters.cells(case) %}
+          {%- if col.kind == 'attachment' and val and col.id not in diff_columns %}
+          {% call attachment_panel_row(cell_prefix ~ loop.index0, col.name, table_width) %}<div class="attachment-content"><pre>{{ val.content }}</pre></div>{% endcall %}
+          {%- endif %}
+          {%- endfor %}
   {%- endmacro -%}

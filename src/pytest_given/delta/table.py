@@ -1,17 +1,19 @@
 """Pairing two parameter tables: their columns, then their cases."""
 
 import math
-from collections.abc import Callable, Container, Hashable, Mapping, Sequence
+from collections.abc import Callable, Hashable, Mapping, Sequence
 
 from ..model import (
     Attachment,
     CasePair,
     CasePairing,
+    CellDelta,
     CellValue,
     ColumnId,
     ColumnKind,
     ColumnPair,
     ColumnPairing,
+    LineDelta,
     NodeId,
     ParameterCase,
     ParameterColumn,
@@ -20,6 +22,7 @@ from ..model import (
     ParamValue,
     case_id,
 )
+from .attachments import line_diff
 from .order import interleaved
 
 type CellKey = tuple[str, ParamValue]  # (type name, value): 1, 1.0 and True differ
@@ -61,6 +64,8 @@ class _Alignment:
         self.case_renames = case_renames
         self.before_columns = _comparable(before.columns)
         self.after_columns = _comparable(after.columns)
+        self.before_kinds = {column.id: column.kind for column in before.columns}
+        self.after_kinds = {column.id: column.kind for column in after.columns}
         self.before_by_id = {case.id: case for case in before.cases}
         self.after_by_id = {case.id: case for case in after.cases}
         self.before_cells = {case.id: cells_of(before, case) for case in before.cases}
@@ -132,31 +137,33 @@ class _Alignment:
             after_id: before_id for before_id, (after_id, _) in self.columns.items()
         }
         column_rows = interleaved(
-            [column.id for column in self.after.columns if _listed(column, before_of)],
-            [
-                column.id
-                for column in self.before.columns
-                if _listed(column, self.columns)
-            ],
+            [column.id for column in self.before.columns],
+            [column.id for column in self.after.columns],
             {before_id: after_id for before_id, (after_id, _) in self.columns.items()},
         )
         case_rows = interleaved(
-            [case.id for case in self.after.cases],
             [case.id for case in self.before.cases],
+            [case.id for case in self.after.cases],
             {before_id: after_id for before_id, (after_id, _) in self.cases.items()},
         )
         return ParameterDelta(
-            columns=tuple(
-                ColumnPair(
-                    before=before_id,
-                    after=after_id,
-                    paired_by=self.columns[before_id][1]
-                    if before_id is not None and after_id is not None
-                    else None,
-                )
-                for before_id, after_id in column_rows
-            ),
+            columns=tuple(self._column_pair(*row) for row in column_rows),
             cases=tuple(self._case_pair(*row, before_of) for row in case_rows),
+        )
+
+    def _column_pair(
+        self, before_id: ColumnId | None, after_id: ColumnId | None
+    ) -> ColumnPair:
+        if before_id is None:
+            assert after_id is not None
+            return ColumnPair(kind=self.after_kinds[after_id], after=after_id)
+        if after_id is None:
+            return ColumnPair(kind=self.before_kinds[before_id], before=before_id)
+        return ColumnPair(
+            kind=self.before_kinds[before_id],
+            before=before_id,
+            after=after_id,
+            paired_by=self.columns[before_id][1],
         )
 
     def _case_pair(
@@ -180,10 +187,37 @@ class _Alignment:
                 and self.before_cells[before_id][before_of[column.id]]
                 != self.after_cells[after_id][column.id]
             ),
+            changed_attachments=self._changed_attachments(
+                before_case, after_case, before_of
+            ),
             id_changed=(before_case.custom_id or after_case.custom_id)
             and case_id(before_id) != case_id(after_id),
             status_changed=before_case.status != after_case.status,
         )
+
+    def _changed_attachments(
+        self,
+        before_case: ParameterCase,
+        after_case: ParameterCase,
+        before_of: dict[ColumnId, ColumnId],
+    ) -> tuple[CellDelta, ...]:
+        before_cells = {
+            column.id: value for column, value in self.before.cells(before_case)
+        }
+        changed: list[CellDelta] = []
+        for column, after_cell in self.after.cells(after_case):
+            if column.kind != 'attachment' or column.id not in before_of:
+                continue
+            before_cell = before_cells[before_of[column.id]]
+            assert before_cell is None or isinstance(before_cell, Attachment)
+            assert after_cell is None or isinstance(after_cell, Attachment)
+            if _payload(before_cell) != _payload(after_cell):
+                changed.append(
+                    CellDelta(
+                        column=column.id, lines=_cell_lines(before_cell, after_cell)
+                    )
+                )
+        return tuple(changed)
 
     def _rewritten_id(self, case: ParameterCase) -> str | None:
         return self.case_renames.get(case_id(case.id))
@@ -205,10 +239,29 @@ def _comparable(columns: Sequence[ParameterColumn]) -> list[ParameterColumn]:
     return [column for column in columns if column.kind != 'attachment']
 
 
-def _listed(column: ParameterColumn, paired: Container[ColumnId]) -> bool:
-    """An attachment column gained or lost is no change, so only a paired one
-    has a place among the pairs."""
-    return column.kind != 'attachment' or column.id in paired
+def _payload(cell: Attachment | None) -> tuple[str, str] | None:
+    return None if cell is None else (cell.content_type, cell.content)
+
+
+def _cell_lines(
+    before: Attachment | None, after: Attachment | None
+) -> tuple[LineDelta, ...]:
+    """A cell without an attachment has no lines, where `line_diff` would read
+    one empty line, and nor has a cell changed in content type alone."""
+    if before is None:
+        assert after is not None
+        return tuple(
+            LineDelta(change='added', after=index)
+            for index in range(after.content.count('\n') + 1)
+        )
+    if after is None:
+        return tuple(
+            LineDelta(change='removed', before=index)
+            for index in range(before.content.count('\n') + 1)
+        )
+    if before.content == after.content:
+        return ()
+    return line_diff(before.content, after.content)
 
 
 def _name_and_kind(column: ParameterColumn) -> tuple[str, ColumnKind]:

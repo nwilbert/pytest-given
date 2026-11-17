@@ -84,6 +84,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Scenario identity** | What pairs a *Scenario* across two reports: its *Node ID* without the parametrize tail, or its full *Node ID* for a *Per-case scenario*. |
 | **Per-case scenario** | One *Case* of a scenario with `group_parametrized` off: it has a parametrize tail but no *Parameter table*, so its *Scenario identity* is its full *Node ID* and it never pairs by values. |
 | **Pairing** | Matching an item of the *before* report with one of the *after* report, by same *Scenario identity* (after the *Rename log* has rewritten the before side's) and then by same *Scenario title*. The unpaired are removed or added. |
+| **Changed part** | One of title, steps, tags, status, parameters and attachments, in which a changed *Scenario* differs between the two sides of a *Delta report*. |
 | **Suggested match** | A removed and an added item that look like one renamed item. Never applied: the delta JSON records it so an agent or a person can confirm it into the *Rename log*. |
 
 ## Domain Storytelling

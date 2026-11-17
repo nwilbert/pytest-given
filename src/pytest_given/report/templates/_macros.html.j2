@@ -41,7 +41,7 @@
       `render_step`. -#}
   {%- macro source_link(source, side=none) -%}
     {%- if source -%}
-      {%- set url = source | source_url(side) if side else source | source_url -%}
+      {%- set url = source | source_url(side) -%}
       {%- if url -%}
       <a href="{{ url }}">{{ source.relpath }}:{{ source.line }}</a>
       {%- else -%}
@@ -92,16 +92,15 @@
     {%- endif -%}
   {%- endmacro -%}
 
-  {#- Why a scenario was skipped or expected to fail, in its status colour. -#}
-  {%- macro reason_box(status, label, reason, was=none) -%}
+  {#- Why a scenario was skipped or expected to fail, in its status colour,
+      and what a `call` block adds under it. -#}
+  {%- macro reason_box(status, label, reason) -%}
     <div class="reason-box {{ status }}">
       {%- if reason %}
       <span class="reason-box-label">{{ label }}</span>
       <span>{{ reason }}</span>
       {%- endif %}
-      {%- if was %}
-      <div class="delta-was">was {% if not reason %}{{ label | lower }} {% endif %}<del>{{ was }}</del></div>
-      {%- endif %}
+      {%- if caller is defined %}{{ caller() }}{% endif %}
     </div>
   {%- endmacro -%}
 
@@ -121,6 +120,29 @@
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ key }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+  {%- endmacro -%}
+
+  {#- The chevron that opens a scenario's body, or its place kept where the
+      scenario has none. -#}
+  {%- macro scenario_disclosure(index, has_body) -%}
+        {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ index }}" :aria-expanded="!!expandedScenarios[{{ index }}]" :aria-label="(expandedScenarios[{{ index }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ index }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ index }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
+  {%- endmacro -%}
+
+  {#- Opens or closes every term's references at once. -#}
+  {%- macro toggle_all_terms_button() -%}
+          <button class="collapse-all-btn" @click="toggleAllTerms()">
+            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
+            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
+          </button>
+  {%- endmacro -%}
+
+  {#- The hover tooltip every term ref shares, filled and placed by `app.js`.
+      At body level, so no collapsible scenario body clips it. -#}
+  {%- macro term_tip() -%}
+<div id="term-tip" role="tooltip" hidden>
+  <span class="term-tip-name"></span>
+  <span class="term-tip-def"></span>
+</div>
   {%- endmacro -%}
 
   {#- The status colours the block: an xfailed one is not an alarm. -#}
@@ -177,18 +199,20 @@
 
   {#- Badge plus the payload it expands, keyed on `cell_id`; a promoted
       attachment has no payload of its own to expand. Operable rather than
-      decorated text: reachable by keyboard and announced as a control. -#}
-  {%- macro attachment_badge(cell_id, label, content_type) -%}
-    <button type="button" class="btn-reset attachment-badge"
+      decorated text: reachable by keyboard and announced as a control. The
+      delta page passes its change, the glyph leading the icon as `lead`,
+      and a call body for the payload's diff. -#}
+  {%- macro attachment_badge(cell_id, label, content_type, change=none, lead='') -%}
+    <button type="button" class="btn-reset attachment-badge"{% if change %} data-change="{{ change }}"{% endif %}
             :aria-expanded="!!expandedAttachments['{{ cell_id }}']"
-            @click="toggleAttachment('{{ cell_id }}')">{{ attachment_icon(content_type) }}{{ label }}</button>
+            @click="toggleAttachment('{{ cell_id }}')">{{ lead }}{{ attachment_icon(content_type) }}{{ label }}</button>
   {%- endmacro -%}
 
-  {%- macro expandable_attachment(cell_id, label, content, content_type) -%}
-    {{ attachment_badge(cell_id, label, content_type) }}
+  {%- macro expandable_attachment(cell_id, label, content, content_type, change=none, lead='') -%}
+    {{ attachment_badge(cell_id, label, content_type, change, lead) }}
     <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
       <div class="attachment-expand-inner">
-        <div class="attachment-content"><pre>{{ content }}</pre></div>
+        {% if caller is defined %}{{ caller() }}{% else %}<div class="attachment-content"><pre>{{ content }}</pre></div>{% endif %}
       </div>
     </div>
   {%- endmacro -%}
@@ -198,7 +222,7 @@
   {#- A leaf's line is `step_text`'s, written out: a macro call per step
       costs the large report's render a twentieth. -#}
   {%- macro render_step(step, step_id, side=none) -%}
-  {%- set text = step.narration | narration(side) if side else step.narration | narration -%}
+  {%- set text = step.narration | narration(side) -%}
   {%- if not step.children -%}
   <div class="step-text">{{ text }}</div>
   {%- else -%}
@@ -520,15 +544,26 @@
       `step_attachments` is. -#}
   {%- macro case_extras(parameters, case, cell_prefix, table_width) -%}
           {% if case.error %}
+          {{ case_error_row(case, table_width) }}
+          {% endif %}
+          {%- for col, val in parameters.cells(case) %}
+          {% if col.kind == 'attachment' and val %}
+          {% set cell_id = cell_prefix ~ loop.index0 %}
+          {% call attachment_panel_row(cell_id, col.name, table_width) %}<div class="attachment-content"><pre>{{ val.content }}</pre></div>{% endcall %}
+          {% endif %}
+          {% endfor %}
+  {%- endmacro -%}
+
+  {%- macro case_error_row(case, table_width) -%}
           <tr>
             <td colspan="{{ table_width }}">
               {{ render_error(case.error, case.status) }}
             </td>
           </tr>
-          {% endif %}
-          {%- for col, val in parameters.cells(case) %}
-          {% if col.kind == 'attachment' and val %}
-          {% set cell_id = cell_prefix ~ loop.index0 %}
+  {%- endmacro -%}
+
+  {#- A payload's panel row, its call body the payload. -#}
+  {%- macro attachment_panel_row(cell_id, label, table_width) -%}
           <tr class="attachment-panel-row">
             <td class="attachment-panel" colspan="{{ table_width }}">
               <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
@@ -539,15 +574,13 @@
                         block, which is collected below the whole table and needs
                         the case key to say where it belongs. What the caption is
                         for is telling two panels open on one row apart. -#}
-                    <div class="attachment-panel-label">{{ col.name }}</div>
-                    <div class="attachment-content"><pre>{{ val.content }}</pre></div>
+                    <div class="attachment-panel-label">{{ label }}</div>
+                    {{ caller() }}
                   </div>
                 </div>
               </div>
             </td>
           </tr>
-          {% endif %}
-          {% endfor %}
   {%- endmacro -%}
 
   {#- Names the parts of an arriving link this report no longer has. The live

@@ -1,9 +1,9 @@
 // --- The delta page ---
 // The report's Alpine component with a Change filter beside the Status one,
-// on each tab. Loaded after app.js, whose helpers it reuses;
-// `__REPORT_DATA__` here holds one entry per listed scenario, keyed by its
-// slug, since a removed and an added scenario can share a node ID, and one
-// per term card, keyed likewise.
+// on each tab, and a Changed in filter under it on the Scenarios tab. Loaded
+// after app.js, whose helpers it reuses; `__REPORT_DATA__` here holds one
+// entry per listed scenario, keyed by its slug, since a removed and an added
+// scenario can share a node ID, and one per term card, keyed likewise.
 function deltaApp() {
   const data = window.__REPORT_DATA__;
   const base = reportApp();
@@ -11,17 +11,14 @@ function deltaApp() {
   const changes = Object.keys(data.change_glyphs);
   const changeFacet = shownFacet(changes, data.scenarios, 'change');
   const { counts: changeCounts, present: changesPresent, allShown: allChangesShown } = changeFacet;
-  // The before glossary's terms that read otherwise than the after one's.
-  const beforeTerms = new Map(data.before_terms.map(t => [t.id, t]));
-  const termCards = data.term_cards;
-  const cardsByKey = new Map(termCards.map(card => [card.key, card]));
-  // A term ref's card, by the side the ref was read on and its term id.
-  const cardOf = { before: {}, after: {} };
-  for (const card of termCards) {
-    for (const side of ['before', 'after']) if (card[side]) cardOf[side][card[side]] = card.key;
-  }
+  // The changed parts, in the model's order, over a row per part a scenario
+  // changed in: the facet counts one value per row.
+  const partRows = data.scenarios.flatMap(s => s.changed_in.map(part => ({ part })));
+  const partFacet = shownFacet(data.changed_parts, partRows, 'part');
+  const { present: partsPresent, allShown: allPartsShown } = partFacet;
   const overrides = {
     shownChanges: allChangesShown(),
+    shownParts: allPartsShown(),
     // The Glossary tab's own, as its search is: not in the URL.
     shownTermChanges: allChangesShown(),
     moduleChange(module) {
@@ -31,16 +28,33 @@ function deltaApp() {
       return data.change_glyphs[change];
     },
     _filterState() {
-      return [...base._filterState.call(this), ...changes.map(c => this.shownChanges[c])];
+      return [
+        ...base._filterState.call(this),
+        ...changes.map(c => this.shownChanges[c]),
+        ...data.changed_parts.map(part => this.shownParts[part]),
+      ];
     },
+    // Added and removed scenarios have no changed parts to hide them by.
     _matchesFilters(s, index, query) {
-      return this.shownChanges[s.change] && base._matchesFilters.call(this, s, index, query);
+      return this.shownChanges[s.change]
+        && (s.change !== 'changed' || s.changed_in.some(part => this.shownParts[part]))
+        && base._matchesFilters.call(this, s, index, query);
     },
+    // A narrowed Changed in filter words the changed entry by the fewer of
+    // its checked and unchecked parts.
     _summaryParts() {
-      const shown = changesPresent.filter(c => this.shownChanges[c]);
-      const parts = base._summaryParts.call(this);
-      if (shown.length === changesPresent.length) return parts;
-      return [shown.length ? shown.join(', ') : 'no changes', ...parts];
+      const summary = base._summaryParts.call(this);
+      const shownParts = partsPresent.filter(part => this.shownParts[part]);
+      const hiddenParts = partsPresent.filter(part => !this.shownParts[part]);
+      // No part checked shows no changed scenario, as the Changed pill off does.
+      const anyPartShown = shownParts.length > 0;
+      const shown = changesPresent.filter(c => this.shownChanges[c] && (c !== 'changed' || anyPartShown));
+      if (shown.length === changesPresent.length && !hiddenParts.length) return summary;
+      const changedWords = hiddenParts.length < shownParts.length
+        ? 'changed in any part but ' + hiddenParts.join(' and ')
+        : 'changed in ' + shownParts.join(' or ');
+      const words = shown.map(c => (c === 'changed' && hiddenParts.length ? changedWords : c));
+      return [words.length ? words.join(', ') : 'no changes', ...summary];
     },
     _unfilteredSummary() {
       return changesPresent.map(c => changeCounts[c] + ' ' + c).join(', ');
@@ -48,27 +62,7 @@ function deltaApp() {
     resetFilters() {
       base.resetFilters.call(this);
       this.shownChanges = allChangesShown();
-    },
-    // A ref carries the side whose glossary it was read against.
-    _tipTerm(pill) {
-      const before = pill.dataset.termSide === 'before' && beforeTerms.get(pill.dataset.termId);
-      return before || base._tipTerm.call(this, pill);
-    },
-    // The Glossary tab lists only the terms that changed; a term ref to any
-    // other has nowhere to go.
-    _hasTermEntry(key) {
-      return cardsByKey.has(key);
-    },
-    _refEntry(pill) {
-      return lookup(cardOf[pill.dataset.termSide], pill.dataset.termId, null);
-    },
-    // Over the cards, which the Change filter narrows too, rather than over a
-    // glossary's terms.
-    _termRows() {
-      return termCards;
-    },
-    _termRow(key) {
-      return cardsByKey.get(key);
+      this.shownParts = allPartsShown();
     },
     _termFilterState() {
       return [...base._termFilterState.call(this), ...changes.map(c => this.shownTermChanges[c])];
@@ -90,17 +84,21 @@ function deltaApp() {
     },
     init() {
       base.init.call(this);
-      this.$watch('shownChanges', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      for (const key of ['shownChanges', 'shownParts']) {
+        this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      }
       alignSides();
-      scrollTablesTogether();
+      scrollTogether();
     },
     _readFacets(params, keep) {
       base._readFacets.call(this, params, keep);
       this.shownChanges = changeFacet.fromHash(params, 'change', keep);
+      this.shownParts = partFacet.fromHash(params, 'changed-in', keep);
     },
     _hashParams() {
       const params = base._hashParams.call(this);
       changeFacet.writeHash(params, 'change', this.shownChanges);
+      partFacet.writeHash(params, 'changed-in', this.shownParts);
       return params;
     },
   };
@@ -110,16 +108,16 @@ function deltaApp() {
   return Object.defineProperties(app, Object.getOwnPropertyDescriptors(overrides));
 }
 
-// Side by side, a step and a case each keep one line across both sides.
-// Re-aligned when a side resizes (sub-steps or a payload opened, the window
-// narrowed), every pair due in one frame: all resets, then all reads, then
-// all writes, so the reads lay the page out once. A pair in a closed
-// scenario waits for it to open, which resizes its body. The sides' sizes
-// are read back after the writes, from the layout the frame needs anyway,
-// so the resize the writes cause aligns nothing again (nor would a change
-// that ends at that same size in that frame, which has nothing to realign).
-// The offset sizes, not the bounding box: like the observer's border box,
-// they leave out transforms.
+// Side by side, a step, each of its attachments and a case each keep one line
+// across both sides. Re-aligned when a side resizes (sub-steps or a payload
+// opened, the window narrowed), every pair due in one frame: all resets, then
+// all reads, then all writes, so the reads lay the page out once. A pair in a
+// closed scenario waits for it to open, which resizes its body. The sides'
+// sizes are read back after the writes, from the layout the frame needs
+// anyway, so the resize the writes cause aligns nothing again (nor would a
+// change that ends at that same size in that frame, which has nothing to
+// realign). The offset sizes, not the bounding box: like the observer's
+// border box, they leave out transforms.
 function alignSides() {
   const pairsOf = new Map();
   const due = new Set();
@@ -159,13 +157,24 @@ function alignSides() {
   }
 }
 
-// Too narrow for its column, each side's table scrolls; the two scroll as
-// one, so a case's two rows show the same stretch, as diff tools do. A
+// Too narrow for its column, each side's table scrolls, as does each side's
+// panel of a changed attachment; the two scroll as one, so a case's two rows,
+// or a line's two versions, show the same stretch, as diff tools do. A
 // scroll this sets fires the other's handler, which skips that echo rather
-// than set the first back: the narrower table's limit would cap the wider.
-function scrollTablesTogether() {
+// than set the first back: the narrower one's limit would cap the wider.
+function scrollTogether() {
+  const pairs = [];
   for (const sides of document.querySelectorAll('.delta-sides')) {
-    const scrollers = [...sides.querySelectorAll(':scope > .delta-table .param-table-scroll')];
+    pairs.push([...sides.querySelectorAll(':scope > .delta-table .param-table-scroll')]);
+  }
+  const panels = new Map();
+  for (const panel of document.querySelectorAll('[data-scroll-pair]')) {
+    const key = panel.dataset.scrollPair;
+    if (!panels.has(key)) panels.set(key, []);
+    panels.get(key).push(panel);
+  }
+  pairs.push(...panels.values());
+  for (const scrollers of pairs) {
     if (scrollers.length !== 2) continue;
     const echoes = new Set();
     for (const [from, to] of [scrollers, [...scrollers].reverse()]) {

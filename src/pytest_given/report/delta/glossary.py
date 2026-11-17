@@ -19,12 +19,18 @@ from ...model import (
     on_side,
     other_side,
     plural,
+    terms_read_the_same,
 )
 from ..glossary_view import KindGrouping, group_by_kind, plural_if_any
+from ..html_renderer import TermRefTarget
 from .scenarios import REMOVED, ListedScenario
 from .steps import MarkedRun, side_runs
 
 type FormChange = Literal['added', 'removed']
+
+# Prefixes the tooltip key of a before term reading otherwise than the after
+# term of its ID. A term ID never holds a `:`.
+_BEFORE_TIP = 'before:'
 
 
 @dataclass(frozen=True)
@@ -57,10 +63,7 @@ class ListedTerm:
 
     @property
     def key(self) -> str:
-        """Its card's ID, prefixed as a removed scenario's slug is (`REMOVED`):
-        a term whose kind changed has a card under each kind."""
-        prefix = REMOVED if self.delta.after is None else ''
-        return prefix + self.shown.id
+        return card_key(self.delta)
 
     @property
     def renamed_from(self) -> str | None:
@@ -178,28 +181,53 @@ def shown_term_scenarios(reach: TermReach) -> dict[TermId, list[str]]:
     return shown
 
 
-def tip_terms(delta: DeltaData) -> list[GlossaryTerm]:
-    """The after glossary's terms, then the before glossary's it lacks, which
-    no after-side ref can name."""
-    after = _terms(delta.glossary.after)
-    after_ids = {term.id for term in after}
-    return after + [
-        term for term in _terms(delta.glossary.before) if term.id not in after_ids
-    ]
+def card_key(term_delta: TermDelta) -> str:
+    """A term card's ID, prefixed as a removed scenario's slug is (`REMOVED`):
+    a term whose kind changed has a card under each kind."""
+    prefix = REMOVED if term_delta.after is None else ''
+    return prefix + term_delta.shown.id
 
 
-def before_tip_terms(delta: DeltaData) -> list[GlossaryTerm]:
-    """The before glossary's terms whose tooltip reads otherwise than the after
-    glossary's term of that ID: a term ref read from the before side looks here
-    first."""
-    after = {term.id: term for term in _terms(delta.glossary.after)}
-    return [
-        term
-        for term in _terms(delta.glossary.before)
-        if (shared := after.get(term.id)) is not None
-        and (shared.canonical, shared.definition_text)
-        != (term.canonical, term.definition_text)
-    ]
+def tip_terms(delta: DeltaData) -> dict[str, GlossaryTerm]:
+    """Every term a ref's tooltip shows, by its tooltip key: the after
+    glossary's terms, the before glossary's it lacks, which no after-side ref
+    can name, then the before ones reading otherwise than the after term of
+    their ID."""
+    tips: dict[str, GlossaryTerm] = {
+        term.id: term for term in _terms(delta.glossary.after)
+    }
+    for term in _terms(delta.glossary.before):
+        tips.setdefault(term.id, term)
+    for term in _read_otherwise(delta):
+        tips[_BEFORE_TIP + term.id] = term
+    return tips
+
+
+def term_ref_targets(delta: DeltaData) -> dict[Side, _SideTargets]:
+    """Where a term ref read on each side points: its side's reading of the
+    term, and the card listing the term's change, if one does."""
+    entries: dict[Side, dict[TermId, str]] = {'before': {}, 'after': {}}
+    for term_delta in delta.glossary.terms:
+        for side, by_id in entries.items():
+            if (term := term_delta.on(side)) is not None:
+                by_id[term.id] = card_key(term_delta)
+    return {
+        'before': _SideTargets(
+            entries['before'], frozenset(term.id for term in _read_otherwise(delta))
+        ),
+        'after': _SideTargets(entries['after'], frozenset()),
+    }
+
+
+@dataclass(frozen=True)
+class _SideTargets:
+    entries: dict[TermId, str]
+    # The terms whose tooltip is keyed `_BEFORE_TIP`.
+    read_otherwise: frozenset[TermId]
+
+    def __call__(self, term_id: TermId) -> TermRefTarget:
+        tip = _BEFORE_TIP + term_id if term_id in self.read_otherwise else term_id
+        return TermRefTarget(tip=tip, entry=self.entries.get(term_id))
 
 
 def _referring(
@@ -214,6 +242,18 @@ def _referring(
         for item in reach[side].get(term.id, [])
     }
     return sorted(found.values(), key=lambda item: position[item.slug])
+
+
+def _read_otherwise(delta: DeltaData) -> list[GlossaryTerm]:
+    """The before glossary's terms whose tooltip reads otherwise than the after
+    glossary's term of that ID."""
+    after = {term.id: term for term in _terms(delta.glossary.after)}
+    return [
+        term
+        for term in _terms(delta.glossary.before)
+        if (shared := after.get(term.id)) is not None
+        and not terms_read_the_same(term, shared)
+    ]
 
 
 def _terms(glossary: Glossary | None) -> list[GlossaryTerm]:

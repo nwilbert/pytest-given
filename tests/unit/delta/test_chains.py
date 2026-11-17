@@ -1,14 +1,13 @@
 """Applying the rename log: chains, the stop rule, `rev` skipping, merges."""
 
 from pytest_given import given, scenario, then, when
-from pytest_given.delta import (
-    RenameEntry,
+from pytest_given.delta.chains import (
     Rewrites,
-    parse_rename_log,
     rewrite_case_id,
     rewrite_identities,
     undo_case_merges,
 )
+from pytest_given.delta.renames import RenameEntry, parse_rename_log
 from tests.ubiquitous_language import pg
 
 

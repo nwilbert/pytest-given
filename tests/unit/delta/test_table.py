@@ -4,10 +4,14 @@ from pytest_given import given, scenario, then, when
 from pytest_given.delta.order import interleaved
 from pytest_given.delta.table import align_table
 from pytest_given.model import (
+    Attachment,
+    AttachmentLabel,
     CasePair,
+    CellDelta,
     CellValue,
     ColumnId,
     ColumnPair,
+    LineDelta,
     NodeId,
     ParameterDelta,
     ParameterTable,
@@ -73,9 +77,19 @@ def test_an_added_column_keeps_the_table_paired_case_by_case() -> None:
         assert [pair.changed_cells for pair in alignment.cases] == [(), ()]
     with then('the size column is added and the other two pair by name'):
         assert alignment.columns == (
-            ColumnPair(before=ColumnId('n'), after=ColumnId('n'), paired_by='name'),
-            ColumnPair(after=ColumnId('size')),
-            ColumnPair(before=ColumnId('big'), after=ColumnId('big'), paired_by='name'),
+            ColumnPair(
+                kind='param',
+                before=ColumnId('n'),
+                after=ColumnId('n'),
+                paired_by='name',
+            ),
+            ColumnPair(kind='param', after=ColumnId('size')),
+            ColumnPair(
+                kind='param',
+                before=ColumnId('big'),
+                after=ColumnId('big'),
+                paired_by='name',
+            ),
         )
     with then('the table changed'):
         assert alignment.changed
@@ -134,7 +148,10 @@ def test_a_renamed_argname_pairs_when_its_values_did_not_change() -> None:
         alignment = _align(before, after)
     with then('euros and eur pair as one column, by their values'):
         assert alignment.columns[0] == ColumnPair(
-            before=ColumnId('euros'), after=ColumnId('eur'), paired_by='values'
+            kind='param',
+            before=ColumnId('euros'),
+            after=ColumnId('eur'),
+            paired_by='values',
         )
     with then('the table changed, though no cell did'):
         assert alignment.changed
@@ -247,12 +264,56 @@ def test_moved_columns_and_cases_alone_leave_the_table_unchanged() -> None:
     assert [pair.paired_by for pair in alignment.cases] == ['values', 'values']
 
 
-def test_an_attachment_column_without_a_namesake_takes_no_part() -> None:
+def test_an_attachment_column_without_a_namesake_never_pairs_by_values() -> None:
     before = table([('n', 'param'), ('log', 'attachment')], _case('1', 1, None))
     after = table([('n', 'param'), ('trace', 'attachment')], _case('1', 1, None))
     alignment = _align(before, after)
-    assert [pair.before for pair in alignment.columns] == [ColumnId('n')]
-    assert not alignment.changed
+    assert [(pair.before, pair.after) for pair in alignment.columns] == [
+        ('n', 'n'),
+        ('attachment:0', None),
+        (None, 'attachment:0'),
+    ]
+    assert alignment.attachments_changed
+    assert not alignment.parameters_changed
+
+
+def test_an_attachment_column_gained_is_an_attachment_change_alone() -> None:
+    before = table([('n', 'param')], _case('1', 1))
+    after = table(
+        [('n', 'param'), ('log', 'attachment')],
+        _case('1', 1, Attachment(AttachmentLabel('log'), 'a')),
+    )
+    alignment = _align(before, after)
+    assert alignment.columns[1] == ColumnPair(
+        kind='attachment', after=ColumnId('attachment:0')
+    )
+    assert alignment.attachments_changed
+    assert not alignment.parameters_changed
+    assert alignment.changed
+
+
+def test_an_attachment_cell_gaining_or_losing_a_payload_diffs_its_lines_alone() -> None:
+    empty = table([('n', 'param'), ('log', 'attachment')], _case('1', 1, None))
+    logged = table(
+        [('n', 'param'), ('log', 'attachment')],
+        _case('1', 1, Attachment(AttachmentLabel('log'), 'a\nb')),
+    )
+    (gained,) = _align(empty, logged).cases
+    assert gained.changed_attachments == (
+        CellDelta(
+            column=ColumnId('attachment:0'),
+            lines=(
+                LineDelta(change='added', after=0),
+                LineDelta(change='added', after=1),
+            ),
+        ),
+    )
+    assert gained.changed
+    assert not gained.parameters_changed
+    (lost,) = _align(logged, empty).cases
+    assert [
+        line.change for cell in lost.changed_attachments for line in cell.lines
+    ] == ['removed', 'removed']
 
 
 def test_an_attachment_column_pairs_by_name_whatever_its_position() -> None:
@@ -264,9 +325,11 @@ def test_an_attachment_column_pairs_by_name_whatever_its_position() -> None:
     alignment = _align(before, after)
     assert [(pair.before, pair.after) for pair in alignment.columns] == [
         ('n', 'n'),
+        (None, 'attachment:0'),
         ('attachment:0', 'attachment:1'),
     ]
-    assert not alignment.changed
+    assert alignment.attachments_changed
+    assert not alignment.parameters_changed
 
 
 def test_a_renamed_derived_column_pairs_per_kind() -> None:
@@ -275,7 +338,10 @@ def test_a_renamed_derived_column_pairs_per_kind() -> None:
         table([('n', 'param'), ('n + n', 'derived')], _case('1', 1, 2)),
     )
     assert alignment.columns[1] == ColumnPair(
-        before=ColumnId('derived:0'), after=ColumnId('derived:0'), paired_by='values'
+        kind='derived',
+        before=ColumnId('derived:0'),
+        after=ColumnId('derived:0'),
+        paired_by='values',
     )
 
 
@@ -312,7 +378,7 @@ def test_cases_with_repeated_values_pair_by_case_id() -> None:
 
 def test_interleaved_places_a_removed_row_after_its_before_predecessor() -> None:
     rows = interleaved(
-        ['a', 'c', 'e'], ['a', 'b', 'c', 'd', 'x', 'e'], {'a': 'a', 'c': 'c', 'e': 'e'}
+        ['a', 'b', 'c', 'd', 'x', 'e'], ['a', 'c', 'e'], {'a': 'a', 'c': 'c', 'e': 'e'}
     )
     assert rows == [
         ('a', 'a'),
@@ -325,11 +391,11 @@ def test_interleaved_places_a_removed_row_after_its_before_predecessor() -> None
 
 
 def test_interleaved_puts_leading_removed_rows_on_top() -> None:
-    assert interleaved(['n'], ['o', 'p'], {}) == [('o', None), ('p', None), (None, 'n')]
+    assert interleaved(['o', 'p'], ['n'], {}) == [('o', None), ('p', None), (None, 'n')]
 
 
 def test_interleaved_follows_the_partner_not_the_before_position() -> None:
-    rows = interleaved(['b', 'a'], ['a', 'x', 'b'], {'a': 'a', 'b': 'b'})
+    rows = interleaved(['a', 'x', 'b'], ['b', 'a'], {'a': 'a', 'b': 'b'})
     assert rows == [('b', 'b'), ('a', 'a'), ('x', None)]
 
 
@@ -339,7 +405,12 @@ def test_cases_are_not_paired_by_values_when_no_param_column_is_shared() -> None
         table([('eur', 'param')], _case('fast', 1), _case('sluggish', 9), custom=True),
     )
     assert alignment.columns == (
-        ColumnPair(before=ColumnId('euros'), after=ColumnId('eur'), paired_by='values'),
+        ColumnPair(
+            kind='param',
+            before=ColumnId('euros'),
+            after=ColumnId('eur'),
+            paired_by='values',
+        ),
     )
     assert [(pair.before, pair.after, pair.paired_by) for pair in alignment.cases] == [
         (_node('fast'), _node('fast'), 'case-id'),

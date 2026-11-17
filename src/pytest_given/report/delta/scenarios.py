@@ -3,12 +3,13 @@ its steps and tables lined up side by side."""
 
 import dataclasses
 from collections.abc import Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cached_property
 from typing import Literal
 
 from ...model import (
     SIDE_MARK,
+    Attachment,
     AttachmentRef,
     CasePair,
     CellValue,
@@ -31,6 +32,7 @@ from ...model import (
 )
 from ..html_renderer import column_phase_blocks, repr_columns, shown_text
 from ..slugs import build_scenario_slug_index
+from .attachments import DiffRow, diff_rows
 from .steps import BlockKey, StepsView, block_keys, steps_view
 
 type ColumnChange = Literal['added', 'removed']
@@ -58,7 +60,7 @@ class ReasonRow:
 @dataclass(frozen=True)
 class TableColumn:
     column: ParameterColumn
-    # A column only this side's table has. Attachment columns stay unmarked.
+    # A column only this side's table has.
     change: ColumnChange | None = None
     was: str | None = None  # a renamed column's before name, on the after side
 
@@ -83,10 +85,15 @@ class TableSide:
         tuple[ParameterColumn, CellValue, BlockKey | None, ColumnChange | None]
     ]:
         """A case's cells, each with its column's phase block and its change."""
+        changed_attachments = {cell.column for cell in pair.changed_attachments}
         for (column, value), shown in zip(
             self.parameters.cells(case), self.columns, strict=True
         ):
-            changed = shown.change == 'added' or column.id in pair.changed_cells
+            changed = (
+                shown.change == 'added'
+                or column.id in pair.changed_cells
+                or column.id in changed_attachments
+            )
             yield (
                 column,
                 value,
@@ -102,6 +109,9 @@ class TableRow:
     before_case: ParameterCase | None
     after_case: ParameterCase | None
     pair: CasePair
+    # Each changed attachment cell's diff, by its after column ID: no rows for
+    # a cell changed in content type alone.
+    attachment_diffs: dict[ColumnId, tuple[DiffRow, ...]] = field(default_factory=dict)
 
     @property
     def change(self) -> Change | None:
@@ -284,7 +294,9 @@ def _table_view(
             ),
         ],
         rows=[
-            TableRow(
+            _table_row(
+                before.parameters,
+                after.parameters,
                 before_cases[pair.before] if pair.before is not None else None,
                 after_cases[pair.after] if pair.after is not None else None,
                 pair,
@@ -292,6 +304,39 @@ def _table_view(
             for pair in parameters.cases
         ],
     )
+
+
+def _table_row(
+    before_table: ParameterTable,
+    after_table: ParameterTable,
+    before_case: ParameterCase | None,
+    after_case: ParameterCase | None,
+    pair: CasePair,
+) -> TableRow:
+    return TableRow(
+        before_case,
+        after_case,
+        pair,
+        {
+            cell.column: diff_rows(
+                cell.lines,
+                _cell_content(before_table, before_case, cell.column),
+                _cell_content(after_table, after_case, cell.column),
+            )
+            for cell in pair.changed_attachments
+        },
+    )
+
+
+def _cell_content(
+    table: ParameterTable, case: ParameterCase | None, column_id: ColumnId
+) -> str:
+    """An attachment cell's payload; '' where the side has no such cell."""
+    if case is not None:
+        for column, value in table.cells(case):
+            if column.id == column_id and isinstance(value, Attachment):
+                return value.content
+    return ''
 
 
 def _lone_table(
@@ -342,12 +387,7 @@ def _keyed(scenario_delta: ScenarioDelta) -> ScenarioDelta:
     if scenario_delta.change != 'changed':
         return scenario_delta
     parameters = scenario_delta.parameters
-    columns = parameters.columns if parameters else ()
-    paired = {
-        pair.before: pair.after
-        for pair in columns
-        if pair.before is not None and pair.after is not None
-    }
+    paired = parameters.column_of if parameters else {}
     return _BeforeKeys(paired).scenario_delta(scenario_delta)
 
 

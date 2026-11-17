@@ -54,6 +54,7 @@ from pytest_given.report.html_renderer import (
     _BLOCK_COMMENT,
     _COMMENT_LINE,
     _TEMPLATES_DIR,
+    TermRefTarget,
     _app_data,
     _avoid_html,
     _make_clause_part_filter,
@@ -1452,17 +1453,29 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
     assert term['definition_html'] == 'A person staying at the hotel.'
 
 
-def test_a_term_ref_carries_the_side_it_was_read_on_only_when_given_one() -> None:
+def test_a_term_ref_names_its_tooltip_and_its_card_where_they_are_not_its_term() -> (
+    None
+):
     n = Narration(
         text='Guest',
         parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
     )
-    sided = make_narration_filter(
-        param_color_map={}, glossary=_glossary(), term_side='before'
+
+    def elsewhere(term_id: TermId) -> TermRefTarget:
+        return TermRefTarget(tip=f'before:{term_id}', entry=f'removed:{term_id}')
+
+    pointed = make_narration_filter(
+        param_color_map={}, glossary=_glossary(), ref_targets=elsewhere
     )
     plain = make_narration_filter(param_color_map={}, glossary=_glossary())
-    assert 'data-term-side="before"' in str(sided(n))
-    assert 'data-term-side' not in str(plain(n))
+    assert _term_ref_attributes(pointed(n)) == ('before:guest', 'removed:guest')
+    assert _term_ref_attributes(plain(n)) == ('guest', None)
+
+
+def _term_ref_attributes(html: str) -> tuple[str, str | None]:
+    [tag] = re.findall(r'<span [^>]*data-term-id=[^>]*>', html)
+    attributes = dict(re.findall(r'([\w-]+)="([^"]*)"', tag))
+    return attributes['data-term-id'], attributes.get('data-term-entry')
 
 
 def test_a_placeholder_takes_no_colour_without_a_colour_map() -> None:

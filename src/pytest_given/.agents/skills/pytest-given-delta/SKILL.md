@@ -76,6 +76,6 @@ Write that commit's full SHA on the default branch (`git log -1 --format=%H <com
 
 ## Values that differ on every run
 
-A step or cell that reads as changed in every delta holds a per-run value, such as a timestamp or a default `str()` with a memory address. Fix it at its source, with a fixed clock or a stable `__str__`.
+A step, cell or attachment that shows as changed in every delta holds a per-run value, such as a timestamp, a generated ID or a default `str()` with a memory address. Fix it at its source, with a fixed clock, a seeded ID generator or a stable `__str__`. For an attachment holding a value the test can't control, replace the varying part with a fixed placeholder before attaching. Unchecking *Attachments* in the HTML's *Changed in* filter hides a scenario whose only changed part is attachments, but doesn't fix it.
 
 *These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

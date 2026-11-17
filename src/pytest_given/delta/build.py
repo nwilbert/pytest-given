@@ -1,9 +1,12 @@
 """Two reports built into a delta: scenarios paired, then compared."""
 
+import dataclasses
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
 from ..model import (
+    CHANGED_PARTS,
+    ChangedPart,
     ColumnId,
     DeltaData,
     DeltaMetadata,
@@ -16,11 +19,13 @@ from ..model import (
     ScenarioDelta,
     ScenarioIdentity,
     ScenarioPairing,
+    StepDelta,
     case_id,
     case_node_id,
     case_suffix,
     node_base,
     scenario_identity,
+    walk_step_deltas,
     without_case_id,
 )
 from .chains import Rewrites, rewrite_case_id, rewrite_identities, undo_case_merges
@@ -87,8 +92,8 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
     unchanged: list[IdentityPair[ScenarioIdentity]] = []
     case_warnings: list[str] = []
     for before_index, after_index in interleaved(
-        list(range(len(after.scenarios))),
-        list(range(len(before.scenarios))),
+        range(len(before.scenarios)),
+        range(len(after.scenarios)),
         {index: partner for index, (partner, _) in pairing.items()},
     ):
         if after_index is None:
@@ -321,19 +326,17 @@ def _compare(
     """The changed scenario's delta, or `None` when nothing that counts differs."""
     parameters = None
     column_of: dict[ColumnId, ColumnId] = {}
-    table_changed = (before.parameters is None) != (after.parameters is None)
+    parameters_changed = (before.parameters is None) != (after.parameters is None)
+    table_attachments_changed = False
     if before.parameters is not None and after.parameters is not None:
         parameters = align_table(
             before.parameters,
             after.parameters,
             case_renames,
         )
-        column_of = {
-            pair.before: pair.after
-            for pair in parameters.columns
-            if pair.before is not None and pair.after is not None
-        }
-        table_changed = parameters.changed
+        column_of = parameters.column_of
+        parameters_changed = parameters.parameters_changed
+        table_attachments_changed = parameters.attachments_changed
 
     def before_column(placeholder: NarrationPlaceholder) -> str:
         # An unpaired column's key matches no after column ID, all of which are
@@ -346,28 +349,38 @@ def _compare(
     title_changed = not narrations_equal(
         comparable_title(before), before_reading, comparable_title(after), after_reading
     )
-    steps = align_steps(before.steps, before_reading, after.steps, after_reading)
+    steps = align_steps(
+        before.steps, before_reading, after.steps, after_reading, column_of
+    )
     delta = ScenarioDelta(
         change='changed',
         before=before,
         after=after,
         paired_by=paired_by,
-        title_changed=title_changed,
         steps=steps,
         parameters=parameters,
     )
-    if (
-        title_changed
-        or steps_changed(steps)
-        or delta.tags_added
-        or delta.tags_removed
-        or delta.status_changed
-        or delta.reason_changed
-        or table_changed
-    ):
-        return delta
-    return None
+    differing: dict[ChangedPart, bool] = {
+        'title': title_changed,
+        'steps': steps_changed(steps),
+        'tags': bool(delta.tags_added or delta.tags_removed),
+        'status': delta.status_changed or delta.reason_changed,
+        'parameters': parameters_changed,
+        'attachments': table_attachments_changed or _attachments_changed(steps),
+    }
+    changed_in = tuple(part for part in CHANGED_PARTS if differing[part])
+    if not changed_in:
+        return None
+    return dataclasses.replace(delta, changed_in=changed_in)
 
 
 def _column_id(placeholder: NarrationPlaceholder) -> str:
     return placeholder.column_id
+
+
+def _attachments_changed(steps: Sequence[StepDelta]) -> bool:
+    return any(
+        attachment.change != 'equal'
+        for step_delta in walk_step_deltas(steps)
+        for attachment in step_delta.attachments
+    )

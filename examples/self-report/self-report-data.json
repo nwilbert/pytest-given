@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-15T10:31:00.318391+00:00",
+    "timestamp": "2026-11-17T17:15:37.684873+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "82bd69bfb88ddb98e432670883bc2c29f3caf32a",
+    "commit_sha": "02f8ca07ab46d0340a64cca65f1876fd8b1e1942",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html",
     "schema_version": 1
@@ -34,7 +34,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 127,
+      "duration_ms": 153,
       "steps": [
         {
           "phase": "given",
@@ -127,7 +127,7 @@
         "diagnostics"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -402,7 +402,7 @@
       "module": "tests.integration.test_cli",
       "tags": [],
       "status": "passed",
-      "duration_ms": 127,
+      "duration_ms": 174,
       "steps": [
         {
           "phase": "given",
@@ -549,7 +549,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -842,7 +842,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -1100,7 +1100,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -1397,7 +1397,7 @@
         "delta"
       ],
       "status": "passed",
-      "duration_ms": 143,
+      "duration_ms": 169,
       "steps": [
         {
           "phase": "given",
@@ -1586,7 +1586,7 @@
         "delta"
       ],
       "status": "passed",
-      "duration_ms": 132,
+      "duration_ms": 161,
       "steps": [
         {
           "phase": "given",
@@ -1712,7 +1712,7 @@
       "module": "tests.integration.test_cli_skills",
       "tags": [],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -1823,7 +1823,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -2009,7 +2009,7 @@
         "delta"
       ],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -2092,7 +2092,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 104,
+      "duration_ms": 103,
       "steps": [
         {
           "phase": "given",
@@ -2185,7 +2185,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -2280,7 +2280,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -2356,7 +2356,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -2465,7 +2465,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -2594,7 +2594,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 553,
+      "duration_ms": 551,
       "steps": [
         {
           "phase": "given",
@@ -2722,7 +2722,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -2909,7 +2909,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 102,
+      "duration_ms": 95,
       "steps": [
         {
           "phase": "given",
@@ -3095,7 +3095,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -3272,7 +3272,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -3414,7 +3414,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 18,
       "steps": [
         {
           "phase": "given",
@@ -3484,7 +3484,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -3604,7 +3604,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -3739,7 +3739,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 70,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -3867,7 +3867,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -3994,7 +3994,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -4129,7 +4129,7 @@
         "spec/definition-refs"
       ],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 69,
       "steps": [
         {
           "phase": "given",
@@ -4260,7 +4260,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 172,
+      "duration_ms": 184,
       "steps": [
         {
           "phase": "given",
@@ -4333,7 +4333,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -4505,7 +4505,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4644,7 +4644,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4789,7 +4789,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -4942,7 +4942,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -5087,7 +5087,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 71,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -5234,7 +5234,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 156,
+      "duration_ms": 165,
       "steps": [
         {
           "phase": "given",
@@ -5455,7 +5455,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 438,
+      "duration_ms": 460,
       "steps": [
         {
           "phase": "given",
@@ -5582,7 +5582,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -5698,7 +5698,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -5800,7 +5800,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -5924,7 +5924,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 106,
+      "duration_ms": 113,
       "steps": [
         {
           "phase": "given",
@@ -6053,7 +6053,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 97,
+      "duration_ms": 106,
       "steps": [
         {
           "phase": "given",
@@ -6221,7 +6221,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -6315,7 +6315,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -6394,7 +6394,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 205,
+      "duration_ms": 214,
       "steps": [
         {
           "phase": "given",
@@ -6576,7 +6576,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -6666,7 +6666,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -6758,7 +6758,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 94,
+      "duration_ms": 111,
       "steps": [
         {
           "phase": "given",
@@ -6840,7 +6840,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -6932,7 +6932,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -7124,7 +7124,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 165,
+      "duration_ms": 180,
       "steps": [
         {
           "phase": "given",
@@ -7221,7 +7221,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 433,
+      "duration_ms": 460,
       "steps": [
         {
           "phase": "given",
@@ -7569,7 +7569,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -7645,7 +7645,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -7785,7 +7785,7 @@
         "spec/boolean-phrases"
       ],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -7954,7 +7954,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -8230,7 +8230,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 441,
+      "duration_ms": 470,
       "steps": [
         {
           "phase": "given",
@@ -8415,7 +8415,7 @@
         "spec/glossary-sections"
       ],
       "status": "passed",
-      "duration_ms": 498,
+      "duration_ms": 545,
       "steps": [
         {
           "phase": "given",
@@ -8715,7 +8715,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -8822,7 +8822,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -8942,7 +8942,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -9072,7 +9072,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 130,
+      "duration_ms": 108,
       "steps": [
         {
           "phase": "given",
@@ -9302,7 +9302,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -9414,7 +9414,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -9510,7 +9510,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 96,
+      "duration_ms": 98,
       "steps": [
         {
           "phase": "given",
@@ -9599,7 +9599,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 73,
+      "duration_ms": 86,
       "steps": [
         {
           "phase": "given",
@@ -9743,7 +9743,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -9892,7 +9892,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 653,
+      "duration_ms": 678,
       "steps": [
         {
           "phase": "given",
@@ -12313,7 +12313,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -12585,7 +12585,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -13165,7 +13165,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -23175,7 +23175,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -23513,7 +23513,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -23686,7 +23686,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -23987,7 +23987,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -24175,7 +24175,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -24561,7 +24561,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -25430,7 +25430,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -25567,7 +25567,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -25765,7 +25765,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -25950,7 +25950,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -26435,7 +26435,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -26576,7 +26576,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -27029,7 +27029,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -27150,6 +27150,236 @@
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1854
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/delta/test_attachments.py::test_a_repeated_label_pairs_its_unchanged_attachments_first",
+      "narration": {
+        "text": "Attachments pair by label in a delta report, a repeated label pairing its unchanged ones first",
+        "parts": [
+          {
+            "value": "Attachments pair by label in a "
+          },
+          {
+            "term_id": "delta-report",
+            "display": "delta report",
+            "expression": "pg[\"Delta report\"].l"
+          },
+          {
+            "value": ", a repeated label pairing its unchanged ones first"
+          }
+        ]
+      },
+      "module": "tests.unit.delta.test_attachments",
+      "tags": [
+        "delta"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a before step attaching two responses and a receipt, and an after one attaching the receipt first and a new response ahead of the two",
+            "parts": [
+              {
+                "value": "a before "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].l"
+              },
+              {
+                "value": " attaching two responses and a receipt, and an after one attaching the receipt first and a new response ahead of the two"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "their attachments are aligned",
+            "parts": [
+              {
+                "value": "their "
+              },
+              {
+                "term_id": "attachment",
+                "display": "attachments",
+                "expression": "pg[\"Attachment\"].l.s"
+              },
+              {
+                "value": " are aligned"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the receipt pairs with the receipt, unchanged",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the new response is added",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the two responses pair with their equals, unchanged",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/delta/test_attachments.py",
+        "line": 50
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/delta/test_attachments.py::test_a_similar_line_is_modified_with_its_word_diff",
+      "narration": {
+        "text": "A reworded line of a changed attachment carries its word diff in a delta report",
+        "parts": [
+          {
+            "value": "A reworded line of a changed attachment carries its word diff in a "
+          },
+          {
+            "term_id": "delta-report",
+            "display": "delta report",
+            "expression": "pg[\"Delta report\"].l"
+          }
+        ]
+      },
+      "module": "tests.unit.delta.test_attachments",
+      "tags": [
+        "delta"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a before and an after attachment whose one line has one word reworded",
+            "parts": [
+              {
+                "value": "a before and an after "
+              },
+              {
+                "term_id": "attachment",
+                "display": "attachment",
+                "expression": "pg[\"Attachment\"].l"
+              },
+              {
+                "value": " whose one line has one word reworded"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the two attachments are aligned",
+            "parts": [
+              {
+                "value": "the two "
+              },
+              {
+                "term_id": "attachment",
+                "display": "attachments",
+                "expression": "pg[\"Attachment\"].l.s"
+              },
+              {
+                "value": " are aligned"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the attachment is changed and its line is modified",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "attachment",
+                "display": "attachment",
+                "expression": "pg[\"Attachment\"].l"
+              },
+              {
+                "value": " is changed and its line is modified"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the modified line marks the reworded word removed and added",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/delta/test_attachments.py",
+        "line": 140
       },
       "story_ids": [],
       "pins": null
@@ -27895,7 +28125,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "its after side differs in module, source, duration, error message, fixture name, story IDs, pins, attachments and an attachment column",
+            "text": "its after side differs in module, source, duration, error message, fixture name, story IDs and pins",
             "parts": []
           },
           "children": [],
@@ -27974,7 +28204,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "six scenarios whose after sides each differ in one of title, step, tag, status, reason and parameter table",
+            "text": "seven scenarios whose after sides each differ in one of title, step, tag, status, reason, parameter table and attachment",
             "parts": []
           },
           "children": [],
@@ -28008,8 +28238,20 @@
         {
           "phase": "then",
           "narration": {
-            "text": "each is changed, with the flag of what differs",
-            "parts": []
+            "text": "each is changed, and its changed parts name what differs",
+            "parts": [
+              {
+                "value": "each is changed, and its "
+              },
+              {
+                "term_id": "changed-part",
+                "display": "changed parts",
+                "expression": "pg[\"Changed part\"].l.s"
+              },
+              {
+                "value": " name what differs"
+              }
+            ]
           },
           "children": [],
           "attachments": [],
@@ -28023,7 +28265,146 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
-        "line": 334
+        "line": 333
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/delta/test_build.py::test_an_attachment_cell_change_counts_only_as_attachments",
+      "narration": {
+        "text": "A changed attachment cell counts as attachments and an added case's cell as parameters in a delta report",
+        "parts": [
+          {
+            "value": "A changed attachment cell counts as attachments and an added case's cell as parameters in a "
+          },
+          {
+            "term_id": "delta-report",
+            "display": "delta report",
+            "expression": "pg[\"Delta report\"].l"
+          }
+        ]
+      },
+      "module": "tests.unit.delta.test_build",
+      "tags": [
+        "delta"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a grouped scenario whose paired case changes its page cell, and one that adds a case with a page cell",
+            "parts": [
+              {
+                "value": "a grouped scenario whose paired "
+              },
+              {
+                "term_id": "case",
+                "display": "case",
+                "expression": "pg[\"Case\"].l"
+              },
+              {
+                "value": " changes its page cell, and one that adds a "
+              },
+              {
+                "term_id": "case",
+                "display": "case",
+                "expression": "pg[\"Case\"].l"
+              },
+              {
+                "value": " with a page cell"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a delta report is built",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "delta-report",
+                "display": "delta report",
+                "expression": "pg[\"Delta report\"].l"
+              },
+              {
+                "value": " is built"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the first scenario's one changed part is attachments, and its changed cell sits under the page column",
+            "parts": [
+              {
+                "value": "the first scenario's one "
+              },
+              {
+                "term_id": "changed-part",
+                "display": "changed part",
+                "expression": "pg['Changed part'].l"
+              },
+              {
+                "value": " is attachments, and its changed cell sits under the page column"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the second scenario's one changed part is parameters, from its added case",
+            "parts": [
+              {
+                "value": "the second scenario's one "
+              },
+              {
+                "term_id": "changed-part",
+                "display": "changed part",
+                "expression": "pg['Changed part'].l"
+              },
+              {
+                "value": " is parameters, from its added "
+              },
+              {
+                "term_id": "case",
+                "display": "case",
+                "expression": "pg[\"Case\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/delta/test_build.py",
+        "line": 397
       },
       "story_ids": [],
       "pins": null
@@ -28085,7 +28466,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
-        "line": 382
+        "line": 494
       },
       "story_ids": [],
       "pins": null
@@ -28175,7 +28556,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
-        "line": 23
+        "line": 22
       },
       "story_ids": [],
       "pins": null
@@ -28249,7 +28630,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
-        "line": 39
+        "line": 38
       },
       "story_ids": [],
       "pins": null
@@ -28353,7 +28734,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
-        "line": 53
+        "line": 52
       },
       "story_ids": [],
       "pins": null
@@ -28461,7 +28842,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
-        "line": 72
+        "line": 71
       },
       "story_ids": [],
       "pins": null
@@ -28557,7 +28938,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
-        "line": 94
+        "line": 93
       },
       "story_ids": [],
       "pins": null
@@ -28642,7 +29023,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
-        "line": 65
+        "line": 66
       },
       "story_ids": [],
       "pins": null
@@ -28737,7 +29118,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
-        "line": 99
+        "line": 100
       },
       "story_ids": [],
       "pins": null
@@ -28860,7 +29241,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
-        "line": 132
+        "line": 133
       },
       "story_ids": [],
       "pins": null
@@ -28993,7 +29374,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
-        "line": 166
+        "line": 167
       },
       "story_ids": [],
       "pins": null
@@ -29120,7 +29501,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
-        "line": 205
+        "line": 206
       },
       "story_ids": [],
       "pins": null
@@ -29317,7 +29698,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_steps.py",
-        "line": 33
+        "line": 41
       },
       "story_ids": [],
       "pins": null
@@ -29398,7 +29779,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_suggestions.py",
-        "line": 82
+        "line": 83
       },
       "story_ids": [],
       "pins": null
@@ -29528,7 +29909,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_table.py",
-        "line": 47
+        "line": 51
       },
       "story_ids": [],
       "pins": null
@@ -29611,7 +29992,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_table.py",
-        "line": 84
+        "line": 98
       },
       "story_ids": [],
       "pins": null
@@ -29697,7 +30078,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_table.py",
-        "line": 115
+        "line": 129
       },
       "story_ids": [],
       "pins": null
@@ -29791,7 +30172,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_table.py",
-        "line": 144
+        "line": 161
       },
       "story_ids": [],
       "pins": null
@@ -33785,7 +34166,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -33938,7 +34319,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -38504,7 +38885,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 137
+        "line": 138
       },
       "story_ids": [],
       "pins": null
@@ -38529,7 +38910,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 149,
+      "duration_ms": 178,
       "steps": [
         {
           "phase": "given",
@@ -38627,7 +39008,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 354
+        "line": 355
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -38668,7 +39049,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -38747,7 +39128,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 884
+        "line": 885
       },
       "story_ids": [],
       "pins": null
@@ -38912,7 +39293,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 1326
+        "line": 1327
       },
       "story_ids": [],
       "pins": null
@@ -42802,6 +43183,25 @@
         "avoid": []
       },
       {
+        "id": "changed-part",
+        "kind": null,
+        "canonical": "Changed part",
+        "definition": {
+          "text": "One of title, steps, tags, status, parameters and attachments, in which a changed *Scenario* differs between the two sides of a *Delta report*.",
+          "parts": [
+            {
+              "value": "One of title, steps, tags, status, parameters and attachments, in which a changed *Scenario* differs between the two sides of a *Delta report*."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 87
+        },
+        "section": "Delta report",
+        "avoid": []
+      },
+      {
         "id": "suggested-match",
         "kind": null,
         "canonical": "Suggested match",
@@ -42815,7 +43215,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 87
+          "line": 88
         },
         "section": "Delta report",
         "avoid": []
@@ -42834,7 +43234,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 97
+          "line": 98
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -42861,7 +43261,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 98
+          "line": 99
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -42880,7 +43280,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 99
+          "line": 100
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -42907,7 +43307,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 100
+          "line": 101
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -42934,7 +43334,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 101
+          "line": 102
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -42969,7 +43369,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 102
+          "line": 103
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43036,7 +43436,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 103
+          "line": 104
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43095,7 +43495,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 104
+          "line": 105
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43130,7 +43530,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 105
+          "line": 106
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43149,7 +43549,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 106
+          "line": 107
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43168,7 +43568,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 107
+          "line": 108
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43203,7 +43603,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 108
+          "line": 109
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43222,7 +43622,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 109
+          "line": 110
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43257,7 +43657,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 110
+          "line": 111
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43292,7 +43692,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 111
+          "line": 112
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43327,7 +43727,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 112
+          "line": 113
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43362,7 +43762,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 113
+          "line": 114
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43413,7 +43813,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 114
+          "line": 115
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43456,7 +43856,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 115
+          "line": 116
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43483,7 +43883,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 116
+          "line": 117
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43510,7 +43910,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 117
+          "line": 118
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43537,7 +43937,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 118
+          "line": 119
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43572,7 +43972,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 119
+          "line": 120
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43615,7 +44015,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 120
+          "line": 121
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43650,7 +44050,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 121
+          "line": 122
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43685,7 +44085,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 122
+          "line": 123
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43712,7 +44112,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 123
+          "line": 124
         },
         "section": "Domain Storytelling",
         "avoid": []
@@ -43747,7 +44147,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 131
+          "line": 132
         },
         "section": "Collaboration",
         "avoid": []
@@ -43766,7 +44166,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 132
+          "line": 133
         },
         "section": "Collaboration",
         "avoid": []
@@ -43793,7 +44193,7 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 133
+          "line": 134
         },
         "section": "Collaboration",
         "avoid": []

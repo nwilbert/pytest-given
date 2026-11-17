@@ -8,7 +8,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar, nav_tab, term_disclosure with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar, nav_tab, term_disclosure, scenario_disclosure, toggle_all_terms_button, term_tip with context -%}
   {{ icon_sprite() }}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
@@ -81,7 +81,7 @@
        data-scenario-id="{{ scenario.id }}">
     <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ loop.index0 }})"{% endif %}>
       <div style="display:flex; align-items:center;">
-        {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ loop.index0 }}" :aria-expanded="!!expandedScenarios[{{ loop.index0 }}]" :aria-label="(expandedScenarios[{{ loop.index0 }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ loop.index0 }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
+        {{ scenario_disclosure(loop.index0, has_body) }}
         <span class="scenario-title">{{ scenario.narration | narration }}</span>
         {{ copy_button('scenario', loop.index0, 'scenario=' ~ scenario_slugs[scenario.id]) }}
       </div>
@@ -390,10 +390,7 @@
             <span>{{ kind.summary }}</span>{% endfor %}{% endif %}
           </div>
           {% if glossary_view.expandable_term_ids %}
-          <button class="collapse-all-btn" @click="toggleAllTerms()">
-            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
-            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
-          </button>
+          {{ toggle_all_terms_button() }}
           {% endif %}
         </div>
       </div>
@@ -443,12 +440,7 @@
 
 </div>
 
-<!-- Shared hover tooltip for term refs; positioned by app.js. Lives at
-     body level so it is never clipped by collapsible scenario bodies. -->
-<div id="term-tip" role="tooltip" hidden>
-  <span class="term-tip-name"></span>
-  <span class="term-tip-def"></span>
-</div>
+{{ term_tip() }}
 
 {% if citations %}
 <!-- The menu a scenario card's, story header's, tag row's or term row's copy

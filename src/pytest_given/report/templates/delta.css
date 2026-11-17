@@ -22,19 +22,22 @@ body.delta {
   --delta-hatch: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
 }
 body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
+/* Whatever is struck as removed is struck in the removed line's red. */
+.delta del { text-decoration-color: var(--removed-line); }
 
 /* A change's colours, for what is marked with one to paint from: a row, a
-   term card, a Change pill, a module's mark, a step, a case. Not a changed
+   term card, a Change pill, a module's mark, a step, a case, a tag or a term
+   form. Not a changed
    cell, whose mark is its tint alone: a changed case's ID keeps the row's
    colour for its glyph. A modified step is changed. */
-.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr)[data-change="added"] {
+.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr, .attachment-badge, .scenario-tag, .use-chip)[data-change="added"] {
   --change-ink: var(--added-ink); --change-line: var(--added-line); --change-tint: var(--added-tint);
 }
-.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark)[data-change="changed"],
+.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .attachment-badge)[data-change="changed"],
 .delta .delta-step[data-change="modified"] {
   --change-ink: var(--changed-ink); --change-line: var(--changed-line); --change-tint: var(--changed-tint);
 }
-.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr)[data-change="removed"] {
+.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr, .attachment-badge, .scenario-tag, .use-chip)[data-change="removed"] {
   --change-ink: var(--removed-ink); --change-line: var(--removed-line); --change-tint: var(--removed-tint);
 }
 
@@ -74,7 +77,6 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   color: var(--text-muted);
   font-weight: normal;
 }
-.delta-was del, .delta-title-line > del.scenario-title { text-decoration-color: var(--removed-line); }
 .delta-change-label {
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -88,15 +90,8 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   padding: 0 7px;
   white-space: nowrap;
 }
-.scenario-tag.delta-tag-added,
-.use-chip.delta-form[data-change="added"] { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
-.scenario-tag.delta-tag-removed,
-.use-chip.delta-form[data-change="removed"] {
-  cursor: default;
-  color: var(--removed-ink);
-  border-color: var(--removed-line);
-  background: var(--removed-tint);
-}
+.delta :is(.scenario-tag, .use-chip)[data-change] { color: var(--change-ink); border-color: var(--change-line); background: var(--change-tint); }
+.delta :is(.scenario-tag, .use-chip)[data-change="removed"] { cursor: default; }
 .delta-status { color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .reason-box .delta-was { margin-top: 2px; }
 
@@ -107,6 +102,26 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   font-size: var(--font-size-sm);
   color: var(--text-muted);
 }
+/* The Changed in filter narrows the Changed pill above it: the Glossary's
+   kind filter rows, each swatch in the changed colour, set in on a hairline
+   under the pills. The legend floats, so the hairline runs past it rather
+   than starting at its middle, as a fieldset's border does. Disabled, a row
+   keeps its check, swatched in the border grey. */
+.delta-changed-in {
+  --kind-line: var(--changed-line);
+  min-width: 0;
+  margin: var(--space-md) 0 0;
+  padding: 0 0 0 var(--space-md);
+  border: 0;
+  border-left: 1px solid var(--border);
+}
+.delta-changed-in > legend { float: left; width: 100%; padding: 0; }
+.delta-changed-in .kind-filter-row { clear: left; }
+.delta-changed-in:disabled > legend,
+.delta-changed-in:disabled .kind-filter-row,
+.delta-changed-in .delta-part-empty { color: var(--text-muted); cursor: default; }
+.delta-changed-in:disabled .kind-swatch,
+.delta-changed-in .delta-part-empty .kind-swatch { --kind-line: var(--border); }
 .delta-module-mark {
   font-weight: 700;
   font-size: var(--font-size-sm);
@@ -187,6 +202,57 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
   background: var(--delta-hatch) content-box;
 }
 
+/* A step's attachment's change, by the glyph leading its badge, a removed
+   one's label struck. */
+.delta-badge-lead {
+  margin-right: 4px;
+  font-weight: 700;
+  color: var(--change-ink);
+}
+
+/* A changed payload's line diff: a line per row, never wrapped, so a line and
+   its counterpart, or the hatch where a side lacks it, stay level; too wide,
+   the panel scrolls, and `delta.js` scrolls its counterpart along. Contained,
+   so a long line widens neither the column nor the table. The lines run as
+   wide as the longest, so a marked line's tint reaches the scrolled-to edge.
+   Removed and added lines are marked whole, as a modified line's words are. */
+.delta-diff {
+  contain: inline-size;
+  padding-inline: 0;
+  white-space: normal;
+}
+.delta-diff-lines { width: max-content; min-width: 100%; }
+/* Under a table's row it takes the table's width, but no less than a short
+   payload line's, however narrow the table. */
+.attachment-panel .delta-diff { min-width: 24rem; }
+.delta-line {
+  min-height: 1lh;
+  padding-inline: var(--space-md);
+  white-space: pre;
+}
+.delta-line[data-change="removed"] {
+  background: var(--removed-tint);
+  text-decoration: line-through;
+  text-decoration-color: currentColor;
+}
+.delta-line[data-change="added"] { background: var(--added-tint); }
+.delta-line-gap { height: 1lh; background: var(--delta-hatch); }
+/* A run of unchanged lines, folded to one that opens it on both sides. */
+.delta-fold-toggle {
+  display: block;
+  width: 100%;
+  padding-inline: var(--space-md);
+  border-block: 1px dashed var(--border);
+  color: var(--text-muted);
+  white-space: pre;
+}
+.delta-fold-toggle:hover { color: var(--text-primary); border-color: var(--text-muted); }
+.delta-fold-toggle:focus-visible { outline-offset: -2px; }
+/* The count stays in view when the panel is scrolled. */
+.delta-fold-toggle > span { display: inline-block; position: sticky; left: var(--space-md); }
+.delta-fold.expanded > .delta-fold-toggle,
+.delta-fold:not(.expanded) > .delta-fold-lines { display: none; }
+
 /* A side's parameter table, a case on one line across the two (`delta.js`
    evens out the rows). Top aligned, since evening out grows a row past its
    content. */
@@ -194,7 +260,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-table .param-table th,
 .delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
 .delta-table .param-table th .delta-was { display: block; }
-.delta-table .param-table del { text-decoration-color: var(--removed-line); }
 /* An added or removed case's row in its change's tint; every case's ID is led
    by its change's glyph, a changed one's in the card's amber. */
 .delta-table .param-table tr[data-change] { background: var(--change-tint); }
@@ -244,4 +309,5 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 .delta-term-side .entry-summary { margin-top: 0; }
 .delta-refs-none { font-size: var(--font-size-sm); color: var(--text-muted); }
-.use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
+/* A chip draws no text decoration of its own. */
+.use-chip.delta-form[data-change="removed"] { text-decoration-line: line-through; }

@@ -1,24 +1,35 @@
 """Two step trees aligned: which steps are unchanged, reworded, added or removed."""
 
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from functools import cached_property
+from typing import Literal
 
-from ..model import Step, StepDelta, StepPath, walk_step_deltas
-from .lcs import lcs_gaps
+from ..model import (
+    AttachmentDelta,
+    ColumnId,
+    Step,
+    StepDelta,
+    StepPath,
+    walk_step_deltas,
+)
+from .attachments import align_attachments
+from .lcs import greedy_pairs, lcs_gaps
 from .narration import (
+    MODIFIED_SIMILARITY,
     Reading,
     Token,
     WordKey,
+    bag_similarity,
     similarity,
     token_diff,
     token_lists_equal,
     tokens,
+    tokens_equal,
     word_counts,
     words_of,
 )
-
-MODIFIED_SIMILARITY = 0.5
 
 
 def align_steps(
@@ -26,8 +37,12 @@ def align_steps(
     before_reading: Reading,
     after: list[Step],
     after_reading: Reading,
+    column_of: Mapping[ColumnId, ColumnId],
 ) -> tuple[StepDelta, ...]:
-    return _Alignment(before_reading, after_reading).siblings(before, (), after, ())
+    """`column_of` maps a before column ID to its paired after column ID."""
+    return _Alignment(before_reading, after_reading, column_of).siblings(
+        before, (), after, ()
+    )
 
 
 def steps_changed(deltas: Sequence[StepDelta]) -> bool:
@@ -36,18 +51,31 @@ def steps_changed(deltas: Sequence[StepDelta]) -> bool:
 
 @dataclass(frozen=True)
 class _Read:
-    """A step with its narration read once, for every comparison it takes part in."""
+    """A step with its narration read once, for every comparison it takes part
+    in. Only a step between two anchors is compared by its words."""
 
     step: Step
     tokens: list[Token]
-    words: list[Token]
-    word_keys: Counter[WordKey]
+
+    @cached_property
+    def words(self) -> list[Token]:
+        return words_of(self.tokens)
+
+    @cached_property
+    def word_keys(self) -> Counter[WordKey]:
+        return word_counts(self.words)
 
 
 class _Alignment:
-    def __init__(self, before_reading: Reading, after_reading: Reading) -> None:
+    def __init__(
+        self,
+        before_reading: Reading,
+        after_reading: Reading,
+        column_of: Mapping[ColumnId, ColumnId],
+    ) -> None:
         self.before_reading = before_reading
         self.after_reading = after_reading
+        self.column_of = column_of
 
     def siblings(
         self,
@@ -72,19 +100,13 @@ class _Alignment:
             )
             if anchor is not None:
                 index_before, index_after = anchor
-                before_path = (*before_parent, index_before)
-                after_path = (*after_parent, index_after)
                 deltas.append(
-                    StepDelta(
-                        change='equal',
-                        before=before_path,
-                        after=after_path,
-                        children=self.siblings(
-                            before[index_before].children,
-                            before_path,
-                            after[index_after].children,
-                            after_path,
-                        ),
+                    self._paired(
+                        'equal',
+                        read_before[index_before],
+                        (*before_parent, index_before),
+                        read_after[index_after],
+                        (*after_parent, index_after),
                     )
                 )
         return tuple(deltas)
@@ -98,58 +120,70 @@ class _Alignment:
         after_gap: range,
         after_parent: StepPath,
     ) -> list[StepDelta]:
-        """The steps between two anchors. Each before step pairs with the first
-        after step past the last pairing that reads like it, else it is removed;
-        the after steps left unpaired are added."""
+        """The steps between two anchors. A before step reading like an after
+        step is modified; the steps left unpaired are removed and added."""
         deltas: list[StepDelta] = []
-        cursor = after_gap.start
-        for index in before_gap:
-            before_path = (*before_parent, index)
-            match = next(
+        pairs = greedy_pairs(
+            before_gap,
+            after_gap,
+            lambda index_before, cursor: next(
                 (
-                    candidate
-                    for candidate in range(cursor, after_gap.stop)
-                    if _similar(before[index], after[candidate])
+                    index_after
+                    for index_after in range(cursor, after_gap.stop)
+                    if _similar(before[index_before], after[index_after])
                 ),
                 None,
-            )
-            if match is None:
-                deltas.append(StepDelta(change='removed', before=before_path))
-                continue
-            deltas.extend(
-                StepDelta(change='added', after=(*after_parent, skipped))
-                for skipped in range(cursor, match)
-            )
-            deltas.append(
-                self._modified(
-                    before[index], before_path, after[match], (*after_parent, match)
-                )
-            )
-            cursor = match + 1
-        deltas.extend(
-            StepDelta(change='added', after=(*after_parent, skipped))
-            for skipped in range(cursor, after_gap.stop)
+            ),
         )
+        for index_before, index_after in pairs:
+            if index_after is None:
+                assert index_before is not None
+                deltas.append(
+                    StepDelta(change='removed', before=(*before_parent, index_before))
+                )
+            elif index_before is None:
+                deltas.append(
+                    StepDelta(change='added', after=(*after_parent, index_after))
+                )
+            else:
+                deltas.append(
+                    self._paired(
+                        'modified',
+                        before[index_before],
+                        (*before_parent, index_before),
+                        after[index_after],
+                        (*after_parent, index_after),
+                    )
+                )
         return deltas
 
-    def _modified(
-        self, before: _Read, before_path: StepPath, after: _Read, after_path: StepPath
+    def _paired(
+        self,
+        change: Literal['equal', 'modified'],
+        before: _Read,
+        before_path: StepPath,
+        after: _Read,
+        after_path: StepPath,
     ) -> StepDelta:
         return StepDelta(
-            change='modified',
+            change=change,
             before=before_path,
             after=after_path,
-            words=token_diff(before.tokens, after.tokens),
+            words=token_diff(before.tokens, after.tokens)
+            if change == 'modified'
+            else (),
             children=self.siblings(
                 before.step.children, before_path, after.step.children, after_path
             ),
+            attachments=self._attachments(before.step, after.step),
         )
+
+    def _attachments(self, before: Step, after: Step) -> tuple[AttachmentDelta, ...]:
+        return align_attachments(before.attachments, after.attachments, self.column_of)
 
 
 def _read(step: Step, reading: Reading) -> _Read:
-    read = tokens(step.narration, reading)
-    words = words_of(read)
-    return _Read(step, read, words, word_counts(words))
+    return _Read(step, tokens(step.narration, reading))
 
 
 def _same(before: _Read, after: _Read) -> bool:
@@ -164,9 +198,6 @@ def _similar(before: _Read, after: _Read) -> bool:
     rules out most dissimilar pairs before the LCS that `similarity` builds."""
     if before.step.phase != after.step.phase:
         return token_lists_equal(before.tokens, after.tokens)
-    total = len(before.words) + len(after.words)
-    if total and 2 * (before.word_keys & after.word_keys).total() < (
-        MODIFIED_SIMILARITY * total
-    ):
+    if bag_similarity(before.word_keys, after.word_keys) < MODIFIED_SIMILARITY:
         return False
-    return similarity(before.words, after.words) >= MODIFIED_SIMILARITY
+    return similarity(before.words, after.words, tokens_equal) >= MODIFIED_SIMILARITY

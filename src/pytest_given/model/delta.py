@@ -11,6 +11,7 @@ from typing import Final, Literal
 
 from .schema import (
     ColumnId,
+    ColumnKind,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -25,6 +26,9 @@ from .step_tree import StepPath
 DELTA_SCHEMA_VERSION: Final = 1
 
 type Change = Literal['added', 'removed', 'changed']
+type ChangedPart = Literal[
+    'title', 'steps', 'tags', 'status', 'parameters', 'attachments'
+]
 type Side = Literal['before', 'after']
 type ScenarioPairing = Literal['rename-log', 'node-id', 'title']
 type CasePairing = Literal['rename-log', 'case-id', 'values']
@@ -32,16 +36,33 @@ type ColumnPairing = Literal['name', 'values']
 type TermPairing = Literal['rename-log', 'term-id']
 type StepChange = Literal['equal', 'modified', 'added', 'removed']
 type Mark = Literal['equal', 'removed', 'added']
+type LineChange = Literal['equal', 'modified', 'removed', 'added']
+type AttachmentChange = Literal['equal', 'changed', 'added', 'removed']
 type SuggestionOf = Literal['scenario', 'case', 'term']
 
 # In the order a delta lists its counts: what a release brings, then what it took away.
 CHANGES: tuple[Change, ...] = ('added', 'changed', 'removed')
+CHANGED_PARTS: tuple[ChangedPart, ...] = (
+    'title',
+    'steps',
+    'tags',
+    'status',
+    'parameters',
+    'attachments',
+)
 SCENARIO_PAIRINGS: tuple[ScenarioPairing, ...] = ('rename-log', 'node-id', 'title')
 CASE_PAIRINGS: tuple[CasePairing, ...] = ('rename-log', 'case-id', 'values')
 COLUMN_PAIRINGS: tuple[ColumnPairing, ...] = ('name', 'values')
 TERM_PAIRINGS: tuple[TermPairing, ...] = ('rename-log', 'term-id')
 STEP_CHANGES: tuple[StepChange, ...] = ('equal', 'modified', 'added', 'removed')
 MARKS: tuple[Mark, ...] = ('equal', 'removed', 'added')
+LINE_CHANGES: tuple[LineChange, ...] = ('equal', 'modified', 'removed', 'added')
+ATTACHMENT_CHANGES: tuple[AttachmentChange, ...] = (
+    'equal',
+    'changed',
+    'added',
+    'removed',
+)
 SUGGESTION_OFS: tuple[SuggestionOf, ...] = ('scenario', 'case', 'term')
 # The mark a side's own words carry in a word diff.
 SIDE_MARK: Final[dict[Side, Literal['removed', 'added']]] = {
@@ -56,6 +77,14 @@ def on_side[T](side: Side, before: T, after: T) -> T:
 
 def other_side(side: Side) -> Side:
     return 'after' if side == 'before' else 'before'
+
+
+def terms_read_the_same(before: GlossaryTerm, after: GlossaryTerm) -> bool:
+    """The same name and definition, which a card and a tooltip show."""
+    return (before.canonical, before.definition_text or '') == (
+        after.canonical,
+        after.definition_text or '',
+    )
 
 
 def change_counts(changes: Iterable[Change]) -> dict[Change, int]:
@@ -81,6 +110,7 @@ class StepDelta:
     after: StepPath | None = None
     words: tuple[DiffSegment, ...] = ()  # modified only
     children: tuple[StepDelta, ...] = ()  # equal and modified only
+    attachments: tuple[AttachmentDelta, ...] = ()  # equal and modified only
 
 
 def walk_step_deltas(deltas: Iterable[StepDelta]) -> Iterator[StepDelta]:
@@ -90,10 +120,45 @@ def walk_step_deltas(deltas: Iterable[StepDelta]) -> Iterator[StepDelta]:
 
 
 @dataclass(frozen=True, kw_only=True)
+class TextSegment:
+    mark: Mark
+    text: str
+
+
+@dataclass(frozen=True, kw_only=True)
+class LineDelta:
+    change: LineChange
+    before: int | None = None  # the first line's index on its side
+    after: int | None = None
+    count: int = 1  # an equal run's length; 1 otherwise
+    words: tuple[TextSegment, ...] = ()  # modified only
+
+
+@dataclass(frozen=True, kw_only=True)
+class AttachmentDelta:
+    change: AttachmentChange
+    before: int | None = None  # its index among its step's attachments
+    after: int | None = None
+    lines: tuple[LineDelta, ...] = ()  # a changed pair of payloads only
+
+
+@dataclass(frozen=True, kw_only=True)
 class ColumnPair:
+    kind: ColumnKind
     before: ColumnId | None = None
     after: ColumnId | None = None
     paired_by: ColumnPairing | None = None
+
+    @property
+    def changed(self) -> bool:
+        """Unpaired, or renamed."""
+        return self.before is None or self.after is None or self.paired_by == 'values'
+
+
+@dataclass(frozen=True, kw_only=True)
+class CellDelta:
+    column: ColumnId  # the after ID
+    lines: tuple[LineDelta, ...]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -102,13 +167,18 @@ class CasePair:
     after: NodeId | None = None
     paired_by: CasePairing | None = None
     changed_cells: tuple[ColumnId, ...] = ()  # after ids of paired columns
+    changed_attachments: tuple[CellDelta, ...] = ()
     id_changed: bool = False
     status_changed: bool = False
 
     @property
     def changed(self) -> bool:
-        """Whether the case reads otherwise on the two sides: unpaired, or
-        with a changed cell, ID or status."""
+        return self.parameters_changed or bool(self.changed_attachments)
+
+    @property
+    def parameters_changed(self) -> bool:
+        """Unpaired, or with a changed cell, ID or status. An unpaired case's
+        attachment cells come and go with it."""
         return (
             self.before is None
             or self.after is None
@@ -121,22 +191,38 @@ class CasePair:
 @dataclass(frozen=True, kw_only=True)
 class ParameterDelta:
     """The alignment of two parameter tables, for a scenario with one on each
-    side. An attachment column appears only when paired, by name, and its
-    cells are never compared."""
+    side. Its changes split between the `parameters` and `attachments` changed
+    parts, and order alone changes neither."""
 
     columns: tuple[ColumnPair, ...]
     cases: tuple[CasePair, ...]
 
     @property
+    def column_of(self) -> dict[ColumnId, ColumnId]:
+        """Each paired before column ID to its after column ID."""
+        return {
+            pair.before: pair.after
+            for pair in self.columns
+            if pair.before is not None and pair.after is not None
+        }
+
+    @property
     def changed(self) -> bool:
-        """Whether anything but order differs: an unpaired or renamed column,
-        an unpaired case, or a paired case with a changed cell, ID or status."""
+        return self.parameters_changed or self.attachments_changed
+
+    @property
+    def parameters_changed(self) -> bool:
         return any(
-            column.before is None
-            or column.after is None
-            or column.paired_by == 'values'
-            for column in self.columns
-        ) or any(case.changed for case in self.cases)
+            column.changed for column in self.columns if column.kind != 'attachment'
+        ) or any(case.parameters_changed for case in self.cases)
+
+    @property
+    def attachments_changed(self) -> bool:
+        """An attachment column unpaired, or a paired case's attachment cell
+        changed. An attachment column never pairs by values."""
+        return any(
+            column.changed for column in self.columns if column.kind == 'attachment'
+        ) or any(case.changed_attachments for case in self.cases)
 
 
 class _Sided[T]:
@@ -173,9 +259,13 @@ class ScenarioDelta(_Sided[Scenario]):
     before: Scenario | None = None
     after: Scenario | None = None
     paired_by: ScenarioPairing | None = None
-    title_changed: bool = False
+    changed_in: tuple[ChangedPart, ...] = ()
     steps: tuple[StepDelta, ...] = ()
     parameters: ParameterDelta | None = None
+
+    @property
+    def title_changed(self) -> bool:
+        return 'title' in self.changed_in
 
     @property
     def tags_added(self) -> tuple[str, ...]:

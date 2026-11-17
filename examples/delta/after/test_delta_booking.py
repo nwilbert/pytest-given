@@ -9,7 +9,16 @@ renames the delta cannot find by itself.
 
 import pytest
 
-from pytest_given import Glossary, given, scenario, sentence, story, then, when
+from pytest_given import (
+    Glossary,
+    attach,
+    given,
+    scenario,
+    sentence,
+    story,
+    then,
+    when,
+)
 
 g = Glossary()
 
@@ -27,19 +36,38 @@ upgrade = g.activity('upgrade', 'Move a guest to a better room at the same rate.
 hotel_stay = story('Stay at the hotel', [sentence(guest('Alice'), 'books', suite)])
 
 
-@scenario('Guests check in with a digital key', tags=['front-desk', 'digital-key'])
+@scenario('Guests check in at the front desk', tags=['front-desk'])
 def test_check_in():
     with given(t'{guest("Alice")} has a confirmed {booking}'):
         stay = {'guest': 'Alice', 'confirmed': True, 'key': None}
     with when(t'{guest("Alice")} gives her name at the front desk'):
         stay['arrived'] = True
-    with when('the hotel sends her a digital key'):
-        stay['key'] = 'digital key'
-    with then('her phone opens the door of her room'):
-        assert stay['key'] == 'digital key'
+    with then('the hotel hands her a key card'):
+        stay['key'] = 'key card'
+        attach(
+            'receipt',
+            '\n'.join(
+                [
+                    'Check-in receipt',
+                    'Guest: Alice',
+                    'Check-in time: <i>14:00</i> *sharp*',
+                    'Late check-out: 12:00',
+                    'Room: 101',
+                    'Nights: 2',
+                    'Breakfast: included',
+                    'Parking: not booked',
+                    f'Key: {stay["key"]}',
+                    'Guest note:',
+                    '<b>*x*</b> [a](b)',
+                ]
+            ),
+        )
+        assert stay['key'] == 'key card'
 
 
-@scenario('Cancelling a paid booking refunds it', tags=['cancellation'])
+@scenario(
+    'Cancelling a paid booking refunds it in full', tags=['cancellation', 'refund']
+)
 def test_cancel_booking():
     with given(t'{guest("Alice")} has a confirmed {booking} she paid for'):
         stay = {'status': 'confirmed', 'paid': True}
@@ -58,7 +86,11 @@ def test_walk_in_booking():
     with given(t'the front desk has one free {suite}'):
         free_rooms = ['101']
     with when(t'a walk-in {guest("Bob")} asks for a {suite}'):
-        assigned = free_rooms.pop()
+        offered = free_rooms[0]
+    with when('he accepts the offer'):
+        free_rooms.remove(offered)
+        assigned = offered
+        attach('offer', f'Suite: {offered}\nRate: unchanged')
     with then(t'{guest("Bob")} gets {suite("Suite 101")}'):
         assert assigned == '101'
 
@@ -103,6 +135,7 @@ def test_payment_declined(payment_method, reason, amount):
     fee = amount // 10
     with given(t'{guest("Alice")} has a pending {booking}'):
         pending = {'paid': False}
+        attach('booking', f'Guest: Alice\nAmount due: {amount}\nStatus: pending')
     with when(
         t'{guest("Alice")} submits the {payment} by {payment_method} '
         t'with a fee of {fee}'

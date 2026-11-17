@@ -5,15 +5,15 @@
 {% include '_head.html.j2' %}
 </head>
 {#- The report's page and component, with what a delta changes: the Change
-    filter, a row per listed scenario and a card per listed term, each shown
-    from one side, and no status, parameter or term-kind colour (`body.delta`
-    in styles.css). -#}
+    and Changed in filters, a row per listed scenario and a card per listed
+    term, each shown from one side, and no status, parameter or term-kind
+    colour (`body.delta` in styles.css). -#}
 <body class="delta" x-data="deltaApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, nav_tab, reason_box, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
-  {%- from '_delta_macros.html.j2' import change_filter, term_card, delta_sides with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, nav_tab, reason_box, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar, scenario_disclosure, toggle_all_terms_button, term_tip with context -%}
+  {%- from '_delta_macros.html.j2' import change_filter, changed_in_filter, term_card, delta_sides with context -%}
   {{ icon_sprite() }}
 
   {#- The Glossary tab only when a term is listed; no Stories tab. -#}
@@ -49,6 +49,7 @@
     {{ search_box('search', 'Search titles and tags...') }}
 
     {{ change_filter('shownChanges', change_counts, unchanged_count) }}
+    {{ changed_in_filter(changed_in_counts) }}
 
     {{ status_filter() }}
 
@@ -84,7 +85,7 @@
        id="scenario-{{ index }}">
     <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ index }})"{% endif %}>
       <div style="display:flex; align-items:center;">
-        {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ index }}" :aria-expanded="!!expandedScenarios[{{ index }}]" :aria-label="(expandedScenarios[{{ index }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ index }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ index }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
+        {{ scenario_disclosure(index, has_body) }}
         <span class="delta-title">
           <span class="delta-title-line">
             {%- if item.change == 'removed' %}
@@ -106,10 +107,10 @@
         {%- endif %}
         {%- for tag in scenario.tags %}
         {%- set added = tag in item.delta.tags_added %}
-        <button type="button" class="btn-reset scenario-tag{% if added %} delta-tag-added{% endif %}" data-tag="{{ tag }}"{% if added %} title="Added tag"{% endif %} :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">{% if added %}+{% endif %}{{ tag }}</button>
+        <button type="button" class="btn-reset scenario-tag" data-tag="{{ tag }}"{% if added %} data-change="added" title="Added tag"{% endif %} :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">{% if added %}{{ change_glyph['added'] }}{% endif %}{{ tag }}</button>
         {%- endfor %}
         {%- for tag in item.delta.tags_removed %}
-        <del class="scenario-tag delta-tag-removed" title="Removed tag">{{ tag }}</del>
+        <del class="scenario-tag" data-change="removed" title="Removed tag">{{ tag }}</del>
         {%- endfor %}
         <span class="scenario-status delta-status">
           {%- if item.change == 'removed' -%}
@@ -127,7 +128,11 @@
     <div class="scenario-body" id="scenario-body-{{ index }}" :class="{ expanded: expandedScenarios[{{ index }}] }">
     <div class="scenario-body-inner">
       {%- for row in item.reasons %}
-      {{ reason_box(row.status, row.label, row.reason, row.was) }}
+      {% call reason_box(row.status, row.label, row.reason) -%}
+      {%- if row.was %}
+      <div class="delta-was">was {% if not row.reason %}{{ row.label | lower }} {% endif %}<del>{{ row.was }}</del></div>
+      {%- endif %}
+      {%- endcall %}
       {%- endfor %}
       {{ delta_sides(item, index) }}
 
@@ -178,10 +183,7 @@
             {%- for change, count in glossary_view.change_counts.items() if count %}
             <span>{{ count }} {{ change }}</span>{% endfor %}
           </div>
-          <button class="collapse-all-btn" @click="toggleAllTerms()">
-            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
-            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
-          </button>
+          {{ toggle_all_terms_button() }}
         </div>
       </div>
 
@@ -205,11 +207,7 @@
 
 </div>
 
-<!-- Shared hover tooltip for term refs; positioned by app.js. -->
-<div id="term-tip" role="tooltip" hidden>
-  <span class="term-tip-name"></span>
-  <span class="term-tip-def"></span>
-</div>
+{{ term_tip() }}
 
 {{ stale_link_snackbar() }}
 

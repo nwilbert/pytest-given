@@ -3505,6 +3505,23 @@
         ```
 - **then** a `failed` «citation finding» remains, blaming a scenario using the term
 
+## ✓ Attachments pair by label in a «delta report», a repeated label pairing its unchanged ones first
+`tests/unit/delta/test_attachments.py::test_a_repeated_label_pairs_its_unchanged_attachments_first` · delta
+
+- **given** a before «step» attaching two responses and a receipt, and an after one attaching the receipt first and a new response ahead of the two
+- **when** their «attachments» are aligned
+- **then** the receipt pairs with the receipt, unchanged
+- **then** the new response is added
+- **then** the two responses pair with their equals, unchanged
+
+## ✓ A reworded line of a changed attachment carries its word diff in a «delta report»
+`tests/unit/delta/test_attachments.py::test_a_similar_line_is_modified_with_its_word_diff` · delta
+
+- **given** a before and an after «attachment» whose one line has one word reworded
+- **when** the two «attachments» are aligned
+- **then** the «attachment» is changed and its line is modified
+- **then** the modified line marks the reworded word removed and added
+
 ## ✓ A grouped scenario's «scenario identity» survives its first «case» changing
 `tests/unit/delta/test_build.py::test_a_grouped_identity_survives_its_first_case_changing` · delta
 
@@ -3557,16 +3574,24 @@
 `tests/unit/delta/test_build.py::test_what_does_not_make_a_scenario_changed` · delta
 
 - **given** a parametrized scenario, moved and renamed through the «rename log»
-- **given** its after side differs in module, source, duration, error message, fixture name, story IDs, pins, attachments and an attachment column
+- **given** its after side differs in module, source, duration, error message, fixture name, story IDs and pins
 - **when** a «delta report» is built
 - **then** the scenario is unchanged and nothing is listed
 
 ## ✓ What makes a scenario changed in a «delta report»
 `tests/unit/delta/test_build.py::test_what_makes_a_scenario_changed` · delta
 
-- **given** six scenarios whose after sides each differ in one of title, step, tag, status, reason and parameter table
+- **given** seven scenarios whose after sides each differ in one of title, step, tag, status, reason, parameter table and attachment
 - **when** a «delta report» is built
-- **then** each is changed, with the flag of what differs
+- **then** each is changed, and its «changed parts» name what differs
+
+## ✓ A changed attachment cell counts as attachments and an added case's cell as parameters in a «delta report»
+`tests/unit/delta/test_build.py::test_an_attachment_cell_change_counts_only_as_attachments` · delta
+
+- **given** a grouped scenario whose paired «case» changes its page cell, and one that adds a «case» with a page cell
+- **when** a «delta report» is built
+- **then** the first scenario's one «changed part» is attachments, and its changed cell sits under the page column
+- **then** the second scenario's one «changed part» is parameters, from its added «case»
 
 ## ✓ A schema version mismatch is refused, naming both versions
 `tests/unit/delta/test_build.py::test_a_schema_version_mismatch_is_refused_naming_both_versions` · delta

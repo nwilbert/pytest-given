@@ -24,7 +24,12 @@ stakeholders who want the behavioral changes without reading code.
 - `pytest-given delta BEFORE.json AFTER.json` builds a delta from two ordinary JSON reports and
   writes a delta JSON and/or a delta HTML page.
 - Scenarios are listed as added, removed or changed. A changed scenario shows what changed in its
-  title, steps, tags, status and parameter table.
+  title, steps, tags, status, parameter table and attachments.
+- An attachment's changes show as a diff, line by line and word by word. An attachment is often the
+  only place a reader sees a scenario's whole result, such as the output document its `then`
+  checks, so a change in it can be the scenario's only behavioral change.
+- A reader can hide the changed scenarios that changed only in parts they don't care about, such as
+  only in their attachments or only in their status.
 - The glossary gets the same treatment: added, removed and changed terms.
 - Grouped parametrized scenarios are fully supported, including added and removed cases, columns
   and cell values. Per-case scenarios pair case by case (see [Scenario identity](#scenario-identity)).
@@ -48,10 +53,6 @@ stakeholders who want the behavioral changes without reading code.
   two shows as one removed and two added.
 - Reading reports of another schema. The delta reads two reports of its own `schema_version` only
   (see [Inputs](#inputs)). No readers or migrations for other shapes, as for `pytest-given report`.
-- Attachments. Their changes don't make a scenario changed, and the delta doesn't diff them. Each
-  scenario and step shows its attachments from the side it is shown from (see
-  [Which side is shown](#which-side-is-shown)), unmarked. Attachment content is often a dumped
-  object whose timestamps and generated IDs differ on every run.
 - Renaming a parameter column by hand. A renamed parametrize argname is paired automatically when
   its values didn't change (see [Cases and columns](#cases-and-columns)), and otherwise reads as one
   column removed and one added.
@@ -182,8 +183,8 @@ still unpaired:
 1. **Columns by name and kind.** A column's name is its header: a `param` column's argname, a
    `derived` column's expression or placeholder name. Its ID never pairs it, since a `derived`
    column's generated ID (`derived:0`) shifts when another derived column comes or goes.
-   An `attachment` column pairs by name too, but gaining or losing one is no change, and its cells
-   are never compared (see [What counts as a change](#what-counts-as-a-change)).
+   An `attachment` column's name is its header too, and its cells compare as attachments do (see
+   [Attachments](#attachments)).
 2. **Cases by custom case ID**, and by a case ID the rename log's `cases` maps rewrote.
 3. **Cases by values.** Two unpaired cases pair when each is the only unpaired case on its side
    with those values in the `param` columns both tables share. This keeps a table paired case by
@@ -204,6 +205,25 @@ identity and pairs as changed, its parameter table shown as added or removed.
 
 A pairing records how it was made: `rename-log`, `case-id` or `values` for a case, `name` or
 `values` for a column.
+
+### Attachments
+
+Inside a paired scenario, a step's attachments pair once its step has paired by the step
+alignment, so an added or removed step's attachments come and go with it. Within a pair of steps,
+attachments pair by label. When a label repeats on one step, its unchanged attachments pair first,
+by the longest common subsequence, and the rest pair in order between them. An unpaired attachment
+is added or removed.
+
+Two paired attachments are equal when their content type and content are equal. An attachment
+whose content varies between cases sits on its step as a pointer to its `attachment` column. Two
+pointers compare by their columns' pairing, and their content compares cell by cell in the
+parameter table. A pointer paired with a payload, from an attachment whose content started or
+stopped varying between cases, is changed, and its column shows as added or removed.
+
+A changed attachment carries a diff of its content: a line diff, and a word diff inside each
+modified line, made the way a step's narration diff is. JSON content is already indented one value
+per line when it is attached, so it diffs line by line as text does. A changed attachment cell
+carries the same diff.
 
 ### Terms
 
@@ -305,14 +325,21 @@ rev = "8d41e07c2a9f4b6e1d3c5a7f9e0b2d4c6a8f1e35"  # v0.6.0
 
 ## What counts as a change
 
-A paired scenario is *changed* when any of these differ, and *unchanged* otherwise:
+A paired scenario is *changed* when any of these parts differ, and *unchanged* otherwise:
 
-- its scenario title
-- its steps: phase, narration and nesting, compared after grouping
-- its tags
-- its status, or its skip or xfail reason
-- its parameter table, after pairing: its columns and their names, its cases, cell values and case
-  statuses, and a case's ID when either side's is custom
+- `title`: its scenario title
+- `steps`: its steps' phase, narration and nesting, compared after grouping
+- `tags`: its tags
+- `status`: its status, or its skip or xfail reason
+- `parameters`: its parameter table, after pairing: its columns other than `attachment` columns
+  and their names, its cases, cell values and case statuses, and a case's ID when either side's is
+  custom
+- `attachments`: an added, removed or changed attachment, an added or removed `attachment` column,
+  or a changed attachment cell of a paired case (see [Attachments](#attachments)). An added or
+  removed case's attachment cells come and go with the case, a `parameters` change.
+
+A changed scenario's *changed parts* are the parts that differ, by those names. The Changed in
+filter selects scenarios by them (see [Scenarios tab](#scenarios-tab)).
 
 A generated case ID is made from its case's values, so the cells and columns already tell its
 change, and it doesn't count by itself. The case ID that ends a per-case scenario's title compares
@@ -332,12 +359,13 @@ So a display that changed only because its term's canonical name changed doesn't
 term shows on the Glossary tab, not in every scenario that mentions it.
 
 Nothing else makes a scenario changed: its node ID, module, source location, duration, error
-message and traceback, fixture names, story membership, pins and attachments. That includes the
-`attachment` columns of a parameter table, which are left out of the table comparison.
+message and traceback, fixture names, story membership and pins.
 
-Values that differ on every run, such as a rendered timestamp or an object's default `str()` with
-its memory address, read as changed in every delta, as they differ between any two normal reports.
-The skill has the agent fix them at their source.
+Values that differ on every run, such as a rendered timestamp, a generated ID or an object's
+default `str()` with its memory address, read as changed in every delta, as they differ between
+any two normal reports. Attachment content holds them most often, since it is often a whole
+dumped object. The skills have the agent fix them at their source. Until then, a reader can
+uncheck *Attachments* in the Changed in filter.
 
 A paired term is *changed* when its canonical name or definition differs (a changed kind unpairs it,
 see [Terms](#terms)). Derived facts, such as its other forms and how many scenarios refer to it, are
@@ -363,14 +391,20 @@ them, so a renderer only has to lay them out. Its exact field names are the buil
   "scenarios": [
     {
       "change": "changed",            // "added" | "removed" | "changed"
-      "paired_by": "rename-log",      // absent for added and removed
+      "paired_by": "rename-log",      // null for added and removed
+      "changed_in": ["steps", "attachments"],  // the changed parts, in the order
+                                      // listed under What counts as a change;
+                                      // [] for added and removed
       "before": { /* Scenario, as in a report */ },
       "after": { /* Scenario */ },
       "steps": [ /* alignment: equal | modified | added | removed, per step,
                     recursing into children; a modified step carries a
-                    word-level diff of its narration */ ],
+                    word-level diff of its narration; a paired step carries
+                    its attachments' alignment, a changed one with its
+                    line and word diff */ ],
       "parameters": { /* column alignment and case alignment, each with its
-                        paired_by, and per-cell before/after values */ }
+                        paired_by, and per-cell before/after values; a changed
+                        attachment cell carries its line and word diff */ }
     }
   ],
   "unchanged": ["…identity pairs…"],
@@ -419,11 +453,14 @@ them, so a renderer only has to lay them out. Its exact field names are the buil
 
 The normal report's page, with the differences below.
 
+The Changed in filter and the attachment diffs are designed with the `frontend-design` skill, then
+Playwright-verified as AGENTS.md's Report testing section requires.
+
 ### Which side is shown
 
 A listed scenario or term is shown from its *after* side, or from its *before* side when it was
 removed. That side supplies its module and terms for Browse by, its status for the Status filter,
-its source link, its attachments and its error, which shows as in the normal report. Search matches
+its source link and its error, which shows as in the normal report. Search matches
 the text of both sides.
 
 ### Header
@@ -458,6 +495,16 @@ the git tag pointing at that SHA (the highest by version order when several do),
 - **Sidebar.** Search and Browse by work as in the normal report. A new *Change* filter (Added,
   Changed, Removed, each with its count) sits above the Status filter. Under it, a muted line gives
   the number of unchanged scenarios.
+- **Changed in.** Under the Change filter, a *Changed in* group holds a checkbox per changed part
+  (Title, Steps, Tags, Status, Parameters, Attachments), each with the number of changed scenarios
+  that changed in it. A scenario counts under each of its changed parts, so the numbers can sum to
+  more than the Changed count. All boxes are checked by default. A box is disabled at zero, and the
+  group while the Changed pill is off. A changed scenario shows when at least one of its changed
+  parts is checked, so unchecking *Attachments* hides the scenarios that changed only in their
+  attachments. Added and removed scenarios have no changed parts, and the group never hides them.
+  A hidden scenario's module leaves Browse by, as with the other filters. The group's state goes in
+  the URL fragment in the Change filter's form: the checked parts, once any part is unchecked. The
+  pill counts stay as they are.
 - **Modules.** Under Browse by, only the modules of listed scenarios appear, each with a change
   glyph and colour: added when only *after* has it, removed when only *before* has it, and changed
   when both have it. A test file that only moved, its scenarios unchanged, doesn't appear.
@@ -512,6 +559,14 @@ scenario does in the normal report, and the column says which side a line belong
 - Unchanged steps show on both sides, plain. Term refs keep their underlines throughout, and each
   side's term refs read from that side's glossary.
 - Nested steps line up the same way, inside their parent.
+- A step's attachments show under it on each side. A changed attachment's badge is led by `~` on
+  both sides, an added one's by `+` on the *after* side, and a removed one's by `−` on the
+  *before* side, its label struck through. The step's own line stays unmarked when only its
+  attachments changed. Opening a changed attachment on either side opens it on both, level with
+  each other. The *before* side marks removed lines and words, struck through on red, and the
+  *after* side added ones, on green, as a modified step's words are marked. A long run of
+  unchanged lines folds to a line such as `… 40 unchanged lines`, which opens on click. Equal
+  attachments and those of an added or removed step show unmarked.
 - Added and removed scenarios show one side only, in one column from the left, without marks: the
   row's colour already says it all.
 
@@ -543,8 +598,10 @@ beneath them:
 - An added column's header is marked `+` and its cells tinted green. A removed column's header is
   struck through on the *before* side. A renamed column shows its new name, with `was <old name>`
   beneath it.
-- `attachment` columns appear in each side's table, unmarked. Hovering one of the same name on both
-  sides highlights it in both tables.
+- `attachment` columns are marked as other columns are. A changed attachment cell is tinted on both
+  sides, as any changed cell is. Its payload opens under its row on both sides, level with each
+  other, with the diff marks and folds of a step's changed attachment. Hovering an attachment column
+  on either side highlights it in both tables.
 - Hovering a placeholder in either side's steps highlights its column in both tables, a renamed
   column included. Hovering a row previews its values in its own side's steps, as in the normal
   report.
@@ -646,8 +703,11 @@ feature's name. It covers:
   IDs differ, becomes a `cases` entry once confirmed.
 - Writing `rev` as [the rename log](#the-rename-log) describes.
 - Re-running the delta until each remaining removed/added pair is genuine.
-- Fixing a value that differs on every run at its source, such as with a fixed clock or a stable
-  `__str__`, when a step or cell reads as changed in every delta.
+- Fixing a value that differs on every run at its source, when a step, cell or attachment reads as
+  changed in every delta: a fixed clock, a seeded ID generator or a stable `__str__`, or, for a
+  value the test can't control, replacing the varying part with a fixed placeholder before
+  attaching. Unchecking *Attachments* in the Changed in filter is the reader's way to skip such
+  noise, not a fix.
 
 It shares the repair technique of the citing skill's [repair guide](../../src/pytest_given/.agents/skills/pytest-given-citing/references/repair.md)
 for renamed tests. The builder decides whether to share a reference file or restate it.
@@ -756,15 +816,16 @@ exist yet at that point, so the step passes `--after-label v<version>`.
   delta with fixed labels. Both runs see the same commit, so the example's rename log entries leave
   `rev` out, and the delta renders without source links, since the staged paths don't exist at that
   commit. Its changes cover every surface: an added, removed, reworded and hand-mapped scenario, tag
-  and status changes, a parameter table with added and removed cases, columns and values, and
-  glossary changes. It serves as the Playwright-verification page and as the site's example delta.
+  and status changes, a parameter table with added and removed cases, columns and values, a
+  scenario changed only in its attachments, a changed attachment cell, and glossary changes. It
+  serves as the Playwright-verification page and as the site's example delta.
 - A delta has no Markdown to read a regeneration's real change from. So `reports_current` also
   compares the example delta JSON without the fields every regeneration rewrites (`metadata`,
   `duration_ms`). It fails on a difference, as a changed `.md` does, and contributors read that
   comparison where they would read a `.md` diff.
 - Self-report scenarios for the user-facing rules: identity and pairing order, the rename log's
-  chains, stop rule and skipping, case and column pairing, how narration compares, and what counts
-  as a change.
+  chains, stop rule and skipping, case and column pairing, how narration compares, how attachments
+  pair and compare, and what counts as a change, with its changed parts.
 - `CHANGELOG.md` entries under *Added*: the delta report, the `pytest-given-delta` skill, and
   `schema_version` in the JSON report's metadata. Under *Changed*, a **Breaking** entry: `pytest-given
   report` and `pytest-given skills` exit 2 on an error, where a script checking for 1 needs to check
@@ -778,6 +839,10 @@ exist yet at that point, so the step passes `--after-label v<version>`.
   diagram.
 - The skill's mirror under `.claude/skills/` is regenerated with the others. The navigating skill
   points at the delta skill for "what changed between releases?".
+- The authoring skill's attachment rules gain one: attach content that is the same on every run,
+  with the fixes the delta skill lists. The reviewing skill gains it as a rubric. A
+  `CHANGELOG.md` entry under *Changed* names the new authoring rule. The delta report's own entry
+  covers attachment diffs.
 
 ## Left to the builder
 
@@ -793,3 +858,6 @@ exist yet at that point, so the step passes `--after-label v<version>`.
   label flags. A delta writes both outputs at once, hence `--json` and `--html` where
   `pytest-given report` has one `-o`.
 - How the delta page shares templates with the report page.
+- When an unequal pair of attachment lines counts as *modified* rather than as one removed and one
+  added, how many unchanged lines a fold keeps around a change, and how long a run must be to fold.
+- The URL fragment key for the Changed in filter.

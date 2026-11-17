@@ -1886,18 +1886,21 @@ body.delta {
 }
 body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 
+.delta del { text-decoration-color: var(--removed-line); }
 
 
 
 
-.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr)[data-change="added"] {
+
+
+.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr, .attachment-badge, .scenario-tag, .use-chip)[data-change="added"] {
   --change-ink: var(--added-ink); --change-line: var(--added-line); --change-tint: var(--added-tint);
 }
-.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark)[data-change="changed"],
+.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .attachment-badge)[data-change="changed"],
 .delta .delta-step[data-change="modified"] {
   --change-ink: var(--changed-ink); --change-line: var(--changed-line); --change-tint: var(--changed-tint);
 }
-.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr)[data-change="removed"] {
+.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr, .attachment-badge, .scenario-tag, .use-chip)[data-change="removed"] {
   --change-ink: var(--removed-ink); --change-line: var(--removed-line); --change-tint: var(--removed-tint);
 }
 
@@ -1937,7 +1940,6 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   color: var(--text-muted);
   font-weight: normal;
 }
-.delta-was del, .delta-title-line > del.scenario-title { text-decoration-color: var(--removed-line); }
 .delta-change-label {
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -1951,15 +1953,8 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   padding: 0 7px;
   white-space: nowrap;
 }
-.scenario-tag.delta-tag-added,
-.use-chip.delta-form[data-change="added"] { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
-.scenario-tag.delta-tag-removed,
-.use-chip.delta-form[data-change="removed"] {
-  cursor: default;
-  color: var(--removed-ink);
-  border-color: var(--removed-line);
-  background: var(--removed-tint);
-}
+.delta :is(.scenario-tag, .use-chip)[data-change] { color: var(--change-ink); border-color: var(--change-line); background: var(--change-tint); }
+.delta :is(.scenario-tag, .use-chip)[data-change="removed"] { cursor: default; }
 .delta-status { color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .reason-box .delta-was { margin-top: 2px; }
 
@@ -1970,6 +1965,26 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   font-size: var(--font-size-sm);
   color: var(--text-muted);
 }
+
+
+
+
+
+.delta-changed-in {
+  --kind-line: var(--changed-line);
+  min-width: 0;
+  margin: var(--space-md) 0 0;
+  padding: 0 0 0 var(--space-md);
+  border: 0;
+  border-left: 1px solid var(--border);
+}
+.delta-changed-in > legend { float: left; width: 100%; padding: 0; }
+.delta-changed-in .kind-filter-row { clear: left; }
+.delta-changed-in:disabled > legend,
+.delta-changed-in:disabled .kind-filter-row,
+.delta-changed-in .delta-part-empty { color: var(--text-muted); cursor: default; }
+.delta-changed-in:disabled .kind-swatch,
+.delta-changed-in .delta-part-empty .kind-swatch { --kind-line: var(--border); }
 .delta-module-mark {
   font-weight: 700;
   font-size: var(--font-size-sm);
@@ -2052,12 +2067,62 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
 
 
+.delta-badge-lead {
+  margin-right: 4px;
+  font-weight: 700;
+  color: var(--change-ink);
+}
+
+
+
+
+
+
+
+.delta-diff {
+  contain: inline-size;
+  padding-inline: 0;
+  white-space: normal;
+}
+.delta-diff-lines { width: max-content; min-width: 100%; }
+
+
+.attachment-panel .delta-diff { min-width: 24rem; }
+.delta-line {
+  min-height: 1lh;
+  padding-inline: var(--space-md);
+  white-space: pre;
+}
+.delta-line[data-change="removed"] {
+  background: var(--removed-tint);
+  text-decoration: line-through;
+  text-decoration-color: currentColor;
+}
+.delta-line[data-change="added"] { background: var(--added-tint); }
+.delta-line-gap { height: 1lh; background: var(--delta-hatch); }
+
+.delta-fold-toggle {
+  display: block;
+  width: 100%;
+  padding-inline: var(--space-md);
+  border-block: 1px dashed var(--border);
+  color: var(--text-muted);
+  white-space: pre;
+}
+.delta-fold-toggle:hover { color: var(--text-primary); border-color: var(--text-muted); }
+.delta-fold-toggle:focus-visible { outline-offset: -2px; }
+
+.delta-fold-toggle > span { display: inline-block; position: sticky; left: var(--space-md); }
+.delta-fold.expanded > .delta-fold-toggle,
+.delta-fold:not(.expanded) > .delta-fold-lines { display: none; }
+
+
+
 
 .delta-table { min-width: 0; }
 .delta-table .param-table th,
 .delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
 .delta-table .param-table th .delta-was { display: block; }
-.delta-table .param-table del { text-decoration-color: var(--removed-line); }
 
 
 .delta-table .param-table tr[data-change] { background: var(--change-tint); }
@@ -2107,7 +2172,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 .delta-term-side .entry-summary { margin-top: 0; }
 .delta-refs-none { font-size: var(--font-size-sm); color: var(--text-muted); }
-.use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
+
+.use-chip.delta-form[data-change="removed"] { text-decoration-line: line-through; }
 
 
 </style>
@@ -2133,7 +2199,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     </nav>
     
     <div class="topbar-meta">
-      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-15 10:30</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-15 10:30</span>
+      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-17 13:28</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-17 13:28</span>
       </p>
       <span class="topbar-version">pytest-given 0.5.2</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
@@ -2164,6 +2230,45 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
       </div>
       <div class="delta-unchanged">1 unchanged</div>
     </div>
+    <fieldset class="delta-changed-in" :disabled="!shownChanges.changed">
+      <legend class="sidebar-label">Changed in</legend>
+      <label class="kind-filter-row">
+        <input type="checkbox" x-model="shownParts.title">
+        <span class="kind-swatch"></span>
+        <span>Title</span>
+        <span class="nav-group-count">2</span>
+      </label>
+      <label class="kind-filter-row">
+        <input type="checkbox" x-model="shownParts.steps">
+        <span class="kind-swatch"></span>
+        <span>Steps</span>
+        <span class="nav-group-count">3</span>
+      </label>
+      <label class="kind-filter-row">
+        <input type="checkbox" x-model="shownParts.tags">
+        <span class="kind-swatch"></span>
+        <span>Tags</span>
+        <span class="nav-group-count">1</span>
+      </label>
+      <label class="kind-filter-row">
+        <input type="checkbox" x-model="shownParts.status">
+        <span class="kind-swatch"></span>
+        <span>Status</span>
+        <span class="nav-group-count">1</span>
+      </label>
+      <label class="kind-filter-row">
+        <input type="checkbox" x-model="shownParts.parameters">
+        <span class="kind-swatch"></span>
+        <span>Parameters</span>
+        <span class="nav-group-count">1</span>
+      </label>
+      <label class="kind-filter-row">
+        <input type="checkbox" x-model="shownParts.attachments">
+        <span class="kind-swatch"></span>
+        <span>Attachments</span>
+        <span class="nav-group-count">2</span>
+      </label>
+    </fieldset>
 
     <div class="sidebar-section">
       <div class="sidebar-label">Status</div>
@@ -2262,16 +2367,14 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-0" :aria-expanded="!!expandedScenarios[0]" :aria-label="(expandedScenarios[0] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(0)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span></button>
         <span class="delta-title">
           <span class="delta-title-line">
-            <span class="scenario-title" data-side="after">Guests check in with a digital key</span>
+            <span class="scenario-title" data-side="after">Guests check in at the front desk</span>
             <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/check_in" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
           </span>
-          <span class="delta-was" data-side="before">was <del>Guests check in at the front desk</del></span>
         </span>
       </div>
       <span class="scenario-meta">
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="front-desk" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">front-desk</button>
-        <button type="button" class="btn-reset scenario-tag delta-tag-added" data-tag="digital-key" title="Added tag" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">+digital-key</button>
         <span class="scenario-status delta-status">✓ passed</span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -2281,25 +2384,57 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body-inner">
       <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s0_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="before">Booking</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s0_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s0_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> gives her name at the front desk</div></div>
-            </div></div><div class="phase-block" data-block="before:2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="removed" data-row="s0_2"><div class="step-text">the hotel hands her a key card</div></div>
-            </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s0_3" aria-hidden="true"></div><div class="delta-gap" data-row="s0_4" aria-hidden="true"></div></div></div></div>
-        <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s0_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="after">Booking</span></div></div>
-            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s0_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Alice</span> gives her name at the front desk</div></div>
-            </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s0_2" aria-hidden="true"></div></div><div class="phase-block delta-continued" data-block="1"><div class="phase-steps">
-              <div class="delta-step" data-change="added" data-row="s0_3"><div class="step-text">the hotel sends her a digital key</div></div>
+              <div class="delta-step" data-change="equal" data-row="s0_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> gives her name at the front desk</div></div>
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="added" data-row="s0_4"><div class="step-text">her phone opens the door of her room</div></div>
+              <div class="delta-step" data-change="equal" data-row="s0_2"><div class="step-text">the hotel hands her a key card</div><div class="step-attachments"><div data-row="s0_2_att_0">
+      <button type="button" class="btn-reset attachment-badge" data-change="changed"
+            :aria-expanded="!!expandedAttachments['s0_2_att_0']"
+            @click="toggleAttachment('s0_2_att_0')"><span class="delta-badge-lead">~</span><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>receipt</button>
+    <div class="attachment-expand" :class="{ expanded: expandedAttachments['s0_2_att_0'] }">
+      <div class="attachment-expand-inner">
+        <div class="attachment-content delta-diff" data-scroll-pair="s0_2_att_0">
+      <div class="delta-diff-lines"><div class="delta-line">Check-in receipt</div><div class="delta-line">Guest: Alice</div><div class="delta-line" data-change="removed">Deposit: none</div><div class="delta-line" data-change="modified">Check-in time: <del class="delta-words">&lt;i&gt;15:00&lt;/i&gt;</del> *sharp*</div><div class="delta-line-gap" aria-hidden="true"></div><div class="delta-line">Room: 101</div><div class="delta-line">Nights: 2</div><div class="delta-line">Breakfast: included</div>
+        <div class="delta-fold" :class="{ expanded: expandedAttachments['s0_2_att_0_fold8'] }">
+          <button type="button" class="btn-reset delta-fold-toggle"
+                  :aria-expanded="!!expandedAttachments['s0_2_att_0_fold8']"
+                  @click="toggleAttachment('s0_2_att_0_fold8')"><span>&hellip; 4 unchanged lines</span></button>
+          <div class="delta-fold-lines"><div class="delta-line">Parking: not booked</div><div class="delta-line">Key: key card</div><div class="delta-line">Guest note:</div><div class="delta-line">&lt;b&gt;*x*&lt;/b&gt; [a](b)</div></div>
+        </div></div>
+    </div>
+      </div>
+    </div>
+    </div></div></div>
+            </div></div></div></div>
+        <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s0_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span></div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s0_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> gives her name at the front desk</div></div>
+            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s0_2"><div class="step-text">the hotel hands her a key card</div><div class="step-attachments"><div data-row="s0_2_att_0">
+      <button type="button" class="btn-reset attachment-badge" data-change="changed"
+            :aria-expanded="!!expandedAttachments['s0_2_att_0']"
+            @click="toggleAttachment('s0_2_att_0')"><span class="delta-badge-lead">~</span><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>receipt</button>
+    <div class="attachment-expand" :class="{ expanded: expandedAttachments['s0_2_att_0'] }">
+      <div class="attachment-expand-inner">
+        <div class="attachment-content delta-diff" data-scroll-pair="s0_2_att_0">
+      <div class="delta-diff-lines"><div class="delta-line">Check-in receipt</div><div class="delta-line">Guest: Alice</div><div class="delta-line-gap" aria-hidden="true"></div><div class="delta-line" data-change="modified">Check-in time: <ins class="delta-words">&lt;i&gt;14:00&lt;/i&gt;</ins> *sharp*</div><div class="delta-line" data-change="added">Late check-out: 12:00</div><div class="delta-line">Room: 101</div><div class="delta-line">Nights: 2</div><div class="delta-line">Breakfast: included</div>
+        <div class="delta-fold" :class="{ expanded: expandedAttachments['s0_2_att_0_fold8'] }">
+          <button type="button" class="btn-reset delta-fold-toggle"
+                  :aria-expanded="!!expandedAttachments['s0_2_att_0_fold8']"
+                  @click="toggleAttachment('s0_2_att_0_fold8')"><span>&hellip; 4 unchanged lines</span></button>
+          <div class="delta-fold-lines"><div class="delta-line">Parking: not booked</div><div class="delta-line">Key: key card</div><div class="delta-line">Guest note:</div><div class="delta-line">&lt;b&gt;*x*&lt;/b&gt; [a](b)</div></div>
+        </div></div>
+    </div>
+      </div>
+    </div>
+    </div></div></div>
             </div></div></div></div>
       </div>
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:30</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:39</span></div>
     </div>
     </div>
   </div>
@@ -2312,15 +2447,17 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-1" :aria-expanded="!!expandedScenarios[1]" :aria-label="(expandedScenarios[1] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(1)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span></button>
         <span class="delta-title">
           <span class="delta-title-line">
-            <span class="scenario-title" data-side="after">Cancelling a paid booking refunds it</span>
+            <span class="scenario-title" data-side="after">Cancelling a paid booking refunds it in full</span>
             <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/cancel_booking" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
           </span>
+          <span class="delta-was" data-side="before">was <del>Cancelling a paid booking refunds it</del></span>
         </span>
       </div>
       <span class="scenario-meta">
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="cancellation" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">cancellation</button>
-        <del class="scenario-tag delta-tag-removed" title="Removed tag">legacy</del>
+        <button type="button" class="btn-reset scenario-tag" data-tag="refund" data-change="added" title="Added tag" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">+refund</button>
+        <del class="scenario-tag" data-change="removed" title="Removed tag">legacy</del>
         <span class="scenario-status delta-status">✓ passed</span>
         <span class="scenario-duration">0ms</span>
       </span>
@@ -2330,27 +2467,27 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body-inner">
       <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="before">Booking</span> she paid for</div></div>
+              <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s1_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> cancels the <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="before">Booking</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s1_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> cancels the <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object has-term-tip" data-term-id="payment" data-term-side="before">Payment</span> in full</div></div>
+              <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
             </div><div class="phase-steps">
-              <div class="delta-step" data-change="removed" data-row="s1_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> receives a cancellation email with her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice" data-term-side="before">Invoice</span></div></div>
+              <div class="delta-step" data-change="removed" data-row="s1_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> receives a cancellation email with her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="before:invoice" data-term-entry="invoice">Invoice</span></div></div>
             </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s1_4" aria-hidden="true"></div></div></div></div>
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="after">Booking</span> she paid for</div></div>
+              <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s1_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Alice</span> cancels the <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="after">Booking</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s1_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> cancels the <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object has-term-tip" data-term-id="payment" data-term-side="after">Payment</span> in full</div></div>
+              <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
             </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s1_3" aria-hidden="true"></div></div><div class="phase-block delta-continued" data-block="2"><div class="phase-steps">
-              <div class="delta-step" data-change="added" data-row="s1_4"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice" data-term-side="after">Invoice</span></div></div>
+              <div class="delta-step" data-change="added" data-row="s1_4"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
             </div></div></div></div>
       </div>
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:42</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:68</span></div>
     </div>
     </div>
   </div>
@@ -2382,23 +2519,35 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body-inner">
       <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><del class="delta-words"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-side="before">Dana</span></del> has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-side="before">Room</span></div></div>
+              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><del class="delta-words"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-entry="removed:receptionist">Dana</span></del> has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite">Room</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-side="before">Room</span></div></div>
-            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s2_2"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Bob</span> gets <del class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-side="before">Room 101</span></del></div></div>
+              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite">Room</span></div></div>
+            </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s2_2" aria-hidden="true"></div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s2_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> gets <del class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite">Room 101</span></del></div></div>
             </div></div></div></div>
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><ins class="delta-words">the front desk </ins>has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite" data-term-side="after">Suite</span></div></div>
+              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><ins class="delta-words">the front desk </ins>has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite" data-term-side="after">Suite</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
+            </div><div class="phase-steps">
+              <div class="delta-step" data-change="added" data-row="s2_2"><div class="step-text">he accepts the offer</div><div class="step-attachments"><div>
+      <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s2_2_att_0']"
+            @click="toggleAttachment('s2_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>offer</button>
+    <div class="attachment-expand" :class="{ expanded: expandedAttachments['s2_2_att_0'] }">
+      <div class="attachment-expand-inner">
+        <div class="attachment-content"><pre>Suite: 101
+Rate: unchanged</pre></div>
+      </div>
+    </div>
+    </div></div></div>
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s2_2"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Bob</span> gets <ins class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite" data-term-side="after">Suite 101</span></ins></div></div>
+              <div class="delta-step" data-change="modified" data-row="s2_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> gets <ins class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite 101</span></ins></div></div>
             </div></div></div></div>
       </div>
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:56</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:84</span></div>
     </div>
     </div>
   </div>
@@ -2428,10 +2577,10 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
       <div class="delta-sides delta-one-side">
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">the next <span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Carol</span> arrives at noon</div>
+              <div class="step-text">the next <span class="term-ref-actor has-term-tip" data-term-id="guest">Carol</span> arrives at noon</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> asks the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-side="before">Receptionist</span> for a 2 pm check-out</div>
+              <div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> asks the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-entry="removed:receptionist">Receptionist</span> for a 2 pm check-out</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the request is refused</div>
@@ -2439,7 +2588,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
       </div>
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:65</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:92</span></div>
     </div>
     </div>
   </div>
@@ -2469,10 +2618,10 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
       <div class="delta-sides delta-one-side">
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Alice</span> has stayed three times before</div>
+              <div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has stayed three times before</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="concierge" data-term-side="after">Concierge</span> prepares her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice" data-term-side="after">Invoice</span></div>
+              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="concierge">Concierge</span> prepares her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the total is reduced by 10 percent</div>
@@ -2480,7 +2629,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
       </div>
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:66</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:98</span></div>
     </div>
     </div>
   </div>
@@ -2502,7 +2651,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
         <span class="scenario-status delta-status">⊗ expected failure → ✗ failed</span>
-        <span class="scenario-duration">43ms</span>
+        <span class="scenario-duration">59ms</span>
       </span>
     </div>
 
@@ -2513,22 +2662,26 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     </div>
       <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s5_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> has a pending <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="before">Booking</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s5_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span></div><div class="step-attachments"><div data-row="s5_0_att_0">
+      <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>booking</span>
+    </div></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s5_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> submits the <span class="term-ref-object has-term-tip" data-term-id="payment" data-term-side="before">Payment</span> by <span data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a <del class="delta-words">deposit</del> of <del class="delta-words"><span data-param="before:derived:0" data-subst="before:derived:0">{deposit}</span></del></div></div>
+              <div class="delta-step" data-change="modified" data-row="s5_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> by <span data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a <del class="delta-words">deposit</del> of <del class="delta-words"><span data-param="before:derived:0" data-subst="before:derived:0">{deposit}</span></del></div></div>
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s5_2"><div class="step-text">the hotel declines the <span class="term-ref-object has-term-tip" data-term-id="payment" data-term-side="before">Payment</span> because of <span data-param="reason" data-subst="reason">{decline_reason}</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s5_2"><div class="step-text">the hotel declines the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> because of <span data-param="reason" data-subst="reason">{decline_reason}</span></div></div>
             </div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s5_3"><div class="step-text">the <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="before">Booking</span> stays pending</div></div>
+              <div class="delta-step" data-change="equal" data-row="s5_3"><div class="step-text">the <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span> stays pending</div></div>
             </div></div></div></div>
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s5_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Alice</span> has a pending <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="after">Booking</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s5_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span></div><div class="step-attachments"><div data-row="s5_0_att_0">
+      <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>booking</span>
+    </div></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s5_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest" data-term-side="after">Alice</span> submits the <span class="term-ref-object has-term-tip" data-term-id="payment" data-term-side="after">Payment</span> by <span data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a <ins class="delta-words">fee</ins> of <ins class="delta-words"><span data-param="derived:0" data-subst="derived:0">{fee}</span></ins></div></div>
+              <div class="delta-step" data-change="modified" data-row="s5_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> by <span data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a <ins class="delta-words">fee</ins> of <ins class="delta-words"><span data-param="derived:0" data-subst="derived:0">{fee}</span></ins></div></div>
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s5_2"><div class="step-text">the hotel declines the <span class="term-ref-object has-term-tip" data-term-id="payment" data-term-side="after">Payment</span> because of <span data-param="reason" data-subst="reason">{reason}</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s5_2"><div class="step-text">the hotel declines the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> because of <span data-param="reason" data-subst="reason">{reason}</span></div></div>
             </div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s5_3"><div class="step-text">the <span class="term-ref-object has-term-tip" data-term-id="booking" data-term-side="after">Booking</span> stays pending</div></div>
+              <div class="delta-step" data-change="equal" data-row="s5_3"><div class="step-text">the <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span> stays pending</div></div>
             </div></div></div></div>
         
         <div class="delta-table" data-side="before">
@@ -2537,6 +2690,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
             <thead data-band="head">
               <tr>
                 <th class="param-id" data-block="frame">case ID</th>
+                <th data-param="attachment:0" data-block="0">booking</th>
                 <th data-param="payment_method" data-block="1">payment_method</th>
                 <th data-param="before:derived:0" data-block="1" data-change="removed"><del>deposit</del></th>
                 <th data-param="reason" data-block="2">decline_reason</th>
@@ -2548,6 +2702,14 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               <tr data-case-row>
                 <th scope="row" class="param-id" data-block="frame" data-change="removed">
                   <span class="delta-row-lead">~</span>credit-card</th>
+                <td data-param="attachment:0" data-block="0">
+              
+              
+              <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s5_before_case0_col0']"
+            @click="toggleAttachment('s5_before_case0_col0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>booking</button>
+              
+            </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">credit card</td>
                 <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">60</td>
                 <td data-param="reason" data-block="2" data-subst="reason">insufficient funds</td>
@@ -2555,11 +2717,44 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
+          
+          
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="7">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_before_case0_col0'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-body"><div class="attachment-panel-label">booking</div>
+                    <div class="attachment-content"><pre>Guest: Alice
+Amount due: 120
+Status: pending</pre></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
             </tbody>
             <tbody data-band="1">
               <tr data-case-row>
                 <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">~</span>debit-card</th>
+                <td data-param="attachment:0" data-block="0" data-change="removed">
+              
+              
+              <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s5_case1_diff0']"
+            @click="toggleAttachment('s5_case1_diff0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>booking</button>
+              
+            </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">debit card</td>
                 <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">40</td>
                 <td data-param="reason" data-block="2" data-subst="reason">expired card</td>
@@ -2568,10 +2763,35 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               </tr>
               
             </tbody>
+            <tbody data-band="1-diff">
+              
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="7">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_case1_diff0'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-body"><div class="attachment-panel-label">booking</div>
+                    <div class="attachment-content delta-diff" data-scroll-pair="s5_case1_diff0">
+      <div class="delta-diff-lines"><div class="delta-line">Guest: Alice</div><div class="delta-line" data-change="modified">Amount due: <del class="delta-words">80</del></div><div class="delta-line">Status: pending</div></div>
+    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+            </tbody>
             <tbody data-band="2">
               <tr data-case-row data-change="removed">
                 <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">−</span><del>bank-transfer</del></th>
+                <td data-param="attachment:0" data-block="0">
+              
+              
+              <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s5_before_case2_col0']"
+            @click="toggleAttachment('s5_before_case2_col0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>booking</button>
+              
+            </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">bank transfer</td>
                 <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">150</td>
                 <td data-param="reason" data-block="2" data-subst="reason">fraud check failed</td>
@@ -2579,11 +2799,39 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
+          
+          
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="7">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_before_case2_col0'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-body"><div class="attachment-panel-label">booking</div>
+                    <div class="attachment-content"><pre>Guest: Alice
+Amount due: 300
+Status: pending</pre></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
             </tbody>
             <tbody data-band="3">
               <tr data-case-row>
                 <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">~</span>gift-card</th>
+                <td data-param="attachment:0" data-block="0">
+              
+            </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">gift card</td>
                 <td data-param="before:derived:0" data-block="1"></td>
                 <td data-param="reason" data-block="2" data-subst="reason">partial balance</td>
@@ -2592,19 +2840,21 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               </tr>
               
           <tr>
-            <td colspan="6">
+            <td colspan="7">
               <div class="error-block xfailed">
       <div class="error-message">gift cards are not wired into payments yet</div><div class="error-frames"><div class="error-frame">
-            <div class="error-frame-loc">test_delta_booking.py:115: in test_payment_declined</div>
+            <div class="error-frame-loc">test_delta_booking.py:143: in test_payment_declined</div>
             <pre class="error-frame-code">    response = submit_payment(payment_method, amount, decline_reason)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
           </div><div class="error-frame">
-            <div class="error-frame-loc">test_delta_booking.py:87: in submit_payment</div>
+            <div class="error-frame-loc">test_delta_booking.py:114: in submit_payment</div>
             <pre class="error-frame-code">    raise NotImplementedError(&#39;gift cards are not wired into payments yet&#39;)</pre>
           </div></div><pre class="error-tail">E   NotImplementedError: gift cards are not wired into payments yet</pre>
     </div>
             </td>
           </tr>
+          
+          
           
           
           
@@ -2616,7 +2866,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
           
             </tbody>
             <tbody data-band="4">
-              <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="6"></td></tr>
+              <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="7"></td></tr>
             </tbody>
           </table>
           </div>
@@ -2627,6 +2877,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
             <thead data-band="head">
               <tr>
                 <th class="param-id" data-block="frame">case ID</th>
+                <th data-param="attachment:0" data-block="0">booking</th>
                 <th data-param="payment_method" data-block="1">payment_method</th>
                 <th data-param="derived:0" data-block="1" data-change="added">+fee</th>
                 <th data-param="reason" data-block="2">reason<span class="delta-was">was <del>decline_reason</del></span></th>
@@ -2638,6 +2889,14 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               <tr data-case-row>
                 <th scope="row" class="param-id" data-block="frame" data-change="added">
                   <span class="delta-row-lead">~</span>credit</th>
+                <td data-param="attachment:0" data-block="0">
+              
+              
+              <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s5_after_case0_col0']"
+            @click="toggleAttachment('s5_after_case0_col0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>booking</button>
+              
+            </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">credit card</td>
                 <td data-param="derived:0" data-block="1" data-subst="derived:0" data-change="added">12</td>
                 <td data-param="reason" data-block="2" data-subst="reason">insufficient funds</td>
@@ -2645,11 +2904,44 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
+          
+          
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="7">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_after_case0_col0'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-body"><div class="attachment-panel-label">booking</div>
+                    <div class="attachment-content"><pre>Guest: Alice
+Amount due: 120
+Status: pending</pre></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
             </tbody>
             <tbody data-band="1">
               <tr data-case-row>
                 <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">~</span>debit-card</th>
+                <td data-param="attachment:0" data-block="0" data-change="added">
+              
+              
+              <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s5_case1_diff0']"
+            @click="toggleAttachment('s5_case1_diff0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>booking</button>
+              
+            </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">debit card</td>
                 <td data-param="derived:0" data-block="1" data-subst="derived:0" data-change="added">9</td>
                 <td data-param="reason" data-block="2" data-subst="reason">expired card</td>
@@ -2658,13 +2950,33 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               </tr>
               
             </tbody>
+            <tbody data-band="1-diff">
+              
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="7">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_case1_diff0'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-body"><div class="attachment-panel-label">booking</div>
+                    <div class="attachment-content delta-diff" data-scroll-pair="s5_case1_diff0">
+      <div class="delta-diff-lines"><div class="delta-line">Guest: Alice</div><div class="delta-line" data-change="modified">Amount due: <ins class="delta-words">95</ins></div><div class="delta-line">Status: pending</div></div>
+    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+            </tbody>
             <tbody data-band="2">
-              <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="6"></td></tr>
+              <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="7"></td></tr>
             </tbody>
             <tbody data-band="3">
               <tr data-case-row>
                 <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">~</span>gift-card</th>
+                <td data-param="attachment:0" data-block="0">
+              
+            </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">gift card</td>
                 <td data-param="derived:0" data-block="1" data-change="added"></td>
                 <td data-param="reason" data-block="2" data-subst="reason">partial balance</td>
@@ -2673,19 +2985,21 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               </tr>
               
           <tr>
-            <td colspan="6">
+            <td colspan="7">
               <div class="error-block failed">
       <div class="error-message">gift cards are not wired into payments yet</div><div class="error-frames"><div class="error-frame">
-            <div class="error-frame-loc">test_delta_booking.py:110: in test_payment_declined</div>
+            <div class="error-frame-loc">test_delta_booking.py:143: in test_payment_declined</div>
             <pre class="error-frame-code">    response = submit_payment(payment_method, amount, reason)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
           </div><div class="error-frame">
-            <div class="error-frame-loc">test_delta_booking.py:88: in submit_payment</div>
+            <div class="error-frame-loc">test_delta_booking.py:120: in submit_payment</div>
             <pre class="error-frame-code">    raise NotImplementedError(&#39;gift cards are not wired into payments yet&#39;)</pre>
           </div></div><pre class="error-tail">E   NotImplementedError: gift cards are not wired into payments yet</pre>
     </div>
             </td>
           </tr>
+          
+          
           
           
           
@@ -2700,6 +3014,14 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               <tr data-case-row data-change="added">
                 <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">+</span>voucher</th>
+                <td data-param="attachment:0" data-block="0">
+              
+              
+              <button type="button" class="btn-reset attachment-badge"
+            :aria-expanded="!!expandedAttachments['s5_after_case4_col0']"
+            @click="toggleAttachment('s5_after_case4_col0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>booking</button>
+              
+            </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">voucher</td>
                 <td data-param="derived:0" data-block="1" data-subst="derived:0" data-change="added">4</td>
                 <td data-param="reason" data-block="2" data-subst="reason">voucher expired</td>
@@ -2707,6 +3029,31 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
+          
+          
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="7">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['s5_after_case4_col0'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-body"><div class="attachment-panel-label">booking</div>
+                    <div class="attachment-content"><pre>Guest: Alice
+Amount due: 40
+Status: pending</pre></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
             </tbody>
           </table>
           </div>
@@ -2714,7 +3061,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
       </div>
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:92</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:124</span></div>
     </div>
     </div>
   </div>
@@ -2857,7 +3204,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                   
                 </div>
                 
-                <div class="scenario-source"><span>test_delta_booking.py:17</span></div>
+                <div class="scenario-source"><span>test_delta_booking.py:26</span></div>
                 
               </div>
             </div>
@@ -2901,7 +3248,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                   
                 </div>
                 
-                <div class="scenario-source"><span>test_delta_booking.py:17</span></div>
+                <div class="scenario-source"><span>test_delta_booking.py:26</span></div>
                 
               </div>
             </div>
@@ -2975,7 +3322,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                   
                 </div>
                 
-                <div class="scenario-source"><span>test_delta_booking.py:19</span></div>
+                <div class="scenario-source"><span>test_delta_booking.py:28</span></div>
                 
               </div>
             </div>
@@ -3023,13 +3370,13 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               <div class="refs-content"><div class="refs-line">
                   <span class="refs-label">Listed scenarios:</span>
                   
-                  <a class="use-chip delta-scenario-chip" href="#scenario=delta_booking/cancel_booking" data-goto-scenario="delta_booking/cancel_booking" data-change="changed" title="Changed scenario">~ Cancelling a paid booking refunds it</a>
+                  <a class="use-chip delta-scenario-chip" href="#scenario=delta_booking/cancel_booking" data-goto-scenario="delta_booking/cancel_booking" data-change="changed" title="Changed scenario">~ Cancelling a paid booking refunds it in full</a>
                   
                   <a class="use-chip delta-scenario-chip" href="#scenario=delta_booking/loyalty_discount" data-goto-scenario="delta_booking/loyalty_discount" data-change="added" title="Added scenario">+ Returning guests get a loyalty discount on the invoice</a>
                   
                 </div>
                 
-                <div class="scenario-source"><span>test_delta_booking.py:21</span></div>
+                <div class="scenario-source"><span>test_delta_booking.py:30</span></div>
                 
               </div>
             </div>
@@ -3073,7 +3420,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                   
                 </div>
                 
-                <div class="scenario-source"><span>test_delta_booking.py:23</span></div>
+                <div class="scenario-source"><span>test_delta_booking.py:32</span></div>
                 
               </div>
             </div>
@@ -3131,7 +3478,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                   
                 </div>
                 
-                <div class="scenario-source"><span>test_delta_booking.py:23</span></div>
+                <div class="scenario-source"><span>test_delta_booking.py:32</span></div>
                 
               </div>
             </div>
@@ -3151,7 +3498,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
 </div>
 
-<!-- Shared hover tooltip for term refs; positioned by app.js. -->
 <div id="term-tip" role="tooltip" hidden>
   <span class="term-tip-name"></span>
   <span class="term-tip-def"></span>
@@ -3175,7 +3521,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"views\":[\"scenarios\",\"glossary\"],\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\",\"section_key\":null,\"avoid\":[]}]},\"before_terms\":[{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\",\"section_key\":null,\"avoid\":[]}],\"expandable_term_ids\":[\"removed:receptionist\",\"concierge\",\"suite\",\"invoice\",\"removed:upgrade\",\"upgrade\"],\"term_cards\":[{\"key\":\"removed:receptionist\",\"kind\":\"actor\",\"change\":\"removed\",\"defined\":true,\"search\":\"receptionist\",\"before\":\"receptionist\",\"after\":null},{\"key\":\"concierge\",\"kind\":\"actor\",\"change\":\"added\",\"defined\":true,\"search\":\"concierge\",\"before\":null,\"after\":\"concierge\"},{\"key\":\"suite\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"room suite\",\"before\":\"room\",\"after\":\"suite\"},{\"key\":\"invoice\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"invoice\",\"before\":\"invoice\",\"after\":\"invoice\"},{\"key\":\"removed:upgrade\",\"kind\":\"object\",\"change\":\"removed\",\"defined\":true,\"search\":\"upgrade\",\"before\":\"upgrade\",\"after\":null},{\"key\":\"upgrade\",\"kind\":\"activity\",\"change\":\"added\",\"defined\":true,\"search\":\"upgrade\",\"before\":null,\"after\":\"upgrade\"}],\"term_scenarios\":{\"guest\":[\"removed:delta_booking/late_checkout\",\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\",\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\"],\"receptionist\":[\"removed:delta_booking/late_checkout\"],\"booking\":[\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"payment\":[\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"invoice\":[\"delta_booking/cancel_booking\",\"delta_booking/loyalty_discount\"],\"suite\":[\"delta_booking/walk_in_booking\"],\"concierge\":[\"delta_booking/loyalty_discount\"]},\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed:delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed:delta_booking/late_checkout\":\"removed:delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"views\":[\"scenarios\",\"glossary\"],\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"before:invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"before:upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\",\"section_key\":null,\"avoid\":[]}]},\"expandable_term_ids\":[\"removed:receptionist\",\"concierge\",\"suite\",\"invoice\",\"removed:upgrade\",\"upgrade\"],\"term_rows\":[{\"key\":\"removed:receptionist\",\"kind\":\"actor\",\"change\":\"removed\",\"defined\":true,\"search\":\"receptionist\"},{\"key\":\"concierge\",\"kind\":\"actor\",\"change\":\"added\",\"defined\":true,\"search\":\"concierge\"},{\"key\":\"suite\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"room suite\"},{\"key\":\"invoice\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"invoice\"},{\"key\":\"removed:upgrade\",\"kind\":\"object\",\"change\":\"removed\",\"defined\":true,\"search\":\"upgrade\"},{\"key\":\"upgrade\",\"kind\":\"activity\",\"change\":\"added\",\"defined\":true,\"search\":\"upgrade\"}],\"term_scenarios\":{\"guest\":[\"removed:delta_booking/late_checkout\",\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\",\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\"],\"receptionist\":[\"removed:delta_booking/late_checkout\"],\"booking\":[\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"payment\":[\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"invoice\":[\"delta_booking/cancel_booking\",\"delta_booking/loyalty_discount\"],\"suite\":[\"delta_booking/walk_in_booking\"],\"concierge\":[\"delta_booking/loyalty_discount\"]},\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"changed_in\":[\"attachments\"],\"search_text\":\"Guests check in at the front desk Guests check in at the front desk\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\",\"refund\"],\"status\":\"passed\",\"change\":\"changed\",\"changed_in\":[\"title\",\"steps\",\"tags\"],\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it in full legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"changed_in\":[\"title\",\"steps\"],\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed:delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"changed_in\":[],\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"changed_in\":[],\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"changed_in\":[\"steps\",\"status\",\"parameters\",\"attachments\"],\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"changed_parts\":[\"title\",\"steps\",\"tags\",\"status\",\"parameters\",\"attachments\"],\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3436,7 +3782,8 @@ function reportApp() {
 
 
 
-  const termRows = glossaryTerms.map(t => ({
+
+  const termRows = data.term_rows || glossaryTerms.map(t => ({
     key: t.id,
     kind: t.kind || 'kindless',
     section: t.section_key,
@@ -3567,7 +3914,7 @@ function reportApp() {
 
 
     termShown(key) {
-      return this._termMatches(this._termRow(key));
+      return this._termMatches(termRowsByKey.get(key));
     },
 
 
@@ -3592,19 +3939,13 @@ function reportApp() {
       const key = this._termFilterState().join('\u0000');
       if (termCountCache && termCountCache.key === key) return termCountCache.value;
       const counts = { kind: {}, section: new Map() };
-      for (const row of this._termRows()) {
+      for (const row of termRows) {
         if (!this._termMatches(row)) continue;
         counts.kind[row.kind] = (counts.kind[row.kind] || 0) + 1;
         if (row.section) counts.section.set(row.section, (counts.section.get(row.section) || 0) + 1);
       }
       termCountCache = { key, value: counts };
       return counts;
-    },
-    _termRows() {
-      return termRows;
-    },
-    _termRow(key) {
-      return termRowsByKey.get(key);
     },
     _termFilterState() {
       return [this.glossarySearch, this.glossaryDefinitionFilter];
@@ -3936,7 +4277,7 @@ function reportApp() {
     },
     goToTerm(id) {
 
-      if (!this._hasTermEntry(id)) return;
+      if (!termRowsByKey.has(id)) return;
       this.mainView = 'glossary';
       if (expandableTermIds.has(id)) this.expandedTerms[id] = true;
 
@@ -3956,7 +4297,7 @@ function reportApp() {
       });
     },
     _termFiltered(key) {
-      const row = this._termRow(key);
+      const row = termRowsByKey.get(key);
       if (!this._termMatches(row)) return true;
       if (this.glossaryGrouping === 'section') return !this.sectionShown(row.section);
       return !this.glossaryKindFilter[row.kind];
@@ -4288,7 +4629,8 @@ function reportApp() {
         const pill = event.target.closest('.term-ref--link[data-term-id]');
         if (!pill) return;
         event.stopPropagation();
-        this.goToTerm(this._refEntry(pill));
+
+        this.goToTerm(pill.dataset.termEntry || pill.dataset.termId);
       }, true);
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-sentence-id]');
@@ -4423,19 +4765,6 @@ function reportApp() {
     },
 
 
-    _tipTerm(pill) {
-      return termsById.get(pill.dataset.termId);
-    },
-
-
-    _hasTermEntry(id) {
-      return Object.hasOwn(termNames, id);
-    },
-    _refEntry(pill) {
-      return pill.dataset.termId;
-    },
-
-
 
 
     _initTermTooltip() {
@@ -4447,7 +4776,7 @@ function reportApp() {
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) { return; }
-        const term = this._tipTerm(pill);
+        const term = termsById.get(pill.dataset.termId);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
         const def = term.definition_html || '';
@@ -4521,7 +4850,7 @@ function reportApp() {
       const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
       if (targetSlug && !targetScenario) stale.push({ kind: 'scenario', value: targetSlug });
       const targetTerm = params.get('term');
-      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => this._hasTermEntry(id)).length;
+      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => termRowsByKey.has(id)).length;
       if (termKnown) {
         this.goToTerm(targetTerm);
       } else if (targetScenario) {
@@ -4580,16 +4909,13 @@ function deltaApp() {
   const changeFacet = shownFacet(changes, data.scenarios, 'change');
   const { counts: changeCounts, present: changesPresent, allShown: allChangesShown } = changeFacet;
 
-  const beforeTerms = new Map(data.before_terms.map(t => [t.id, t]));
-  const termCards = data.term_cards;
-  const cardsByKey = new Map(termCards.map(card => [card.key, card]));
 
-  const cardOf = { before: {}, after: {} };
-  for (const card of termCards) {
-    for (const side of ['before', 'after']) if (card[side]) cardOf[side][card[side]] = card.key;
-  }
+  const partRows = data.scenarios.flatMap(s => s.changed_in.map(part => ({ part })));
+  const partFacet = shownFacet(data.changed_parts, partRows, 'part');
+  const { present: partsPresent, allShown: allPartsShown } = partFacet;
   const overrides = {
     shownChanges: allChangesShown(),
+    shownParts: allPartsShown(),
 
     shownTermChanges: allChangesShown(),
     moduleChange(module) {
@@ -4599,16 +4925,33 @@ function deltaApp() {
       return data.change_glyphs[change];
     },
     _filterState() {
-      return [...base._filterState.call(this), ...changes.map(c => this.shownChanges[c])];
+      return [
+        ...base._filterState.call(this),
+        ...changes.map(c => this.shownChanges[c]),
+        ...data.changed_parts.map(part => this.shownParts[part]),
+      ];
     },
+
     _matchesFilters(s, index, query) {
-      return this.shownChanges[s.change] && base._matchesFilters.call(this, s, index, query);
+      return this.shownChanges[s.change]
+        && (s.change !== 'changed' || s.changed_in.some(part => this.shownParts[part]))
+        && base._matchesFilters.call(this, s, index, query);
     },
+
+
     _summaryParts() {
-      const shown = changesPresent.filter(c => this.shownChanges[c]);
-      const parts = base._summaryParts.call(this);
-      if (shown.length === changesPresent.length) return parts;
-      return [shown.length ? shown.join(', ') : 'no changes', ...parts];
+      const summary = base._summaryParts.call(this);
+      const shownParts = partsPresent.filter(part => this.shownParts[part]);
+      const hiddenParts = partsPresent.filter(part => !this.shownParts[part]);
+
+      const anyPartShown = shownParts.length > 0;
+      const shown = changesPresent.filter(c => this.shownChanges[c] && (c !== 'changed' || anyPartShown));
+      if (shown.length === changesPresent.length && !hiddenParts.length) return summary;
+      const changedWords = hiddenParts.length < shownParts.length
+        ? 'changed in any part but ' + hiddenParts.join(' and ')
+        : 'changed in ' + shownParts.join(' or ');
+      const words = shown.map(c => (c === 'changed' && hiddenParts.length ? changedWords : c));
+      return [words.length ? words.join(', ') : 'no changes', ...summary];
     },
     _unfilteredSummary() {
       return changesPresent.map(c => changeCounts[c] + ' ' + c).join(', ');
@@ -4616,27 +4959,7 @@ function deltaApp() {
     resetFilters() {
       base.resetFilters.call(this);
       this.shownChanges = allChangesShown();
-    },
-
-    _tipTerm(pill) {
-      const before = pill.dataset.termSide === 'before' && beforeTerms.get(pill.dataset.termId);
-      return before || base._tipTerm.call(this, pill);
-    },
-
-
-    _hasTermEntry(key) {
-      return cardsByKey.has(key);
-    },
-    _refEntry(pill) {
-      return lookup(cardOf[pill.dataset.termSide], pill.dataset.termId, null);
-    },
-
-
-    _termRows() {
-      return termCards;
-    },
-    _termRow(key) {
-      return cardsByKey.get(key);
+      this.shownParts = allPartsShown();
     },
     _termFilterState() {
       return [...base._termFilterState.call(this), ...changes.map(c => this.shownTermChanges[c])];
@@ -4658,17 +4981,21 @@ function deltaApp() {
     },
     init() {
       base.init.call(this);
-      this.$watch('shownChanges', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      for (const key of ['shownChanges', 'shownParts']) {
+        this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      }
       alignSides();
-      scrollTablesTogether();
+      scrollTogether();
     },
     _readFacets(params, keep) {
       base._readFacets.call(this, params, keep);
       this.shownChanges = changeFacet.fromHash(params, 'change', keep);
+      this.shownParts = partFacet.fromHash(params, 'changed-in', keep);
     },
     _hashParams() {
       const params = base._hashParams.call(this);
       changeFacet.writeHash(params, 'change', this.shownChanges);
+      partFacet.writeHash(params, 'changed-in', this.shownParts);
       return params;
     },
   };
@@ -4731,9 +5058,20 @@ function alignSides() {
 
 
 
-function scrollTablesTogether() {
+
+function scrollTogether() {
+  const pairs = [];
   for (const sides of document.querySelectorAll('.delta-sides')) {
-    const scrollers = [...sides.querySelectorAll(':scope > .delta-table .param-table-scroll')];
+    pairs.push([...sides.querySelectorAll(':scope > .delta-table .param-table-scroll')]);
+  }
+  const panels = new Map();
+  for (const panel of document.querySelectorAll('[data-scroll-pair]')) {
+    const key = panel.dataset.scrollPair;
+    if (!panels.has(key)) panels.set(key, []);
+    panels.get(key).push(panel);
+  }
+  pairs.push(...panels.values());
+  for (const scrollers of pairs) {
     if (scrollers.length !== 2) continue;
     const echoes = new Set();
     for (const [from, to] of [scrollers, [...scrollers].reverse()]) {

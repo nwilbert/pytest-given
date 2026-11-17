@@ -1,12 +1,20 @@
 """Aligning two step trees into equal, modified, added and removed steps."""
 
 from pytest_given import given, scenario, then, when
-from pytest_given.delta.narration import Reading, reading_words, similarity
-from pytest_given.delta.steps import MODIFIED_SIMILARITY, align_steps, steps_changed
+from pytest_given.delta.narration import (
+    MODIFIED_SIMILARITY,
+    Reading,
+    reading_words,
+    similarity,
+    tokens_equal,
+)
+from pytest_given.delta.steps import align_steps, steps_changed
 from pytest_given.model import (
     Attachment,
+    AttachmentDelta,
     AttachmentLabel,
     Glossary,
+    LineDelta,
     Step,
     StepChange,
     StepDelta,
@@ -27,7 +35,7 @@ def _changes(deltas: tuple[StepDelta, ...]) -> list[StepChange]:
 
 
 def _align(before: list[Step], after: list[Step]) -> tuple[StepDelta, ...]:
-    return align_steps(before, _READING, after, _READING)
+    return align_steps(before, _READING, after, _READING, {})
 
 
 @scenario(
@@ -80,6 +88,7 @@ def test_the_brief_texts_fall_on_either_side_of_the_threshold() -> None:
         return similarity(
             reading_words(step('then', before).narration, _READING),
             reading_words(step('then', after).narration, _READING),
+            tokens_equal,
         )
 
     reworded = similar(
@@ -149,7 +158,7 @@ def test_an_unrelated_step_before_a_match_is_added_first() -> None:
     ]
 
 
-def test_attachments_pins_and_fixture_names_are_ignored() -> None:
+def test_attachments_pins_and_fixture_names_leave_a_step_equal() -> None:
     attached = Step(
         phase='given',
         narration=step('given', 'a room').narration,
@@ -159,3 +168,38 @@ def test_attachments_pins_and_fixture_names_are_ignored() -> None:
     deltas = _align([attached], [step('given', 'a room')])
     assert _changes(deltas) == ['equal']
     assert not steps_changed(deltas)
+
+
+def test_an_equal_step_carries_its_changed_attachment() -> None:
+    def noted(content: str) -> Step:
+        return Step(
+            phase='given',
+            narration=step('given', 'a room').narration,
+            attachments=[Attachment(label=AttachmentLabel('note'), content=content)],
+        )
+
+    deltas = _align([noted('x')], [noted('y')])
+    assert _changes(deltas) == ['equal']
+    assert deltas[0].attachments == (
+        AttachmentDelta(
+            change='changed',
+            before=0,
+            after=0,
+            lines=(
+                LineDelta(change='removed', before=0),
+                LineDelta(change='added', after=0),
+            ),
+        ),
+    )
+    assert not steps_changed(deltas)
+
+
+def test_a_modified_step_carries_its_attachments_alignment() -> None:
+    reworded = Step(
+        phase='given',
+        narration=step('given', 'a room with a view').narration,
+        attachments=[Attachment(label=AttachmentLabel('note'), content='x')],
+    )
+    deltas = _align([step('given', 'a room')], [reworded])
+    assert _changes(deltas) == ['modified']
+    assert deltas[0].attachments == (AttachmentDelta(change='added', after=0),)

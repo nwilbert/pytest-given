@@ -2,8 +2,11 @@
 each side reading as its own scenario does, under its own phases. Its sides
 and a side's runs of a word diff serve the tables and the Glossary tab too."""
 
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
+from itertools import groupby
+from operator import itemgetter
+from typing import Protocol
 
 from ...model import (
     SIDE_MARK,
@@ -23,6 +26,7 @@ from ...model import (
     walk_steps,
 )
 from ..html_renderer import phase_blocks
+from .attachments import AttachmentRow, attachment_rows
 
 # A phase block's `data-block`, which its table columns carry too. An after
 # block's is its index, and a before block takes the key of the after block its
@@ -63,6 +67,7 @@ class StepRow:
     before: StepLine | None
     after: StepLine | None
     children: tuple[StepRow, ...]
+    attachments: tuple[AttachmentRow, ...] = ()  # equal and modified rows only
 
     def line(self, side: Side) -> StepLine | None:
         return on_side(side, self.before, self.after)
@@ -139,13 +144,40 @@ def block_keys(scenario_delta: ScenarioDelta) -> dict[Side, list[BlockKey]]:
 def side_runs(runs: Sequence[DiffSegment], side: Side) -> tuple[MarkedRun, ...]:
     """One side's text of a word diff: its equal runs and its own changed
     ones, each in that side's own parts."""
-    return _joined(
-        [
-            MarkedRun(run.mark, on_side(side, run.before, run.after))
-            for run in runs
-            if run.mark in ('equal', SIDE_MARK[side])
-        ]
+    own = [
+        MarkedRun(run.mark, on_side(side, run.before, run.after))
+        for run in runs
+        if run.mark in ('equal', SIDE_MARK[side])
+    ]
+    return tuple(
+        MarkedRun(mark, merged_literals(part for run in group for part in run.parts))
+        for mark, group in joined_marks(
+            own, [narration_text(run.parts).isspace() for run in own]
+        )
     )
+
+
+def joined_marks[R: _Marked](
+    runs: Sequence[R], spaces: Sequence[bool]
+) -> Iterator[tuple[Mark, list[R]]]:
+    """Runs of one mark grouped, and a run of spaces alone between two changes
+    of one mark taken into them, so a changed stretch reads as one. `spaces`
+    tells, run by run, whether it is spaces alone."""
+    marks = [run.mark for run in runs]
+    for index in range(1, len(runs) - 1):
+        if (
+            runs[index].mark == 'equal'
+            and runs[index - 1].mark == runs[index + 1].mark
+            and spaces[index]
+        ):
+            marks[index] = runs[index - 1].mark
+    for mark, group in groupby(zip(marks, runs, strict=True), key=itemgetter(0)):
+        yield mark, [run for _, run in group]
+
+
+class _Marked(Protocol):
+    @property
+    def mark(self) -> Mark: ...
 
 
 @dataclass(frozen=True)
@@ -153,6 +185,15 @@ class _Rows:
     steps: dict[Side, dict[StepPath, Step]]
 
     def row(self, step_delta: StepDelta, path: StepPath) -> StepRow:
+        attachments: tuple[AttachmentRow, ...] = ()
+        if step_delta.attachments:
+            assert step_delta.before is not None
+            assert step_delta.after is not None
+            attachments = attachment_rows(
+                step_delta.attachments,
+                self.steps['before'][step_delta.before],
+                self.steps['after'][step_delta.after],
+            )
         return StepRow(
             change=step_delta.change,
             path=path,
@@ -162,6 +203,7 @@ class _Rows:
                 self.row(child, (*path, index))
                 for index, child in enumerate(step_delta.children)
             ),
+            attachments=attachments,
         )
 
     def _line(self, step_delta: StepDelta, side: Side) -> StepLine | None:
@@ -200,23 +242,3 @@ def _side_blocks(
         blocks[-1].rows.append(row)
     assert next(unopened, None) is None
     return blocks
-
-
-def _joined(runs: list[MarkedRun]) -> tuple[MarkedRun, ...]:
-    """Runs of one mark merged, and a run of spaces alone between two changes
-    of one mark taken into them, so a changed stretch reads as one."""
-    joined: list[MarkedRun] = []
-    for index, run in enumerate(runs):
-        mark = run.mark
-        if (
-            mark == 'equal'
-            and 0 < index < len(runs) - 1
-            and runs[index - 1].mark == runs[index + 1].mark
-            and narration_text(run.parts).isspace()
-        ):
-            mark = runs[index - 1].mark
-        if joined and joined[-1].mark == mark:
-            joined[-1] = MarkedRun(mark, merged_literals(joined[-1].parts + run.parts))
-        else:
-            joined.append(MarkedRun(mark, run.parts))
-    return tuple(joined)

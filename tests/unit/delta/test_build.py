@@ -8,18 +8,17 @@ import pytest
 from pytest_given import given, scenario, then, when
 from pytest_given.delta import (
     DeltaInputs,
-    DeltaResult,
-    RenameEntry,
-    RenameLog,
     build_delta,
     check_schema_versions,
     version_warnings,
 )
-from pytest_given.delta.build import comparable_title, is_per_case
+from pytest_given.delta.build import DeltaResult, comparable_title, is_per_case
+from pytest_given.delta.renames import RenameEntry, RenameLog
 from pytest_given.model import (
     REPORT_SCHEMA_VERSION,
     Attachment,
     AttachmentLabel,
+    ColumnKind,
     DeltaData,
     ErrorInfo,
     Glossary,
@@ -34,6 +33,7 @@ from pytest_given.model import (
     ScenarioDelta,
     SentenceId,
     SourceLocation,
+    Step,
     StoryId,
     report_to_dict,
     scenario_identity,
@@ -298,13 +298,12 @@ def test_what_does_not_make_a_scenario_changed() -> None:
         )
     with given(
         'its after side differs in module, source, duration, error message, '
-        'fixture name, story IDs, pins, attachments and an attachment column'
+        'fixture name, story IDs and pins'
     ):
         original = before.scenarios[0]
         after_step = dataclasses.replace(
             original.steps[0],
             fixture_name='page',
-            attachments=[Attachment(AttachmentLabel('log'), 'text')],
             pins=(Pin(story_id=StoryId('s'), sentence_id=SentenceId(1)),),
         )
         after = report(
@@ -320,7 +319,7 @@ def test_what_does_not_make_a_scenario_changed() -> None:
                 steps=[after_step],
                 parameters=table(
                     [('n', 'param'), ('page', 'attachment')],
-                    ('b.py::u[1]', [1, Attachment(AttachmentLabel('page'), 'two')]),
+                    ('b.py::u[1]', [1, Attachment(AttachmentLabel('page'), 'one')]),
                 ),
             )
         )
@@ -337,8 +336,8 @@ def test_what_does_not_make_a_scenario_changed() -> None:
 )
 def test_what_makes_a_scenario_changed() -> None:
     with given(
-        'six scenarios whose after sides each differ in one of title, step, tag, '
-        'status, reason and parameter table'
+        'seven scenarios whose after sides each differ in one of title, step, '
+        'tag, status, reason, parameter table and attachment'
     ):
         cases = table([('n', 'param')], ('t.py::table[1]', [1]))
         before = report(
@@ -348,6 +347,7 @@ def test_what_makes_a_scenario_changed() -> None:
             scn('t.py::status', 'Status'),
             dataclasses.replace(scn('t.py::reason', 'Reason'), skip_reason='slow'),
             scn('t.py::table[1]', 'Table', parameters=cases),
+            scn('t.py::attach', 'Attach', _logged('a')),
         )
         after = report(
             scn('t.py::title', 'New title'),
@@ -360,23 +360,135 @@ def test_what_makes_a_scenario_changed() -> None:
                 'Table',
                 parameters=table([('n', 'param')], ('t.py::table[1]', [2])),
             ),
+            scn('t.py::attach', 'Attach', _logged('b')),
         )
     with when(t'a {pg["Delta report"].l} is built'):
-        title, steps, tags, status, reason, parameters = _delta(
-            before, after
-        ).delta.scenarios
-    with then('each is changed, with the flag of what differs'):
-        assert all(
-            listed.change == 'changed'
-            for listed in (title, steps, tags, status, reason, parameters)
-        )
-        assert title.title_changed
+        listed = _delta(before, after).delta.scenarios
+        _title, steps, tags, status, reason, parameters, attached = listed
+    with then(t'each is changed, and its {pg["Changed part"].l.s} name what differs'):
+        assert all(scenario_delta.change == 'changed' for scenario_delta in listed)
+        assert [scenario_delta.changed_in for scenario_delta in listed] == [
+            ('title',),
+            ('steps',),
+            ('tags',),
+            ('status',),
+            ('status',),
+            ('parameters',),
+            ('attachments',),
+        ]
         assert [step_delta.change for step_delta in steps.steps] == ['modified']
         assert (tags.tags_added, tags.tags_removed) == (('b',), ('a',))
         assert status.status_changed
         assert reason.reason_changed
         assert parameters.parameters is not None
         assert parameters.parameters.changed
+        assert [attachment.change for attachment in attached.steps[0].attachments] == [
+            'changed'
+        ]
+
+
+def _logged(content: str) -> Step:
+    return dataclasses.replace(
+        step('given', 'a log'),
+        attachments=[Attachment(AttachmentLabel('log'), content)],
+    )
+
+
+@scenario(
+    t"A changed attachment cell counts as attachments and an added case's "
+    t'cell as parameters in a {pg["Delta report"].l}',
+    tags=['delta'],
+)
+def test_an_attachment_cell_change_counts_only_as_attachments() -> None:
+    with given(
+        t'a grouped scenario whose paired {pg["Case"].l} changes its page cell, '
+        t'and one that adds a {pg["Case"].l} with a page cell'
+    ):
+        columns: list[tuple[str, ColumnKind]] = [('n', 'param'), ('page', 'attachment')]
+        one = Attachment(AttachmentLabel('page'), 'one')
+        two = Attachment(AttachmentLabel('page'), 'two')
+        before = report(
+            scn(
+                't.py::cell[1]',
+                'Cell',
+                parameters=table(columns, ('t.py::cell[1]', [1, one])),
+            ),
+            scn(
+                't.py::grown[1]',
+                'Grown',
+                parameters=table(columns, ('t.py::grown[1]', [1, one])),
+            ),
+        )
+        after = report(
+            scn(
+                't.py::cell[1]',
+                'Cell',
+                parameters=table(columns, ('t.py::cell[1]', [1, two])),
+            ),
+            scn(
+                't.py::grown[1]',
+                'Grown',
+                parameters=table(
+                    columns, ('t.py::grown[1]', [1, one]), ('t.py::grown[2]', [2, two])
+                ),
+            ),
+        )
+    with when(t'a {pg["Delta report"].l} is built'):
+        cell, grown = _delta(before, after).delta.scenarios
+    with then(
+        t"the first scenario's one {pg['Changed part'].l} is attachments, "
+        t'and its changed cell sits under the page column'
+    ):
+        assert cell.changed_in == ('attachments',)
+        assert cell.parameters is not None
+        (changed_cell,) = cell.parameters.cases[0].changed_attachments
+        after_table = after.scenarios[0].parameters
+        assert after_table is not None
+        assert [
+            column.name
+            for column in after_table.columns
+            if column.id == changed_cell.column
+        ] == ['page']
+    with then(
+        t"the second scenario's one {pg['Changed part'].l} is parameters, "
+        t'from its added {pg["Case"].l}'
+    ):
+        assert grown.changed_in == ('parameters',)
+
+
+def test_changed_parts_follow_the_listed_order() -> None:
+    before = report(
+        scn(
+            't.py::t[1]',
+            'Old title',
+            tags=['a'],
+            parameters=table([('n', 'param')], ('t.py::t[1]', [1])),
+        )
+    )
+    after = report(
+        scn(
+            't.py::t[1]',
+            'New title',
+            tags=['b'],
+            parameters=table([('n', 'param')], ('t.py::t[1]', [2])),
+        )
+    )
+
+    (changed,) = _delta(before, after).delta.scenarios
+
+    assert changed.changed_in == ('title', 'tags', 'parameters')
+
+
+def test_added_and_removed_scenarios_have_no_changed_parts() -> None:
+    before = report(scn('t.py::gone', 'Gone'))
+    after = report(scn('t.py::new', 'New'))
+
+    delta = _delta(before, after).delta
+
+    assert [(listed.change, listed.changed_in) for listed in delta.scenarios] == [
+        ('removed', ()),
+        ('added', ()),
+    ]
 
 
 @scenario(
@@ -738,7 +850,7 @@ def test_a_per_case_scenario_whose_case_alone_is_mapped_pairs_by_rename_log() ->
         before, after, _move('t.py::t', None, {'x': 'y'})
     ).delta.scenarios
 
-    assert (changed.paired_by, changed.title_changed) == ('rename-log', False)
+    assert (changed.paired_by, changed.changed_in) == ('rename-log', ('tags',))
 
 
 def test_a_rename_log_merge_is_warned_and_pairs_nothing_through_it() -> None:

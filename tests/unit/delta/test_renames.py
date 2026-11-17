@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from pytest_given import given, scenario, then, when
-from pytest_given.delta import (
+from pytest_given.delta.renames import (
     DEFAULT_RENAMES_PATH,
     RenameEntry,
     RenameLog,

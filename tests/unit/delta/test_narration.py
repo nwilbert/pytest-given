@@ -10,6 +10,7 @@ from pytest_given.delta.narration import (
     similarity,
     term_forms,
     tokens,
+    tokens_equal,
     word_diff,
 )
 from pytest_given.model import (
@@ -404,6 +405,7 @@ def test_similarity_counts_shared_tokens_without_spaces() -> None:
         return similarity(
             reading_words(_plain(before), _reading()),
             reading_words(_plain(after), _reading()),
+            tokens_equal,
         )
 
     assert similar('a b c', 'a b c') == 1.0

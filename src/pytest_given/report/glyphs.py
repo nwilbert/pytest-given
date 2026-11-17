@@ -1,4 +1,4 @@
-"""How a status and a citation's state are marked, wherever either is shown."""
+"""How a status and a citation's state are marked, wherever each is shown."""
 
 from typing import Literal
 

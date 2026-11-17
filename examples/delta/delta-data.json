@@ -3,7 +3,7 @@
     "before": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-15T10:30:48.974752+00:00",
+        "timestamp": "2026-11-15T16:15:25.713107+00:00",
         "pytest_version": "9.2.0",
         "plugin_version": "0.5.2",
         "commit_sha": null,
@@ -19,7 +19,7 @@
     "after": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-15T10:30:49.581597+00:00",
+        "timestamp": "2026-11-15T16:15:26.205120+00:00",
         "pytest_version": "9.2.0",
         "plugin_version": "0.5.2",
         "commit_sha": null,
@@ -33,7 +33,7 @@
       ]
     },
     "plugin_version": "0.5.2",
-    "timestamp": "2026-11-15T10:30:49.924312+00:00",
+    "timestamp": "2026-11-15T16:15:26.508585+00:00",
     "title": "Delta Example for v2",
     "kind": "delta",
     "schema_version": 1
@@ -106,7 +106,13 @@
               "parts": []
             },
             "children": [],
-            "attachments": [],
+            "attachments": [
+              {
+                "label": "receipt",
+                "content": "Check-in receipt\nGuest: Alice\nDeposit: none\nCheck-in time: <i>15:00</i> *sharp*\nRoom: 101\nNights: 2\nBreakfast: included\nParking: not booked\nKey: key card\nGuest note:\n<b>*x*</b> [a](b)",
+                "content_type": "text"
+              }
+            ],
             "pins": null,
             "fixture_name": null
           }
@@ -117,7 +123,7 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 30
+          "line": 39
         },
         "story_ids": [],
         "pins": null
@@ -125,13 +131,12 @@
       "after": {
         "id": "test_delta_booking.py::test_check_in",
         "narration": {
-          "text": "Guests check in with a digital key",
+          "text": "Guests check in at the front desk",
           "parts": []
         },
         "module": "test_delta_booking",
         "tags": [
-          "front-desk",
-          "digital-key"
+          "front-desk"
         ],
         "status": "passed",
         "duration_ms": 0,
@@ -182,24 +187,19 @@
             "fixture_name": null
           },
           {
-            "phase": "when",
-            "narration": {
-              "text": "the hotel sends her a digital key",
-              "parts": []
-            },
-            "children": [],
-            "attachments": [],
-            "pins": null,
-            "fixture_name": null
-          },
-          {
             "phase": "then",
             "narration": {
-              "text": "her phone opens the door of her room",
+              "text": "the hotel hands her a key card",
               "parts": []
             },
             "children": [],
-            "attachments": [],
+            "attachments": [
+              {
+                "label": "receipt",
+                "content": "Check-in receipt\nGuest: Alice\nCheck-in time: <i>14:00</i> *sharp*\nLate check-out: 12:00\nRoom: 101\nNights: 2\nBreakfast: included\nParking: not booked\nKey: key card\nGuest note:\n<b>*x*</b> [a](b)",
+                "content_type": "text"
+              }
+            ],
             "pins": null,
             "fixture_name": null
           }
@@ -210,13 +210,15 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 30
+          "line": 39
         },
         "story_ids": [],
         "pins": null
       },
       "paired_by": "node-id",
-      "title_changed": true,
+      "changed_in": [
+        "attachments"
+      ],
       "steps": [
         {
           "change": "equal",
@@ -227,7 +229,8 @@
             0
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
           "change": "equal",
@@ -238,34 +241,80 @@
             1
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
-          "change": "removed",
+          "change": "equal",
           "before": [
             2
           ],
-          "after": null,
-          "words": [],
-          "children": []
-        },
-        {
-          "change": "added",
-          "before": null,
           "after": [
             2
           ],
           "words": [],
-          "children": []
-        },
-        {
-          "change": "added",
-          "before": null,
-          "after": [
-            3
-          ],
-          "words": [],
-          "children": []
+          "children": [],
+          "attachments": [
+            {
+              "change": "changed",
+              "before": 0,
+              "after": 0,
+              "lines": [
+                {
+                  "change": "equal",
+                  "before": 0,
+                  "after": 0,
+                  "count": 2,
+                  "words": []
+                },
+                {
+                  "change": "removed",
+                  "before": 2,
+                  "after": null,
+                  "count": 1,
+                  "words": []
+                },
+                {
+                  "change": "modified",
+                  "before": 3,
+                  "after": 2,
+                  "count": 1,
+                  "words": [
+                    {
+                      "mark": "equal",
+                      "text": "Check-in time: "
+                    },
+                    {
+                      "mark": "removed",
+                      "text": "<i>15:00</i>"
+                    },
+                    {
+                      "mark": "added",
+                      "text": "<i>14:00</i>"
+                    },
+                    {
+                      "mark": "equal",
+                      "text": " *sharp*"
+                    }
+                  ]
+                },
+                {
+                  "change": "added",
+                  "before": null,
+                  "after": 3,
+                  "count": 1,
+                  "words": []
+                },
+                {
+                  "change": "equal",
+                  "before": 4,
+                  "after": 4,
+                  "count": 7,
+                  "words": []
+                }
+              ]
+            }
+          ]
         }
       ],
       "parameters": null
@@ -394,7 +443,7 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 41
+          "line": 68
         },
         "story_ids": [],
         "pins": null
@@ -402,12 +451,13 @@
       "after": {
         "id": "test_delta_booking.py::test_cancel_booking",
         "narration": {
-          "text": "Cancelling a paid booking refunds it",
+          "text": "Cancelling a paid booking refunds it in full",
           "parts": []
         },
         "module": "test_delta_booking",
         "tags": [
-          "cancellation"
+          "cancellation",
+          "refund"
         ],
         "status": "passed",
         "duration_ms": 0,
@@ -515,13 +565,17 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 42
+          "line": 68
         },
         "story_ids": [],
         "pins": null
       },
       "paired_by": "node-id",
-      "title_changed": false,
+      "changed_in": [
+        "title",
+        "steps",
+        "tags"
+      ],
       "steps": [
         {
           "change": "equal",
@@ -532,7 +586,8 @@
             0
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
           "change": "equal",
@@ -543,7 +598,8 @@
             1
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
           "change": "equal",
@@ -554,7 +610,8 @@
             2
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
           "change": "removed",
@@ -563,7 +620,8 @@
           ],
           "after": null,
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
           "change": "added",
@@ -572,7 +630,8 @@
             3
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         }
       ],
       "parameters": null
@@ -677,7 +736,7 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 55
+          "line": 82
         },
         "story_ids": [],
         "pins": null
@@ -744,6 +803,23 @@
             "fixture_name": null
           },
           {
+            "phase": "when",
+            "narration": {
+              "text": "he accepts the offer",
+              "parts": []
+            },
+            "children": [],
+            "attachments": [
+              {
+                "label": "offer",
+                "content": "Suite: 101\nRate: unchanged",
+                "content_type": "text"
+              }
+            ],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
             "phase": "then",
             "narration": {
               "text": "Bob gets Suite 101",
@@ -775,13 +851,16 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 56
+          "line": 84
         },
         "story_ids": [],
         "pins": null
       },
       "paired_by": "rename-log",
-      "title_changed": true,
+      "changed_in": [
+        "title",
+        "steps"
+      ],
       "steps": [
         {
           "change": "modified",
@@ -858,7 +937,8 @@
               ]
             }
           ],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
           "change": "equal",
@@ -869,7 +949,18 @@
             1
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
+        },
+        {
+          "change": "added",
+          "before": null,
+          "after": [
+            2
+          ],
+          "words": [],
+          "children": [],
+          "attachments": []
         },
         {
           "change": "modified",
@@ -877,7 +968,7 @@
             2
           ],
           "after": [
-            2
+            3
           ],
           "words": [
             {
@@ -926,7 +1017,8 @@
               ]
             }
           ],
-          "children": []
+          "children": [],
+          "attachments": []
         }
       ],
       "parameters": null
@@ -1013,14 +1105,14 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 65
+          "line": 92
         },
         "story_ids": [],
         "pins": null
       },
       "after": null,
       "paired_by": null,
-      "title_changed": false,
+      "changed_in": [],
       "steps": [],
       "parameters": null
     },
@@ -1104,13 +1196,13 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 66
+          "line": 98
         },
         "story_ids": [],
         "pins": null
       },
       "paired_by": null,
-      "title_changed": false,
+      "changed_in": [],
       "steps": [],
       "parameters": null
     },
@@ -1127,7 +1219,7 @@
           "error-handling"
         ],
         "status": "xfailed",
-        "duration_ms": 57,
+        "duration_ms": 43,
         "steps": [
           {
             "phase": "given",
@@ -1150,7 +1242,13 @@
               ]
             },
             "children": [],
-            "attachments": [],
+            "attachments": [
+              {
+                "label": "booking",
+                "content_type": "text",
+                "column_id": "attachment:0"
+              }
+            ],
             "pins": null,
             "fixture_name": null
           },
@@ -1253,6 +1351,11 @@
         "parameters": {
           "columns": [
             {
+              "id": "attachment:0",
+              "name": "booking",
+              "kind": "attachment"
+            },
+            {
               "id": "payment_method",
               "name": "payment_method",
               "kind": "param"
@@ -1277,6 +1380,11 @@
             {
               "id": "test_delta_booking.py::test_payment_declined[credit-card]",
               "values": [
+                {
+                  "label": "booking",
+                  "content": "Guest: Alice\nAmount due: 120\nStatus: pending",
+                  "content_type": "text"
+                },
                 "credit card",
                 "60",
                 "insufficient funds",
@@ -1289,6 +1397,11 @@
             {
               "id": "test_delta_booking.py::test_payment_declined[debit-card]",
               "values": [
+                {
+                  "label": "booking",
+                  "content": "Guest: Alice\nAmount due: 80\nStatus: pending",
+                  "content_type": "text"
+                },
                 "debit card",
                 "40",
                 "expired card",
@@ -1301,6 +1414,11 @@
             {
               "id": "test_delta_booking.py::test_payment_declined[bank-transfer]",
               "values": [
+                {
+                  "label": "booking",
+                  "content": "Guest: Alice\nAmount due: 300\nStatus: pending",
+                  "content_type": "text"
+                },
                 "bank transfer",
                 "150",
                 "fraud check failed",
@@ -1313,6 +1431,7 @@
             {
               "id": "test_delta_booking.py::test_payment_declined[gift-card]",
               "values": [
+                null,
                 "gift card",
                 null,
                 "partial balance",
@@ -1324,14 +1443,14 @@
                 "frames": [
                   {
                     "path": "test_delta_booking.py",
-                    "lineno": 115,
+                    "lineno": 143,
                     "func": "test_payment_declined",
                     "code": "    response = submit_payment(payment_method, amount, decline_reason)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                     "is_internal": false
                   },
                   {
                     "path": "test_delta_booking.py",
-                    "lineno": 87,
+                    "lineno": 114,
                     "func": "submit_payment",
                     "code": "    raise NotImplementedError('gift cards are not wired into payments yet')",
                     "is_internal": false
@@ -1349,7 +1468,7 @@
         "xfail_reason": "gift cards are not wired in yet",
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 91
+          "line": 118
         },
         "story_ids": [],
         "pins": null
@@ -1365,7 +1484,7 @@
           "error-handling"
         ],
         "status": "failed",
-        "duration_ms": 43,
+        "duration_ms": 42,
         "steps": [
           {
             "phase": "given",
@@ -1388,7 +1507,13 @@
               ]
             },
             "children": [],
-            "attachments": [],
+            "attachments": [
+              {
+                "label": "booking",
+                "content_type": "text",
+                "column_id": "attachment:0"
+              }
+            ],
             "pins": null,
             "fixture_name": null
           },
@@ -1491,6 +1616,11 @@
         "parameters": {
           "columns": [
             {
+              "id": "attachment:0",
+              "name": "booking",
+              "kind": "attachment"
+            },
+            {
               "id": "payment_method",
               "name": "payment_method",
               "kind": "param"
@@ -1515,6 +1645,11 @@
             {
               "id": "test_delta_booking.py::test_payment_declined[credit]",
               "values": [
+                {
+                  "label": "booking",
+                  "content": "Guest: Alice\nAmount due: 120\nStatus: pending",
+                  "content_type": "text"
+                },
                 "credit card",
                 "12",
                 "insufficient funds",
@@ -1527,6 +1662,11 @@
             {
               "id": "test_delta_booking.py::test_payment_declined[debit-card]",
               "values": [
+                {
+                  "label": "booking",
+                  "content": "Guest: Alice\nAmount due: 95\nStatus: pending",
+                  "content_type": "text"
+                },
                 "debit card",
                 "9",
                 "expired card",
@@ -1539,6 +1679,7 @@
             {
               "id": "test_delta_booking.py::test_payment_declined[gift-card]",
               "values": [
+                null,
                 "gift card",
                 null,
                 "partial balance",
@@ -1550,14 +1691,14 @@
                 "frames": [
                   {
                     "path": "test_delta_booking.py",
-                    "lineno": 110,
+                    "lineno": 143,
                     "func": "test_payment_declined",
                     "code": "    response = submit_payment(payment_method, amount, reason)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                     "is_internal": false
                   },
                   {
                     "path": "test_delta_booking.py",
-                    "lineno": 88,
+                    "lineno": 120,
                     "func": "submit_payment",
                     "code": "    raise NotImplementedError('gift cards are not wired into payments yet')",
                     "is_internal": false
@@ -1571,6 +1712,11 @@
             {
               "id": "test_delta_booking.py::test_payment_declined[voucher]",
               "values": [
+                {
+                  "label": "booking",
+                  "content": "Guest: Alice\nAmount due: 40\nStatus: pending",
+                  "content_type": "text"
+                },
                 "voucher",
                 "4",
                 "voucher expired",
@@ -1587,13 +1733,18 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 92
+          "line": 124
         },
         "story_ids": [],
         "pins": null
       },
       "paired_by": "node-id",
-      "title_changed": false,
+      "changed_in": [
+        "steps",
+        "status",
+        "parameters",
+        "attachments"
+      ],
       "steps": [
         {
           "change": "equal",
@@ -1604,7 +1755,15 @@
             0
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": [
+            {
+              "change": "equal",
+              "before": 0,
+              "after": 0,
+              "lines": []
+            }
+          ]
         },
         {
           "change": "modified",
@@ -1728,7 +1887,8 @@
               ]
             }
           ],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
           "change": "equal",
@@ -1739,7 +1899,8 @@
             2
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         },
         {
           "change": "equal",
@@ -1750,32 +1911,44 @@
             3
           ],
           "words": [],
-          "children": []
+          "children": [],
+          "attachments": []
         }
       ],
       "parameters": {
         "columns": [
           {
+            "kind": "attachment",
+            "before": "attachment:0",
+            "after": "attachment:0",
+            "paired_by": "name"
+          },
+          {
+            "kind": "param",
             "before": "payment_method",
             "after": "payment_method",
             "paired_by": "name"
           },
           {
+            "kind": "derived",
             "before": "derived:0",
             "after": null,
             "paired_by": null
           },
           {
+            "kind": "derived",
             "before": null,
             "after": "derived:0",
             "paired_by": null
           },
           {
+            "kind": "param",
             "before": "decline_reason",
             "after": "reason",
             "paired_by": "values"
           },
           {
+            "kind": "param",
             "before": "amount",
             "after": "amount",
             "paired_by": "name"
@@ -1787,6 +1960,7 @@
             "after": "test_delta_booking.py::test_payment_declined[credit]",
             "paired_by": "rename-log",
             "changed_cells": [],
+            "changed_attachments": [],
             "id_changed": true,
             "status_changed": false
           },
@@ -1797,6 +1971,47 @@
             "changed_cells": [
               "amount"
             ],
+            "changed_attachments": [
+              {
+                "column": "attachment:0",
+                "lines": [
+                  {
+                    "change": "equal",
+                    "before": 0,
+                    "after": 0,
+                    "count": 1,
+                    "words": []
+                  },
+                  {
+                    "change": "modified",
+                    "before": 1,
+                    "after": 1,
+                    "count": 1,
+                    "words": [
+                      {
+                        "mark": "equal",
+                        "text": "Amount due: "
+                      },
+                      {
+                        "mark": "removed",
+                        "text": "80"
+                      },
+                      {
+                        "mark": "added",
+                        "text": "95"
+                      }
+                    ]
+                  },
+                  {
+                    "change": "equal",
+                    "before": 2,
+                    "after": 2,
+                    "count": 1,
+                    "words": []
+                  }
+                ]
+              }
+            ],
             "id_changed": false,
             "status_changed": false
           },
@@ -1805,6 +2020,7 @@
             "after": null,
             "paired_by": null,
             "changed_cells": [],
+            "changed_attachments": [],
             "id_changed": false,
             "status_changed": false
           },
@@ -1813,6 +2029,7 @@
             "after": "test_delta_booking.py::test_payment_declined[gift-card]",
             "paired_by": "case-id",
             "changed_cells": [],
+            "changed_attachments": [],
             "id_changed": false,
             "status_changed": true
           },
@@ -1821,6 +2038,7 @@
             "after": "test_delta_booking.py::test_payment_declined[voucher]",
             "paired_by": null,
             "changed_cells": [],
+            "changed_attachments": [],
             "id_changed": false,
             "status_changed": false
           }
@@ -1852,7 +2070,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 16
+            "line": 25
           },
           "section": null,
           "avoid": []
@@ -1871,7 +2089,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 17
+            "line": 26
           },
           "section": null,
           "avoid": []
@@ -1890,7 +2108,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 19
+            "line": 28
           },
           "section": null,
           "avoid": []
@@ -1909,7 +2127,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 20
+            "line": 29
           },
           "section": null,
           "avoid": []
@@ -1928,7 +2146,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 21
+            "line": 30
           },
           "section": null,
           "avoid": []
@@ -1947,7 +2165,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 22
+            "line": 31
           },
           "section": null,
           "avoid": []
@@ -1966,7 +2184,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 23
+            "line": 32
           },
           "section": null,
           "avoid": []
@@ -1989,7 +2207,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 16
+            "line": 25
           },
           "section": null,
           "avoid": []
@@ -2008,7 +2226,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 17
+            "line": 26
           },
           "section": null,
           "avoid": []
@@ -2027,7 +2245,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 19
+            "line": 28
           },
           "section": null,
           "avoid": []
@@ -2046,7 +2264,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 20
+            "line": 29
           },
           "section": null,
           "avoid": []
@@ -2065,7 +2283,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 21
+            "line": 30
           },
           "section": null,
           "avoid": []
@@ -2084,7 +2302,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 22
+            "line": 31
           },
           "section": null,
           "avoid": []
@@ -2103,7 +2321,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 23
+            "line": 32
           },
           "section": null,
           "avoid": []
@@ -2127,7 +2345,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 17
+            "line": 26
           },
           "section": null,
           "avoid": []
@@ -2160,7 +2378,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 17
+            "line": 26
           },
           "section": null,
           "avoid": []
@@ -2189,7 +2407,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 19
+            "line": 28
           },
           "section": null,
           "avoid": []
@@ -2208,7 +2426,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 19
+            "line": 28
           },
           "section": null,
           "avoid": []
@@ -2244,7 +2462,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 21
+            "line": 30
           },
           "section": null,
           "avoid": []
@@ -2263,7 +2481,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 21
+            "line": 30
           },
           "section": null,
           "avoid": []
@@ -2398,7 +2616,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 23
+            "line": 32
           },
           "section": null,
           "avoid": []
@@ -2429,7 +2647,7 @@
           },
           "source": {
             "relpath": "test_delta_booking.py",
-            "line": 23
+            "line": 32
           },
           "section": null,
           "avoid": []

@@ -9,7 +9,16 @@ renames the delta cannot find by itself.
 
 import pytest
 
-from pytest_given import Glossary, given, scenario, sentence, story, then, when
+from pytest_given import (
+    Glossary,
+    attach,
+    given,
+    scenario,
+    sentence,
+    story,
+    then,
+    when,
+)
 
 g = Glossary()
 
@@ -35,6 +44,24 @@ def test_check_in():
         stay['arrived'] = True
     with then('the hotel hands her a key card'):
         stay['key'] = 'key card'
+        attach(
+            'receipt',
+            '\n'.join(
+                [
+                    'Check-in receipt',
+                    'Guest: Alice',
+                    'Deposit: none',
+                    'Check-in time: <i>15:00</i> *sharp*',
+                    'Room: 101',
+                    'Nights: 2',
+                    'Breakfast: included',
+                    'Parking: not booked',
+                    f'Key: {stay["key"]}',
+                    'Guest note:',
+                    '<b>*x*</b> [a](b)',
+                ]
+            ),
+        )
         assert stay['key'] == 'key card'
 
 
@@ -108,6 +135,7 @@ def test_payment_declined(payment_method, decline_reason, amount):
     deposit = amount // 2
     with given(t'{guest("Alice")} has a pending {booking}'):
         pending = {'paid': False}
+        attach('booking', f'Guest: Alice\nAmount due: {amount}\nStatus: pending')
     with when(
         t'{guest("Alice")} submits the {payment} by {payment_method} '
         t'with a deposit of {deposit}'

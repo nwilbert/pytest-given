@@ -16,13 +16,17 @@ from markupsafe import Markup
 
 from ...markdown import definition_html
 from ...model import (
+    CHANGED_PARTS,
+    SIDE_MARK,
     Change,
     DeltaData,
     DeltaSide,
+    GlossaryTerm,
     Mark,
     Narration,
     Side,
     SourceLocation,
+    TextSegment,
     change_counts,
     narration_of,
     narration_text,
@@ -40,23 +44,23 @@ from ..html_renderer import (
     term_app_data,
 )
 from ..theme import DEFAULT_THEME, Theme
+from .attachments import FoldRow
 from .glossary import (
     DeltaGlossaryView,
     TermReach,
-    before_tip_terms,
     delta_glossary_view,
     shown_term_scenarios,
     term_reach,
+    term_ref_targets,
     tip_terms,
 )
 from .scenarios import ListedScenario, listed_scenarios
-from .steps import MarkedRun
+from .steps import MarkedRun, joined_marks
 
 _SHORT_SHA = 7
 
-
 # How a change is marked beside its word, wherever colour is not enough.
-_CHANGE_GLYPH: dict[Change, str] = {
+CHANGE_GLYPH: dict[Change, str] = {
     'added': '+',
     'changed': '~',
     'removed': '\N{MINUS SIGN}',
@@ -78,9 +82,9 @@ def delta_render_context(
 ) -> dict[str, object]:
     after = delta.metadata.after.metadata
     listed = listed_scenarios(delta)
-    module_changes = _module_changes(delta, listed)
     reach = term_reach(delta, listed)
     glossary_view = delta_glossary_view(delta, listed, reach)
+    tips = tip_terms(delta)
     return {
         'title': delta.metadata.title or after.title or after.project,
         'range': (range_side(delta.metadata.before), range_side(delta.metadata.after)),
@@ -88,18 +92,22 @@ def delta_render_context(
         'plugin_version': delta.metadata.plugin_version,
         'listed': listed,
         'change_counts': change_counts(item.change for item in listed),
+        # A scenario counts under each part it changed in.
+        'changed_in_counts': {
+            part: sum(part in item.delta.changed_in for item in listed)
+            for part in CHANGED_PARTS
+        },
         'unchanged_count': len(delta.unchanged),
-        'module_changes': module_changes,
         'glossary_view': glossary_view,
         # Browse by offers Terms as the report does, whenever a side has any.
-        'browse_terms': bool(tip_terms(delta)),
-        'change_glyph': _CHANGE_GLYPH,
+        'browse_terms': bool(tips),
+        'change_glyph': CHANGE_GLYPH,
         'theme_default': theme,
         # Parameter coloring is off on this page: green, red and amber mean
         # only added, removed and changed.
         'param_colors': [],
         'app_data_js': script_json_parse(
-            _app_data(delta, listed, module_changes, reach, glossary_view)
+            _app_data(delta, listed, reach, glossary_view, tips)
         ),
         **bundled_assets('delta.css'),
         'delta_js': bundled_script('delta.js'),
@@ -123,6 +131,14 @@ def range_side(side: DeltaSide) -> RangeSide:
     return RangeSide(side.label, when) if side.label else RangeSide(when)
 
 
+def text_diff(words: tuple[TextSegment, ...], side: Side) -> Markup:
+    """A changed attachment line on one side, its changed words marked."""
+    return Markup('').join(
+        _marked(segment.mark, Markup.escape(segment.text))
+        for segment in _side_segments(words, side)
+    )
+
+
 def _module_changes(
     delta: DeltaData, listed: list[ListedScenario]
 ) -> dict[str, Change]:
@@ -142,28 +158,29 @@ def _module_changes(
 def _app_data(
     delta: DeltaData,
     listed: list[ListedScenario],
-    module_changes: dict[str, Change],
     reach: TermReach,
     glossary_view: DeltaGlossaryView,
+    tips: dict[str, GlossaryTerm],
 ) -> dict[str, object]:
     """What `delta.js` seeds `reportApp()` with: the report's projection, one
     entry per listed scenario keyed by its slug, since a removed and an added
-    scenario can share a node ID, and one per term card, keyed likewise."""
+    scenario can share a node ID, and one row per term card, keyed likewise.
+    The glossary holds every term a tooltip shows, by the key a ref names it
+    by."""
     return {
         'status_labels': STATUS_LABEL,
         'views': ['scenarios', 'glossary'] if glossary_view.listed else ['scenarios'],
-        'glossary': {'terms': [term_app_data(term) for term in tip_terms(delta)]},
-        'before_terms': [term_app_data(term) for term in before_tip_terms(delta)],
+        'glossary': {
+            'terms': [{**term_app_data(term), 'id': key} for key, term in tips.items()]
+        },
         'expandable_term_ids': [card.key for card in glossary_view.listed],
-        'term_cards': [
+        'term_rows': [
             {
                 'key': card.key,
                 'kind': card.shown.kind or 'kindless',
                 'change': card.change,
                 'defined': card.shown.definition is not None,
                 'search': card.search_text,
-                'before': card.delta.before.id if card.delta.before else None,
-                'after': card.delta.after.id if card.delta.after else None,
             }
             for card in glossary_view.listed
         ],
@@ -175,13 +192,14 @@ def _app_data(
                 'tags': item.shown.tags,
                 'status': item.shown.status,
                 'change': item.change,
+                'changed_in': list(item.delta.changed_in),
                 'search_text': _search_text(item),
             }
             for item in listed
         ],
-        'scenario_slugs': {item.slug: item.slug for item in listed},
-        'module_changes': module_changes,
-        'change_glyphs': _CHANGE_GLYPH,
+        'changed_parts': list(CHANGED_PARTS),
+        'module_changes': _module_changes(delta, listed),
+        'change_glyphs': CHANGE_GLYPH,
     }
 
 
@@ -196,21 +214,14 @@ def _build_env(
     delta: DeltaData, source_link_template: str | None
 ) -> jinja2.Environment:
     env = base_env()
-    # Parameter colouring is off on this page. A ref links only to a term the
-    # Glossary tab lists: an unchanged one has no card to open.
-    terms = delta.glossary.terms
+    # Parameter colouring is off on this page.
+    ref_targets = term_ref_targets(delta)
     narration_filters = {
         'before': make_narration_filter(
-            None,
-            delta.glossary.before,
-            term_side='before',
-            linked_terms={term.before.id for term in terms if term.before},
+            None, delta.glossary.before, ref_targets=ref_targets['before']
         ),
         'after': make_narration_filter(
-            None,
-            delta.glossary.after,
-            term_side='after',
-            linked_terms={term.after.id for term in terms if term.after},
+            None, delta.glossary.after, ref_targets=ref_targets['after']
         ),
     }
     # Compiled only for a side some scenario or term is shown from, so a
@@ -269,8 +280,21 @@ def _build_env(
     env.filters['narration'] = narration
     env.filters['narration_diff'] = narration_diff
     env.filters['definition_diff'] = definition_diff
+    env.filters['text_diff'] = text_diff
+    env.tests['fold_row'] = lambda value: isinstance(value, FoldRow)
     env.filters['source_url'] = source_url
     return env
+
+
+def _side_segments(words: tuple[TextSegment, ...], side: Side) -> list[TextSegment]:
+    """The side's own segments, joined as `steps.side_runs` joins a narration's."""
+    own = [segment for segment in words if segment.mark in ('equal', SIDE_MARK[side])]
+    return [
+        TextSegment(mark=mark, text=''.join(segment.text for segment in group))
+        for mark, group in joined_marks(
+            own, [segment.text.isspace() for segment in own]
+        )
+    ]
 
 
 def _contexts(words: tuple[MarkedRun, ...]) -> Iterator[tuple[str, str]]:

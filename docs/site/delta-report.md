@@ -32,23 +32,28 @@ Keep a delta only when it lists a change.
 
 ## What counts as a change
 
-A scenario found on both sides is *changed* when any of these differ:
+A scenario found on both sides is *changed* when any of these parts differ. The parts that differ are its *changed parts*, listed in `changed_in` in the delta JSON.
 
-- its title
-- its steps, with their phase, narration and nesting
-- its tags
-- its status, or its skip or xfail reason
-- its parameter table, meaning its columns, cases, cell values and case statuses
+- **Title**: its title
+- **Steps**: its steps, with their phase, narration and nesting
+- **Tags**: its tags
+- **Status**: its status, or its skip or xfail reason
+- **Parameters**: its parameter table, meaning its columns, cases, cell values and case statuses, apart from `attachment` columns
+- **Attachments**: its attachments. An attachment was added or removed, or its content or content type changed. An `attachment` column was added or removed. Or a paired case's attachment cell changed. The attachment cells of an added or removed case count under Parameters, with their case.
 
 A case ID that pytest generates from the values does not count on its own, only the values do. A custom case ID counts.
 
 Steps compare by their text, with each value as the report shows it. A term ref compares by its term, so renaming a term alone does not make a scenario changed.
 
-Nothing else counts. That includes the node ID, the module, the source location, the duration, the error, the fixtures, the stories and the attachments.
+Nothing else counts. That includes the node ID, the module, the source location, the duration, the error, the fixtures, the stories and the pins.
 
 A term is *changed* when its name or definition differs.
 
-A value that differs on every run makes its scenario changed in every delta. An example is a timestamp, or an object's default `str()` with its memory address. Fix it at its source, with a fixed clock or a stable `__str__`.
+A value that differs on every run makes its scenario changed in every delta. Examples are a timestamp, a generated ID, or an object's default `str()` with its memory address. Attachments hold such values most often, since an attachment is often a whole dumped object. Fix the value at its source, with a fixed clock, a seeded ID generator or a stable `__str__`. For a value the test cannot control, replace the varying part with a fixed placeholder before attaching. Until then, unchecking Attachments in the *Changed in* filter hides a scenario whose only changed part is attachments.
+
+The delta HTML's sidebar has a Change filter for added, changed and removed scenarios. Under it, a *Changed in* filter holds a checkbox per changed part, each with the number of changed scenarios that changed in it. A changed scenario shows while at least one of its changed parts is checked. So unchecking Attachments hides the scenarios that changed only in their attachments. Added and removed scenarios have no changed parts, and the filter never hides them. Once a part is unchecked, the address bar holds the checked parts.
+
+A changed attachment, or a changed attachment cell, opens on both sides as a diff. The before side marks the removed lines and words, and the after side the added ones. A long run of unchanged lines folds to a line such as `… 40 unchanged lines`, which opens on click.
 
 ## How scenarios pair
 
@@ -59,6 +64,8 @@ A scenario still unpaired then pairs by title, if exactly one unpaired scenario 
 Whatever stays unpaired is removed on the before side and added on the after side. A test renamed with a new title is therefore listed as one scenario removed and one added.
 
 Inside a paired parametrized scenario, columns pair by name first. Cases then pair by custom case ID, then by their values, then by generated case ID. A case whose value changed under a generated ID, such as `2-True` to `3-True`, is listed as one case removed and one added.
+
+Inside a paired step, attachments pair by label. When a label repeats on the step, its unchanged attachments pair first, and the rest pair in order between them. An attachment whose label changed is listed as one attachment removed and one added.
 
 Glossary terms pair by term ID. A term whose kind changed is listed as removed under its old kind and added under its new one. A term that gains or loses a kind still pairs.
 

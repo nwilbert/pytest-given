@@ -2,24 +2,30 @@
 
 The writer is `serde`'s reflective walk. The reader checks no schema version:
 rendering a delta computes nothing, so a field it lacks cannot read as a change.
-What rendering looks up it does check: the sides a change shows, and each step
-path, column and case a scenario's pairing names.
+What rendering looks up it does check: the sides a change shows, and the step
+paths, columns and cases the step and table pairings name. An attachment diff's
+indices and a changed attachment cell's column go unchecked.
 """
 
 from collections.abc import Callable, Sequence
 from typing import NotRequired, TypedDict, cast
 
 from .delta import (
+    ATTACHMENT_CHANGES,
     CASE_PAIRINGS,
+    CHANGED_PARTS,
     CHANGES,
     COLUMN_PAIRINGS,
     DELTA_SCHEMA_VERSION,
+    LINE_CHANGES,
     MARKS,
     SCENARIO_PAIRINGS,
     STEP_CHANGES,
     SUGGESTION_OFS,
     TERM_PAIRINGS,
+    AttachmentDelta,
     CasePair,
+    CellDelta,
     Change,
     ColumnPair,
     DeltaData,
@@ -28,16 +34,19 @@ from .delta import (
     DiffSegment,
     GlossaryDelta,
     IdentityPair,
+    LineDelta,
     ParameterDelta,
     ScenarioDelta,
     StepDelta,
     Suggestion,
     TermDelta,
     TermFacts,
+    TextSegment,
     walk_step_deltas,
 )
 from .errors import PytestGivenError
 from .schema import (
+    COLUMN_KINDS,
     ColumnId,
     NodeId,
     ParameterTable,
@@ -143,7 +152,10 @@ def _read_scenario_delta(d: _ScenarioDeltaJson) -> ScenarioDelta:
             lambda value: literal(value, SCENARIO_PAIRINGS, 'scenario pairing'),
             d.get('paired_by'),
         ),
-        title_changed=d.get('title_changed', False),
+        changed_in=tuple(
+            literal(part, CHANGED_PARTS, 'changed part')
+            for part in d.get('changed_in', ())
+        ),
         steps=tuple(_step_delta_from_dict(s) for s in d.get('steps', ())),
         parameters=_parameter_delta_from_dict(d.get('parameters')),
     )
@@ -156,6 +168,36 @@ def _step_delta_from_dict(d: _StepDeltaJson) -> StepDelta:
         after=_step_path(d.get('after')),
         words=_segments_from_list(d.get('words', ())),
         children=tuple(_step_delta_from_dict(c) for c in d.get('children', ())),
+        attachments=tuple(
+            _attachment_delta_from_dict(a) for a in d.get('attachments', ())
+        ),
+    )
+
+
+def _attachment_delta_from_dict(attachment: _AttachmentDeltaJson) -> AttachmentDelta:
+    return AttachmentDelta(
+        change=literal(attachment['change'], ATTACHMENT_CHANGES, 'attachment change'),
+        before=attachment.get('before'),
+        after=attachment.get('after'),
+        lines=_lines_from_list(attachment.get('lines', ())),
+    )
+
+
+def _lines_from_list(items: Sequence[_LineDeltaJson]) -> tuple[LineDelta, ...]:
+    return tuple(
+        LineDelta(
+            change=literal(item['change'], LINE_CHANGES, 'line change'),
+            before=item.get('before'),
+            after=item.get('after'),
+            count=item.get('count', 1),
+            words=tuple(
+                TextSegment(
+                    mark=literal(word['mark'], MARKS, 'diff mark'), text=word['text']
+                )
+                for word in item.get('words', ())
+            ),
+        )
+        for item in items
     )
 
 
@@ -191,6 +233,7 @@ def _parameter_delta_from_dict(
 
 def _column_pair_from_dict(d: _ColumnPairJson) -> ColumnPair:
     return ColumnPair(
+        kind=literal(d['kind'], COLUMN_KINDS, 'column kind'),
         before=_optional(ColumnId, d.get('before')),
         after=_optional(ColumnId, d.get('after')),
         paired_by=_optional(
@@ -209,6 +252,10 @@ def _case_pair_from_dict(d: _CasePairJson) -> CasePair:
             d.get('paired_by'),
         ),
         changed_cells=tuple(ColumnId(c) for c in d.get('changed_cells', ())),
+        changed_attachments=tuple(
+            CellDelta(column=ColumnId(c['column']), lines=_lines_from_list(c['lines']))
+            for c in d.get('changed_attachments', ())
+        ),
         id_changed=d.get('id_changed', False),
         status_changed=d.get('status_changed', False),
     )
@@ -353,15 +400,37 @@ class _SegmentJson(TypedDict):
     after: NotRequired[list[JsonObject]]
 
 
+class _TextSegmentJson(TypedDict):
+    mark: str
+    text: str
+
+
+class _LineDeltaJson(TypedDict):
+    change: str
+    before: NotRequired[int | None]
+    after: NotRequired[int | None]
+    count: NotRequired[int]
+    words: NotRequired[list[_TextSegmentJson]]
+
+
+class _AttachmentDeltaJson(TypedDict):
+    change: str
+    before: NotRequired[int | None]
+    after: NotRequired[int | None]
+    lines: NotRequired[list[_LineDeltaJson]]
+
+
 class _StepDeltaJson(TypedDict):
     change: str
     before: NotRequired[list[int] | None]
     after: NotRequired[list[int] | None]
     words: NotRequired[list[_SegmentJson]]
     children: NotRequired[list[_StepDeltaJson]]
+    attachments: NotRequired[list[_AttachmentDeltaJson]]
 
 
 class _ColumnPairJson(TypedDict):
+    kind: str
     before: NotRequired[str | None]
     after: NotRequired[str | None]
     paired_by: NotRequired[str | None]
@@ -372,8 +441,14 @@ class _CasePairJson(TypedDict):
     after: NotRequired[str | None]
     paired_by: NotRequired[str | None]
     changed_cells: NotRequired[list[str]]
+    changed_attachments: NotRequired[list[_CellDeltaJson]]
     id_changed: NotRequired[bool]
     status_changed: NotRequired[bool]
+
+
+class _CellDeltaJson(TypedDict):
+    column: str
+    lines: list[_LineDeltaJson]
 
 
 class _ParameterDeltaJson(TypedDict):
@@ -386,7 +461,7 @@ class _ScenarioDeltaJson(TypedDict):
     before: NotRequired[JsonObject | None]
     after: NotRequired[JsonObject | None]
     paired_by: NotRequired[str | None]
-    title_changed: NotRequired[bool]
+    changed_in: NotRequired[list[str]]
     steps: NotRequired[list[_StepDeltaJson]]
     parameters: NotRequired[_ParameterDeltaJson | None]
 

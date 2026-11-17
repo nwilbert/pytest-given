@@ -17,6 +17,7 @@ from ..model import (
     TermId,
     TermKind,
     build_term_crossrefs,
+    terms_read_the_same,
 )
 from .chains import rewrite_identities
 from .narration import Reading, placeholder_name, same_term_id, word_diff
@@ -71,7 +72,7 @@ def align_terms(
     deltas: list[TermDelta] = []
     unchanged: list[IdentityPair[TermId]] = []
     rows = interleaved(
-        [term.id for term in after_terms], [term.id for term in before_terms], paired
+        [term.id for term in before_terms], [term.id for term in after_terms], paired
     )
     for before_id, after_id in rows:
         before_term = before_by_id[before_id] if before_id is not None else None
@@ -93,7 +94,7 @@ def align_terms(
                 )
             )
         elif before_term is not None and after_term is not None:
-            if _same_term(before_term, after_term):
+            if terms_read_the_same(before_term, after_term):
                 unchanged.append(
                     IdentityPair(before=before_term.id, after=after_term.id)
                 )
@@ -160,13 +161,6 @@ def _kind_changed_warning(before: GlossaryTerm, after: GlossaryTerm) -> str:
         f'rename log: term "{before.id}" became "{after.id}" and its kind changed '
         f'from {before.kind} to {after.kind}, so the glossary lists it removed '
         'and added; its term refs still compare as one term'
-    )
-
-
-def _same_term(before: GlossaryTerm, after: GlossaryTerm) -> bool:
-    return (before.canonical, before.definition_text or '') == (
-        after.canonical,
-        after.definition_text or '',
     )
 
 

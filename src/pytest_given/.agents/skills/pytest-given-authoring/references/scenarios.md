@@ -41,6 +41,7 @@ Readers scan titles first, often without the steps: in the report's list, in Mar
   - **An input document goes on the `given` that arranges it. An output document goes on the `then` that checks it.** Output is the case people miss most. The assertions only sample the result, so the attachment is the only place where a reader sees all of it.
   - **Attach documents, not object dumps.** Skip the attachment when the step text or the parameter table already shows the value, or when the artifact is too big to read inline, like a full HTML page. The exception is a real before and after: when a step reduces a rich input to a small output, attaching the input lets a reader check a claim like "only the first line survives".
   - Across parametrize cases, an attachment whose content varies becomes a column, headed by its label.
+  - **Attach content that is the same on every run.** A timestamp, a generated ID or a default `str()` with a memory address shows the scenario as changed in every delta report. Use a fixed clock, a seeded ID generator or a stable `__str__`. For a value the test can't control, replace the varying part with a fixed placeholder before attaching.
 
 ## Expected raises
 

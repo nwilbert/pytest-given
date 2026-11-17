@@ -5,7 +5,11 @@ import pytest
 
 from pytest_given.model import (
     DELTA_SCHEMA_VERSION,
+    Attachment,
+    AttachmentDelta,
+    AttachmentLabel,
     CasePair,
+    CellDelta,
     ColumnId,
     ColumnPair,
     DeltaData,
@@ -16,6 +20,7 @@ from pytest_given.model import (
     GlossaryDelta,
     IdentityPair,
     JsonObject,
+    LineDelta,
     NarrationValue,
     NodeId,
     ParameterDelta,
@@ -25,6 +30,7 @@ from pytest_given.model import (
     Suggestion,
     TermDelta,
     TermFacts,
+    TextSegment,
     delta_from_dict,
     delta_to_dict,
     is_delta_dict,
@@ -66,7 +72,12 @@ def _full_delta() -> DeltaData:
         ),
         step('when', 'it cools'),
         step('then', 'it is gone'),
-        parameters=table([('size', 'param')], ('1', [1]), ('gone', [2]), custom=True),
+        parameters=table(
+            [('size', 'param'), ('log', 'attachment')],
+            ('1', [1, None]),
+            ('gone', [2, None]),
+            custom=True,
+        ),
     )
     after_scenario = scn(
         'tests/test_a.py::test_a[2]',
@@ -76,7 +87,8 @@ def _full_delta() -> DeltaData:
         tags=['fast'],
         status='failed',
         parameters=table(
-            [('size', 'param'), ('shown', 'derived')], ('2', [1, 'x'], 'failed')
+            [('size', 'param'), ('shown', 'derived'), ('log', 'attachment')],
+            ('2', [1, 'x', Attachment(AttachmentLabel('log'), 'a')], 'failed'),
         ),
     )
     changed = ScenarioDelta(
@@ -84,7 +96,7 @@ def _full_delta() -> DeltaData:
         before=before_scenario,
         after=after_scenario,
         paired_by='rename-log',
-        title_changed=True,
+        changed_in=('title', 'steps', 'attachments'),
         steps=(
             StepDelta(
                 change='modified',
@@ -92,6 +104,31 @@ def _full_delta() -> DeltaData:
                 after=(0, 1),
                 words=words,
                 children=(StepDelta(change='equal', before=(0, 0), after=(0, 0)),),
+                attachments=(
+                    AttachmentDelta(
+                        change='changed',
+                        before=0,
+                        after=0,
+                        lines=(
+                            LineDelta(change='equal', before=0, after=0, count=2),
+                            LineDelta(
+                                change='modified',
+                                before=2,
+                                after=2,
+                                words=(
+                                    TextSegment(mark='equal', text='a '),
+                                    TextSegment(mark='removed', text='b'),
+                                    TextSegment(mark='added', text='c'),
+                                ),
+                            ),
+                            LineDelta(change='removed', before=3),
+                            LineDelta(change='added', after=3),
+                        ),
+                    ),
+                    AttachmentDelta(change='equal', before=1, after=1),
+                    AttachmentDelta(change='added', after=2),
+                    AttachmentDelta(change='removed', before=2),
+                ),
             ),
             StepDelta(change='added', after=(1,)),
             StepDelta(change='removed', before=(2,)),
@@ -99,9 +136,18 @@ def _full_delta() -> DeltaData:
         parameters=ParameterDelta(
             columns=(
                 ColumnPair(
-                    before=ColumnId('size'), after=ColumnId('size'), paired_by='name'
+                    kind='param',
+                    before=ColumnId('size'),
+                    after=ColumnId('size'),
+                    paired_by='name',
                 ),
-                ColumnPair(after=ColumnId('derived:0')),
+                ColumnPair(kind='derived', after=ColumnId('derived:0')),
+                ColumnPair(
+                    kind='attachment',
+                    before=ColumnId('attachment:0'),
+                    after=ColumnId('attachment:0'),
+                    paired_by='name',
+                ),
             ),
             cases=(
                 CasePair(
@@ -109,6 +155,12 @@ def _full_delta() -> DeltaData:
                     after=NodeId('2'),
                     paired_by='values',
                     changed_cells=(ColumnId('size'),),
+                    changed_attachments=(
+                        CellDelta(
+                            column=ColumnId('attachment:0'),
+                            lines=(LineDelta(change='added', after=0),),
+                        ),
+                    ),
                     id_changed=True,
                     status_changed=True,
                 ),
@@ -367,6 +419,18 @@ def test_an_unknown_change_is_refused() -> None:
         delta_from_dict(delta_dict)
 
 
+def test_an_unknown_changed_part_is_refused() -> None:
+    delta_dict = _through_json(_full_delta())
+    scenarios = delta_dict['scenarios']
+    assert isinstance(scenarios, list)
+    first = scenarios[0]
+    assert isinstance(first, dict)
+    first['changed_in'] = ['title', 'colour']
+
+    with pytest.raises(PytestGivenError, match="invalid changed part 'colour'"):
+        delta_from_dict(delta_dict)
+
+
 def _parameters(
     columns: tuple[ColumnPair, ...] = (), cases: tuple[CasePair, ...] = ()
 ) -> ParameterDelta:
@@ -378,34 +442,62 @@ def _case(**kw: object) -> CasePair:
 
 
 @pytest.mark.parametrize(
-    ('parameters', 'changed'),
+    ('parameters', 'parameters_changed', 'attachments_changed'),
     [
         (
             _parameters(
                 (
                     ColumnPair(
-                        before=ColumnId('a'), after=ColumnId('a'), paired_by='name'
+                        kind='param',
+                        before=ColumnId('a'),
+                        after=ColumnId('a'),
+                        paired_by='name',
                     ),
                 ),
                 (_case(),),
             ),
             False,
+            False,
         ),
-        (_parameters((ColumnPair(after=ColumnId('b')),)), True),
+        (_parameters((ColumnPair(kind='param', after=ColumnId('b')),)), True, False),
         (
             _parameters(
                 (
                     ColumnPair(
-                        before=ColumnId('a'), after=ColumnId('b'), paired_by='values'
+                        kind='param',
+                        before=ColumnId('a'),
+                        after=ColumnId('b'),
+                        paired_by='values',
                     ),
                 )
             ),
             True,
+            False,
         ),
-        (_parameters(cases=(CasePair(before=NodeId('1')),)), True),
-        (_parameters(cases=(_case(changed_cells=(ColumnId('a'),)),)), True),
-        (_parameters(cases=(_case(status_changed=True),)), True),
-        (_parameters(cases=(_case(id_changed=True),)), True),
+        (_parameters(cases=(CasePair(before=NodeId('1')),)), True, False),
+        (_parameters(cases=(_case(changed_cells=(ColumnId('a'),)),)), True, False),
+        (_parameters(cases=(_case(status_changed=True),)), True, False),
+        (_parameters(cases=(_case(id_changed=True),)), True, False),
+        (
+            _parameters(
+                (ColumnPair(kind='attachment', before=ColumnId('attachment:0')),)
+            ),
+            False,
+            True,
+        ),
+        (
+            _parameters(
+                cases=(
+                    _case(
+                        changed_attachments=(
+                            CellDelta(column=ColumnId('attachment:0'), lines=()),
+                        )
+                    ),
+                )
+            ),
+            False,
+            True,
+        ),
     ],
     ids=[
         'all-paired',
@@ -415,12 +507,18 @@ def _case(**kw: object) -> CasePair:
         'changed-cell',
         'changed-status',
         'changed-id',
+        'unpaired-attachment-column',
+        'changed-attachment-cell',
     ],
 )
-def test_a_parameter_delta_is_changed_when_a_pair_is(
-    parameters: ParameterDelta, changed: bool
+def test_a_parameter_delta_tells_a_parameter_change_from_an_attachment_change(
+    parameters: ParameterDelta, parameters_changed: bool, attachments_changed: bool
 ) -> None:
-    assert parameters.changed is changed
+    assert (parameters.parameters_changed, parameters.attachments_changed) == (
+        parameters_changed,
+        attachments_changed,
+    )
+    assert parameters.changed is (parameters_changed or attachments_changed)
 
 
 def test_a_scenario_delta_derives_what_changed_from_its_two_sides() -> None:

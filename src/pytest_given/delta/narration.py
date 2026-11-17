@@ -12,6 +12,7 @@ from collections.abc import Callable, Iterable, Iterator, Sequence
 from dataclasses import dataclass, field, replace
 from functools import lru_cache
 from itertools import groupby
+from operator import itemgetter
 from typing import Literal
 
 from ..markdown import CodeSpan, EmphasisSpan, PlainSpan, located_spans
@@ -33,7 +34,11 @@ from ..model import (
     parts_in_context,
     s_form,
 )
-from .lcs import lcs_gaps, lcs_pairs
+from .lcs import lcs_pairs, marked_items
+
+# The `similarity` from which a reworded step or line reads as modified, not
+# as removed and added.
+MODIFIED_SIMILARITY = 0.5
 
 
 @dataclass(frozen=True)
@@ -120,13 +125,24 @@ def token_bucket(read: Sequence[Token]) -> TokenBucket:
     )
 
 
-def similarity(words_a: Sequence[Token], words_b: Sequence[Token]) -> float:
-    """The share of `reading_words` the two have in common: 1.0 for the same
+def similarity[T](
+    words_a: Sequence[T],
+    words_b: Sequence[T],
+    equal: Callable[[T, T], bool],
+) -> float:
+    """The share of words the two have in common, in order: 1.0 for the same
     words, 0.0 for none shared."""
     if not words_a and not words_b:
         return 1.0
-    shared = len(lcs_pairs(words_a, words_b, tokens_equal))
+    shared = len(lcs_pairs(words_a, words_b, equal))
     return 2 * shared / (len(words_a) + len(words_b))
+
+
+def bag_similarity[K](counts_a: Counter[K], counts_b: Counter[K]) -> float:
+    """The share of words the two have in common, in any order, which bounds
+    `similarity` from above without an LCS."""
+    total = counts_a.total() + counts_b.total()
+    return 1.0 if not total else 2 * (counts_a & counts_b).total() / total
 
 
 def reading_words(narration: Narration, reading: Reading) -> list[Token]:
@@ -154,9 +170,10 @@ def word_diff(
 def token_diff(
     tokens_a: Sequence[Token], tokens_b: Sequence[Token]
 ) -> tuple[DiffSegment, ...]:
+    marked = marked_items(tokens_a, tokens_b, tokens_equal)
     return tuple(
-        _segment(mark, [pair for _, pair in ops])
-        for mark, ops in groupby(_ops(tokens_a, tokens_b), key=lambda op: op[0])
+        _segment(mark, list(items))
+        for mark, items in groupby(marked, key=itemgetter(0))
     )
 
 
@@ -183,7 +200,7 @@ _SPACES = re.compile(r'(\s+)')
 def _value_tokens(value: NarrationValue) -> Iterator[Token]:
     """Read by word, as a literal reading the same is: each word keeps the
     value it is a piece of."""
-    for kind, piece in _pieces(value.rendered):
+    for kind, piece in pieces(value.rendered):
         yield Token(kind, piece, parts=(replace(value, rendered=piece),))
 
 
@@ -238,11 +255,12 @@ def _plain_tokens(text: str) -> Iterator[Token]:
 
 
 def _word_tokens(text: str) -> Iterator[Token]:
-    for kind, piece in _pieces(text):
+    for kind, piece in pieces(text):
         yield _literal(kind, piece)
 
 
-def _pieces(text: str) -> Iterator[tuple[TokenKind, str]]:
+def pieces(text: str) -> Iterator[tuple[TokenKind, str]]:
+    """`text` split into its runs of spaces and the words between them."""
     for piece in _SPACES.split(text):
         if piece:
             yield ('space' if piece.isspace() else 'word'), piece
@@ -252,33 +270,13 @@ def _literal(kind: TokenKind, source: str) -> Token:
     return Token(kind, source, parts=(NarrationLiteral(value=source),))
 
 
-type _Op = tuple[Mark, _Pair]
-
-
-@dataclass(frozen=True)
-class _Pair:
-    """A token of the diff, with its before and after reading when equal."""
-
-    before: Token | None
-    after: Token | None
-
-
-def _ops(tokens_a: Sequence[Token], tokens_b: Sequence[Token]) -> Iterator[_Op]:
-    """Each token marked, every gap between matches read removed-then-added."""
-    for gap_a, gap_b, anchor in lcs_gaps(tokens_a, tokens_b, tokens_equal):
-        for index in gap_a:
-            yield 'removed', _Pair(tokens_a[index], None)
-        for index in gap_b:
-            yield 'added', _Pair(None, tokens_b[index])
-        if anchor is not None:
-            yield 'equal', _Pair(tokens_a[anchor[0]], tokens_b[anchor[1]])
-
-
-def _segment(mark: Mark, pairs: list[_Pair]) -> DiffSegment:
+def _segment(
+    mark: Mark, items: list[tuple[Mark, Token | None, Token | None]]
+) -> DiffSegment:
     return DiffSegment(
         mark=mark,
-        before=_parts([pair.before for pair in pairs if pair.before]),
-        after=_parts([pair.after for pair in pairs if pair.after]),
+        before=_parts([before for _, before, _ in items if before]),
+        after=_parts([after for _, _, after in items if after]),
     )
 
 
