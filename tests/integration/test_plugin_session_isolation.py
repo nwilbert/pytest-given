@@ -88,7 +88,7 @@ def test_after():
 def test_lint_still_anchors_steps_after_nested_inprocess_run(pytester):
     """Step-source capture must resolve against the outer rootdir even after a
     nested run re-pointed it: the empty given executed after the nested run
-    only reaches the AST rules if its `Step.source` was captured."""
+    only reaches the AST rules if its source was captured."""
     pytester.makepyfile(test_outer=OUTER_LINTED)
     result = pytester.runpytest('--given-lint')
     result.assert_outcomes(passed=2, errors=1)

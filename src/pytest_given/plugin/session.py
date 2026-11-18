@@ -24,14 +24,13 @@ from ..git import detect_commit_sha
 from ..grouping import group_parametrized
 from ..lint import LintFinding, error_count, run_lint, summary_rows, summary_title
 from ..model import (
-    REPORT_SCHEMA_VERSION,
+    CapturedScenario,
     Glossary,
     JsonObject,
     Metadata,
     PytestGivenError,
     PytestGivenWarning,
     ReportData,
-    Scenario,
     SessionCapture,
     Story,
     in_report_order,
@@ -124,12 +123,12 @@ class _SessionReport:
     """A finished session's report: what the lint reads, and the serialized
     report the sinks are rendered from.
 
-    `scenarios` keep `Step.source`, which the report leaves out and the AST
-    lint rules anchor to. `report_dict` is None on a run with no sink
+    `scenarios` keep their steps' sources, which the report leaves out and
+    the AST lint rules anchor to. `report_dict` is None on a run with no sink
     configured, which skips serializing entirely.
     """
 
-    scenarios: list[Scenario]
+    scenarios: list[CapturedScenario]
     glossary: Glossary | None
     stories: list[Story]
     report_dict: JsonObject | None
@@ -267,7 +266,6 @@ def _build_report(
                 commit_sha=detect_commit_sha(),
                 title=given.title,
                 report_url=given.report_url,
-                schema_version=REPORT_SCHEMA_VERSION,
             ),
             scenarios=scenarios,
             stories=capture.stories,
@@ -283,7 +281,7 @@ def _build_report(
 
 
 def _warn_of_undeclared_stories(
-    scenarios: list[Scenario], stories: list[Story]
+    scenarios: list[CapturedScenario], stories: list[Story]
 ) -> None:
     """The report's stories are those whose `story()` call ran this session;
     one that ran before it started — in a module still imported from an

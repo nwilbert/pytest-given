@@ -14,7 +14,6 @@ from ..model import (
 )
 from ..report import (
     DEFAULT_HTML_PATH,
-    DEFAULT_JSON_PATH,
     DEFAULT_THEME,
     MD_SUFFIXES,
     SOURCE_LINK_HELP,
@@ -26,6 +25,7 @@ from ..report import (
     resolve_source_link_template,
     resolve_theme,
 )
+from .arguments import add_json_report_argument
 
 
 def add_report_parser(
@@ -35,16 +35,7 @@ def add_report_parser(
         'report', help='Re-render a saved JSON report as HTML or Markdown'
     )
     report_parser.set_defaults(handler=run_report)
-    report_parser.add_argument(
-        'json_file',
-        nargs='?',
-        type=Path,
-        default=DEFAULT_JSON_PATH,
-        help=(
-            f'Path to JSON report data (default: {DEFAULT_JSON_PATH.as_posix()}, '
-            'where a bare --given-json writes it)'
-        ),
-    )
+    add_json_report_argument(report_parser)
     report_parser.add_argument(
         '-o',
         '--output',

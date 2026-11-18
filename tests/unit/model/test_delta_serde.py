@@ -1,13 +1,11 @@
 import json
+import re
 from collections.abc import Callable
 
 import pytest
 
 from pytest_given.model import (
     DELTA_SCHEMA_VERSION,
-    Attachment,
-    AttachmentDelta,
-    AttachmentLabel,
     CasePair,
     CellDelta,
     ColumnId,
@@ -15,22 +13,11 @@ from pytest_given.model import (
     DeltaData,
     DeltaMetadata,
     DeltaSide,
-    DiffSegment,
-    Glossary,
-    GlossaryDelta,
-    IdentityPair,
     JsonObject,
-    LineDelta,
-    NarrationValue,
     NodeId,
     ParameterDelta,
     PytestGivenError,
     ScenarioDelta,
-    StepDelta,
-    Suggestion,
-    TermDelta,
-    TermFacts,
-    TextSegment,
     delta_from_dict,
     delta_to_dict,
     is_delta_dict,
@@ -38,177 +25,12 @@ from pytest_given.model import (
     report_to_dict,
 )
 from tests.unit.delta.builders import (
-    lit,
     meta,
-    narr,
-    ph,
-    ref,
     report,
     scn,
-    step,
-    table,
     term,
 )
-
-
-def _full_delta() -> DeltaData:
-    value = NarrationValue(
-        rendered='3', expression='n', format_spec='02', conversion='r'
-    )
-    words = (
-        DiffSegment(
-            mark='equal',
-            before=(lit('a  '), ref('coffee', 'coffee')),
-            after=(lit('a '), ref('coffee', 'Coffee')),
-        ),
-        DiffSegment(mark='removed', before=(lit('old'), value)),
-        DiffSegment(mark='added', after=(ph('size', 'size'), lit('new'))),
-    )
-    before_scenario = scn(
-        'tests/test_a.py::test_a[1]',
-        'A brew',
-        step(
-            'given', narr(lit('a '), ref('coffee', 'coffee')), step('when', 'it pours')
-        ),
-        step('when', 'it cools'),
-        step('then', 'it is gone'),
-        parameters=table(
-            [('size', 'param'), ('log', 'attachment')],
-            ('1', [1, None]),
-            ('gone', [2, None]),
-            custom=True,
-        ),
-    )
-    after_scenario = scn(
-        'tests/test_a.py::test_a[2]',
-        'A brew',
-        step('given', 'a cup', step('when', 'it fills'), step('when', 'it brews')),
-        step('then', 'it is served'),
-        tags=['fast'],
-        status='failed',
-        parameters=table(
-            [('size', 'param'), ('shown', 'derived'), ('log', 'attachment')],
-            ('2', [1, 'x', Attachment(AttachmentLabel('log'), 'a')], 'failed'),
-        ),
-    )
-    changed = ScenarioDelta(
-        change='changed',
-        before=before_scenario,
-        after=after_scenario,
-        paired_by='rename-log',
-        changed_in=('title', 'steps', 'attachments'),
-        steps=(
-            StepDelta(
-                change='modified',
-                before=(0,),
-                after=(0, 1),
-                words=words,
-                children=(StepDelta(change='equal', before=(0, 0), after=(0, 0)),),
-                attachments=(
-                    AttachmentDelta(
-                        change='changed',
-                        before=0,
-                        after=0,
-                        lines=(
-                            LineDelta(change='equal', before=0, after=0, count=2),
-                            LineDelta(
-                                change='modified',
-                                before=2,
-                                after=2,
-                                words=(
-                                    TextSegment(mark='equal', text='a '),
-                                    TextSegment(mark='removed', text='b'),
-                                    TextSegment(mark='added', text='c'),
-                                ),
-                            ),
-                            LineDelta(change='removed', before=3),
-                            LineDelta(change='added', after=3),
-                        ),
-                    ),
-                    AttachmentDelta(change='equal', before=1, after=1),
-                    AttachmentDelta(change='added', after=2),
-                    AttachmentDelta(change='removed', before=2),
-                ),
-            ),
-            StepDelta(change='added', after=(1,)),
-            StepDelta(change='removed', before=(2,)),
-        ),
-        parameters=ParameterDelta(
-            columns=(
-                ColumnPair(
-                    kind='param',
-                    before=ColumnId('size'),
-                    after=ColumnId('size'),
-                    paired_by='name',
-                ),
-                ColumnPair(kind='derived', after=ColumnId('derived:0')),
-                ColumnPair(
-                    kind='attachment',
-                    before=ColumnId('attachment:0'),
-                    after=ColumnId('attachment:0'),
-                    paired_by='name',
-                ),
-            ),
-            cases=(
-                CasePair(
-                    before=NodeId('1'),
-                    after=NodeId('2'),
-                    paired_by='values',
-                    changed_cells=(ColumnId('size'),),
-                    changed_attachments=(
-                        CellDelta(
-                            column=ColumnId('attachment:0'),
-                            lines=(LineDelta(change='added', after=0),),
-                        ),
-                    ),
-                    id_changed=True,
-                    status_changed=True,
-                ),
-                CasePair(before=NodeId('gone')),
-            ),
-        ),
-    )
-    return DeltaData(
-        metadata=DeltaMetadata(
-            before=DeltaSide(metadata=meta('aaa'), label='v1', modules=('m.a',)),
-            after=DeltaSide(metadata=meta('bbb'), modules=('m.a', 'm.b')),
-            plugin_version='0.2.0',
-            timestamp='2026-02-02T00:00:00+00:00',
-            title='Coffee changes for v2',
-        ),
-        scenarios=(
-            changed,
-            ScenarioDelta(change='added', after=after_scenario),
-            ScenarioDelta(change='removed', before=before_scenario),
-        ),
-        unchanged=(IdentityPair(before='t::a', after='t::a'),),
-        suggestions=(
-            Suggestion(of='scenario', before='t::old', after='t::new'),
-            Suggestion(
-                of='case',
-                before='1',
-                after='2',
-                scenario=IdentityPair(before='t::a', after='t::a'),
-            ),
-        ),
-        glossary=GlossaryDelta(
-            before=Glossary(terms=[term('coffee', 'coffee', definition='A drink.')]),
-            after=Glossary(terms=[term('coffee', 'coffee', definition='A hot drink.')]),
-            terms=(
-                TermDelta(
-                    change='changed',
-                    before=term('coffee', 'coffee', definition='A drink.'),
-                    after=term('coffee', 'coffee', definition='A hot drink.'),
-                    paired_by='term-id',
-                    before_facts=TermFacts(other_forms=('coffees',), scenario_count=2),
-                    after_facts=TermFacts(scenario_count=3),
-                    definition=(DiffSegment(mark='added', after=(lit('hot'),)),),
-                ),
-                TermDelta(change='added', after=term('tea', 'tea')),
-            ),
-            unchanged=(IdentityPair(before='tea', after='tea'),),
-        ),
-    )
+from tests.unit.model.builders import full_delta
 
 
 def _through_json(delta: DeltaData) -> JsonObject:
@@ -218,7 +40,7 @@ def _through_json(delta: DeltaData) -> JsonObject:
 
 
 def test_a_delta_with_every_variant_round_trips_through_json() -> None:
-    delta = _full_delta()
+    delta = full_delta()
 
     restored = delta_from_dict(_through_json(delta))
 
@@ -254,7 +76,7 @@ def test_a_delta_dict_is_told_from_a_report_dict_by_its_kind() -> None:
     report_dict = report_to_dict(report(scn('t.py::a', 'A')))
 
     assert (
-        is_delta_dict(_through_json(_full_delta())),
+        is_delta_dict(_through_json(full_delta())),
         is_delta_dict(report_dict),
     ) == (
         True,
@@ -284,14 +106,15 @@ def test_a_dict_that_is_neither_a_delta_nor_a_report_is_not_called_a_report() ->
     [
         (DELTA_SCHEMA_VERSION + 1, f'schema version {DELTA_SCHEMA_VERSION + 1}'),
         (None, 'no schema version'),
+        (True, 'schema version True'),
     ],
-    ids=['another', 'none'],
+    ids=['another', 'none', 'boolean'],
 )
 def test_a_delta_of_another_schema_version_is_refused(
-    version: int | None, named: str
+    version: int | bool | None, named: str
 ) -> None:
     """Before reading it, which might pass and leave a render to crash."""
-    delta_dict = _through_json(_full_delta())
+    delta_dict = _through_json(full_delta())
     metadata = delta_dict['metadata']
     assert isinstance(metadata, dict)
     metadata['schema_version'] = version
@@ -318,22 +141,62 @@ def _add_a_scenario(delta_dict: JsonObject, scenario: object) -> None:
 
 
 @pytest.mark.parametrize(
-    'mutate',
+    ('mutate', 'path'),
     [
-        _drop_a_side,
-        lambda delta_dict: _add_a_scenario(delta_dict, 3),
-        lambda delta_dict: _add_a_scenario(delta_dict, {}),
+        (_drop_a_side, r'metadata\.before'),
+        (lambda delta_dict: _add_a_scenario(delta_dict, 3), r'scenarios\.\d+\.after'),
+        (
+            lambda delta_dict: _add_a_scenario(delta_dict, {}),
+            r'scenarios\.\d+\.after\.id',
+        ),
     ],
     ids=['missing-side', 'scenario-not-a-dict', 'scenario-missing-fields'],
 )
 def test_a_malformed_delta_raises_a_pytest_given_error(
-    mutate: Callable[[JsonObject], None],
+    mutate: Callable[[JsonObject], None], path: str
 ) -> None:
-    delta_dict = _through_json(_full_delta())
+    delta_dict = _through_json(full_delta())
     mutate(delta_dict)
 
-    with pytest.raises(PytestGivenError, match='not a pytest-given delta'):
+    with pytest.raises(PytestGivenError) as raised:
         delta_from_dict(delta_dict, 'delta.json')
+
+    message = str(raised.value)
+    assert message.startswith('delta.json is not a valid pytest-given delta:\n')
+    assert re.search(f'\n  {path}: ', message)
+
+
+def test_a_malformed_delta_lists_the_path_and_reason_of_each_problem() -> None:
+    delta_dict = _through_json(full_delta())
+    _changed_scenario(delta_dict)['change'] = 'moved'
+
+    with pytest.raises(PytestGivenError) as raised:
+        delta_from_dict(delta_dict, 'd.json')
+
+    assert str(raised.value).startswith('d.json is not a valid pytest-given delta:')
+    assert "scenarios.0.change: Input should be 'added', 'removed' or 'changed'" in str(
+        raised.value
+    )
+
+
+def test_a_side_with_an_uncitable_report_url_is_refused() -> None:
+    delta_dict = _through_json(full_delta())
+    metadata = delta_dict['metadata']
+    assert isinstance(metadata, dict)
+    before = metadata['before']
+    assert isinstance(before, dict)
+    side_metadata = before['metadata']
+    assert isinstance(side_metadata, dict)
+    side_metadata['report_url'] = 'ftp://x'
+
+    with pytest.raises(
+        PytestGivenError,
+        match=(
+            r'd\.json is not a valid pytest-given delta:\n'
+            r'  metadata: before\.metadata\.report_url must be'
+        ),
+    ):
+        delta_from_dict(delta_dict, 'd.json')
 
 
 def _changed_scenario(delta_dict: JsonObject) -> JsonObject:
@@ -379,13 +242,28 @@ def _drop_the_after_term(delta_dict: JsonObject) -> None:
 
 
 @pytest.mark.parametrize(
-    'mutate',
+    ('mutate', 'problem'),
     [
-        _drop_the_after_scenario,
-        _point_a_step_past_its_scenario,
-        _name_a_missing_case,
-        _drop_the_after_table,
-        _drop_the_after_term,
+        (
+            _drop_the_after_scenario,
+            'scenarios.0: a changed entry in the delta lacks a side.',
+        ),
+        (
+            _point_a_step_past_its_scenario,
+            'scenarios.0: a step in the delta names a step its scenario lacks.',
+        ),
+        (
+            _name_a_missing_case,
+            (
+                'scenarios.0: a table pairing in the delta names a column or case '
+                'its table lacks.'
+            ),
+        ),
+        (
+            _drop_the_after_table,
+            'scenarios.0: a table pairing in the delta lacks a table.',
+        ),
+        (_drop_the_after_term, 'glossary: a changed entry in the delta lacks a side.'),
     ],
     ids=[
         'changed-scenario-one-side',
@@ -396,39 +274,29 @@ def _drop_the_after_term(delta_dict: JsonObject) -> None:
     ],
 )
 def test_a_delta_naming_what_it_lacks_is_refused_before_rendering(
-    mutate: Callable[[JsonObject], None],
+    mutate: Callable[[JsonObject], None], problem: str
 ) -> None:
     """A delta whose shape a later version changed reads as malformed, not as
     a render that fails half-way."""
-    delta_dict = _through_json(_full_delta())
+    delta_dict = _through_json(full_delta())
     mutate(delta_dict)
 
-    with pytest.raises(PytestGivenError, match='not a pytest-given delta'):
+    with pytest.raises(PytestGivenError) as raised:
         delta_from_dict(delta_dict, 'delta.json')
 
-
-def test_an_unknown_change_is_refused() -> None:
-    delta_dict = _through_json(_full_delta())
-    scenarios = delta_dict['scenarios']
-    assert isinstance(scenarios, list)
-    first = scenarios[0]
-    assert isinstance(first, dict)
-    first['change'] = 'moved'
-
-    with pytest.raises(PytestGivenError, match="invalid scenario change 'moved'"):
-        delta_from_dict(delta_dict)
+    assert str(raised.value) == (
+        f'delta.json is not a valid pytest-given delta:\n  {problem}'
+    )
 
 
 def test_an_unknown_changed_part_is_refused() -> None:
-    delta_dict = _through_json(_full_delta())
-    scenarios = delta_dict['scenarios']
-    assert isinstance(scenarios, list)
-    first = scenarios[0]
-    assert isinstance(first, dict)
-    first['changed_in'] = ['title', 'colour']
+    delta_dict = _through_json(full_delta())
+    _changed_scenario(delta_dict)['changed_in'] = ['title', 'colour']
 
-    with pytest.raises(PytestGivenError, match="invalid changed part 'colour'"):
+    with pytest.raises(PytestGivenError) as raised:
         delta_from_dict(delta_dict)
+
+    assert 'scenarios.0.changed_in.1: Input should be' in str(raised.value)
 
 
 def _parameters(

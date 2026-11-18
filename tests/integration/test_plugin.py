@@ -5,8 +5,9 @@ from pathlib import Path
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
-from pytest_given.model import REPORT_SCHEMA_VERSION
+from pytest_given.model import REPORT_SCHEMA_VERSION, JsonObject, report_from_dict
 from pytest_given.plugin import session
+from pytest_given.report import CoverageRecord, build_coverage_records
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
 # --- Capture to report: the basic shapes ---
@@ -2716,7 +2717,7 @@ def test_scenario_matched_against_two_stories(pytester, tmp_path):
         assert data['scenarios'][0]['story_ids'] == ['book', 'stay']
         assert [
             (record['story_id'], record['sentence_id'], record['scenario_ids'])
-            for record in data['coverage']
+            for record in _coverage(data)
         ] == [('book', 1, [scenario_id]), ('stay', 1, [scenario_id])]
 
 
@@ -2783,7 +2784,7 @@ def test_a_declared_story_no_scenario_covers_appears(pytester, tmp_path):
     ):
         data = json.loads(json_path.read_text())
         assert [one['title'] for one in data['stories']] == ['Unread']
-        assert [record['scenario_ids'] for record in data['coverage']] == [[]]
+        assert [record['scenario_ids'] for record in _coverage(data)] == [[]]
 
 
 @scenario(
@@ -2827,7 +2828,7 @@ def test_a_pinned_scenario_still_counts_its_step_pins(pytester, tmp_path):
         scenario_id = data['scenarios'][0]['id']
         assert [
             record['sentence_id']
-            for record in data['coverage']
+            for record in _coverage(data)
             if scenario_id in record['scenario_ids']
         ] == [1, 2]
 
@@ -2869,7 +2870,7 @@ def test_a_step_pin_into_a_story_outside_stories_covers_it(pytester, tmp_path):
         data = json.loads(json_path.read_text())
         scenario_id = data['scenarios'][0]['id']
         assert [
-            (record['story_id'], record['scenario_ids']) for record in data['coverage']
+            (record['story_id'], record['scenario_ids']) for record in _coverage(data)
         ] == [('book', []), ('stay', [scenario_id])]
 
 
@@ -2924,7 +2925,7 @@ def test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches(pytester, tmp_pa
         result.assert_outcomes(passed=3)
         data = json.loads(json_path.read_text())
         covering = {
-            record['story_id']: record['scenario_ids'] for record in data['coverage']
+            record['story_id']: record['scenario_ids'] for record in _coverage(data)
         }
         assert [node_id.rsplit('::', 1)[1] for node_id in covering['book']] == [
             'test_first',
@@ -3068,7 +3069,7 @@ def test_fixture_label_pin_reaches_the_grafted_step_and_coverage(pytester):
         {'story_id': 'book', 'sentence_id': 2}
     ]
     covering = {
-        record['sentence_id']: record['scenario_ids'] for record in data['coverage']
+        record['sentence_id']: record['scenario_ids'] for record in _coverage(data)
     }
     assert covering[2] == [scenario_record['id']]
 
@@ -4460,7 +4461,7 @@ def test_a_scenario_only_run_writes_the_same_report(
         return data
 
     full = normalized(full_path)
-    assert full['coverage'][0]['scenario_ids']
+    assert _coverage(full)[0]['scenario_ids']
     assert normalized(selected_path) == full
 
 
@@ -4615,3 +4616,8 @@ def test_phrased_columns_keep_their_generated_case_ids(pytester, tmp_path):
         'test_pin[False-True]',
         'test_pin[True-False]',
     ]
+
+
+def _coverage(data: JsonObject) -> list[CoverageRecord]:
+    """The report's story coverage, as `pytest-given coverage` prints it."""
+    return build_coverage_records(report_from_dict(data))

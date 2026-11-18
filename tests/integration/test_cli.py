@@ -7,6 +7,7 @@ import pytest
 
 from pytest_given import PytestGivenError, given, scenario, then, when
 from pytest_given.cli import main
+from pytest_given.model import REPORT_SCHEMA_VERSION
 from pytest_given.report import sinks
 from tests.ubiquitous_language import pg
 from tests.unit.report.app_data import embedded_app_data
@@ -15,19 +16,7 @@ from tests.unit.report.term_refs import term_refs
 
 def test_cli_generates_html(tmp_path: Path) -> None:
     json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'cli-test',
-                    'timestamp': '2026-04-09',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [],
-            }
-        )
-    )
+    json_path.write_text(json.dumps(_minimal_report()))
     html_path = tmp_path / 'out.html'
     rc = main(['report', str(json_path), '-o', str(html_path)])
     assert rc == 0
@@ -152,12 +141,7 @@ def test_cli_source_link_preset(tmp_path: Path) -> None:
     json_path.write_text(
         json.dumps(
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
+                'metadata': _metadata('p'),
                 'scenarios': [_scenario_with_source()],
             }
         )
@@ -183,12 +167,7 @@ def test_cli_source_link_none_renders_plain_span(tmp_path: Path) -> None:
     json_path.write_text(
         json.dumps(
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
+                'metadata': _metadata('p'),
                 'scenarios': [_scenario_with_source()],
             }
         )
@@ -206,12 +185,7 @@ def test_cli_format_md_to_stdout(tmp_path, capsys) -> None:
     json_path.write_text(
         json.dumps(
             {
-                'metadata': {
-                    'project': 'cli',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
+                'metadata': _metadata('cli'),
                 'scenarios': [
                     {
                         'id': 'tests/t.py::test_a',
@@ -239,12 +213,7 @@ def test_cli_md_to_stdout_is_utf8_on_a_codepage_console(tmp_path, monkeypatch) -
     json_path.write_text(
         json.dumps(
             {
-                'metadata': {
-                    'project': 'cli',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
+                'metadata': _metadata('cli'),
                 'scenarios': [
                     {
                         'id': 'tests/t.py::test_a',
@@ -273,12 +242,7 @@ def test_cli_md_inferred_from_output_extension(tmp_path, name) -> None:
     json_path.write_text(
         json.dumps(
             {
-                'metadata': {
-                    'project': 'cli',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
+                'metadata': _metadata('cli'),
                 'scenarios': [],
             }
         )
@@ -294,12 +258,7 @@ def test_cli_md_creates_missing_parent_dirs(tmp_path) -> None:
     json_path.write_text(
         json.dumps(
             {
-                'metadata': {
-                    'project': 'cli',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
+                'metadata': _metadata('cli'),
                 'scenarios': [],
             }
         )
@@ -341,15 +300,42 @@ def test_cli_renders_the_definition_refs_a_saved_report_stores(tmp_path: Path) -
 
 
 def _minimal_report() -> dict:
+    return {'metadata': _metadata('cli-test'), 'scenarios': []}
+
+
+def _metadata(project: str) -> dict:
     return {
-        'metadata': {
-            'project': 'cli-test',
-            'timestamp': '2026-04-09',
-            'pytest_version': '9',
-            'plugin_version': '0.1',
-        },
-        'scenarios': [],
+        'project': project,
+        'timestamp': '2026-04-09',
+        'pytest_version': '9',
+        'plugin_version': '0.1',
+        'schema_version': REPORT_SCHEMA_VERSION,
     }
+
+
+@scenario(
+    t'`pytest-given report` refuses a {pg["Report"].l} of another schema version',
+    tags=['spec/report-schema-validation'],
+)
+def test_cli_refuses_a_report_of_another_schema_version(tmp_path: Path, capsys) -> None:
+    with given(t'a saved {pg["Report"].l} whose metadata names no schema version'):
+        report = _minimal_report()
+        del report['metadata']['schema_version']
+        json_path = tmp_path / 'old.json'
+        json_path.write_text(json.dumps(report), encoding='utf-8')
+    with when('`pytest-given report` renders it'):
+        rc = main(['report', str(json_path), '-o', str(tmp_path / 'o.html')])
+    with then('it exits 2'):
+        assert rc == 2
+    with then(
+        'stderr is one line naming the version it reads and how to regenerate '
+        'the report'
+    ):
+        assert capsys.readouterr().err == (
+            f'Error: {json_path.as_posix()} is a report of no schema version; '
+            'this pytest-given reads version 1. Regenerate it by running the '
+            'suite under this pytest-given.\n'
+        )
 
 
 def test_cli_reports_malformed_json_without_a_traceback(tmp_path: Path, capsys) -> None:
@@ -419,18 +405,13 @@ def test_cli_reports_a_stale_report_without_a_traceback(tmp_path: Path, capsys) 
 def test_cli_reports_a_report_of_the_wrong_shape_without_a_traceback(
     payload: object, tmp_path: Path, capsys
 ) -> None:
-    """JSON that parses but is not a pytest-given report.
-
-    `report_from_dict` indexes what it is handed, so each of these surfaces as a
-    different builtin from deep inside serde — `KeyError`, `TypeError`,
-    `AttributeError`. The CLI owes the user one message either way.
-    """
+    """JSON that parses but is not a pytest-given report."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(json.dumps(payload), encoding='utf-8')
     rc = main(['report', str(json_path), '-o', str(tmp_path / 'o.html')])
     assert rc == 2
     err = capsys.readouterr().err
-    assert 'not a pytest-given report' in err
+    assert 'pytest-given report' in err
     assert 'Traceback' not in err
 
 

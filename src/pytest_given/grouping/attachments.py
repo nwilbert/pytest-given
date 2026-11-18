@@ -8,8 +8,8 @@ from ..model import (
     Attachment,
     AttachmentLabel,
     AttachmentRef,
+    CapturedStep,
     NodeId,
-    Step,
     StepAttachment,
     StepPath,
 )
@@ -22,7 +22,7 @@ type LabeledAttachments = dict[AttachmentLabel, list[Attachment]]
 
 
 def templatize_attachments(
-    step: Step, path: StepPath, builder: ColumnBuilder
+    step: CapturedStep, path: StepPath, builder: ColumnBuilder
 ) -> list[StepAttachment]:
     """Baseline attachments, with any whose payload varies promoted to a column.
 
@@ -59,7 +59,7 @@ def templatize_attachments(
     return out
 
 
-def _by_label(step: Step) -> LabeledAttachments:
+def _by_label(step: CapturedStep) -> LabeledAttachments:
     """That step's attachments grouped by label, in the order it recorded them —
     the one shape everything below reads: a count is a `len`, an occurrence an
     index, and a label the case never attached a missing key."""

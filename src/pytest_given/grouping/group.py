@@ -11,8 +11,8 @@ from collections.abc import Iterable
 from dataclasses import replace
 
 from ..model import (
+    CapturedScenario,
     ParamInfo,
-    Scenario,
     iter_steps,
     node_base,
     rolled_up_status,
@@ -28,12 +28,12 @@ type GroupKey = tuple[str, str]
 
 
 def group_parametrized(
-    scenarios: list[Scenario], param_info: ParamInfo
-) -> list[Scenario]:
+    scenarios: list[CapturedScenario], param_info: ParamInfo
+) -> list[CapturedScenario]:
     """Group parametrized scenarios into single scenarios with parameter tables.
     The result is in no particular order: the report sorts it."""
-    result: list[Scenario] = []
-    groups: dict[GroupKey, list[Scenario]] = {}
+    result: list[CapturedScenario] = []
+    groups: dict[GroupKey, list[CapturedScenario]] = {}
     for scenario in scenarios:
         if scenario.id in param_info:
             key = (node_base(scenario.id), scenario.narration.text)
@@ -48,7 +48,9 @@ def group_parametrized(
     return result
 
 
-def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
+def _grouped_scenario(
+    cases: list[CapturedScenario], param_info: ParamInfo
+) -> CapturedScenario:
     group = build_group(cases, param_info)
     check_same_template(group)
     check_rebound_params(group)

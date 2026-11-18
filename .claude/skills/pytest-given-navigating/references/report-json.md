@@ -3,15 +3,17 @@
 `pytest <selection> --given-json=report.json` writes one file with five top-level keys:
 
 ```
+$schema       the URL of the JSON Schema the file follows
 metadata      project, title, report_url, timestamp, pytest_version, plugin_version, commit_sha,
               schema_version
 scenarios[]   one entry per @scenario (parametrized cases grouped into one)
 glossary      {terms: [...]} — every declared term, referenced or not; null on a suite with no glossary
 stories[]     one entry per story(...)
-coverage[]    one entry per story sentence — which scenarios cover it
 ```
 
-`schema_version` changes with every change to this shape. A delta JSON (`metadata.kind` is `"delta"`) is not a report: `pytest-given report` refuses it, and `pytest-given delta <file>` renders it.
+Which scenarios cover each story sentence is not in the file: `pytest-given coverage report.json` prints it as a JSON array, one `{story_id, sentence_id, tracked, scenario_ids}` per sentence, and exits 1 when a tracked sentence has no scenario.
+
+`schema_version` changes with every change to this shape, and `pytest-given report` refuses a report of another one. The file at the `$schema` URL lists every field and its type. A delta JSON (`metadata.kind` is `"delta"`) is not a report: `pytest-given report` refuses it, and `pytest-given delta <file>` renders it.
 
 ## Scenario
 
@@ -92,16 +94,16 @@ jq -r '.scenarios[] | select(.tags | index("validation")) | .narration.text' rep
 jq -r '.scenarios[] | select(.tags | any(startswith("ticket/"))) | .narration.text' report.json
 
 # Scenarios covering a story (node IDs) — `story_ids` misses one that only pins it
-jq -r '[.coverage[] | select(.story_id == "lend-and-return-a-book") | .scenario_ids[]]
-       | unique[]' report.json
+pytest-given coverage report.json |
+  jq -r '[.[] | select(.story_id == "lend-and-return-a-book") | .scenario_ids[]] | unique[]'
 
 # Uncovered sentences (tracked ones no scenario covers), as story#sentence
-jq -r '.coverage[] | select(.tracked and .scenario_ids == [])
-       | .story_id + "#" + (.sentence_id|tostring)' report.json
+pytest-given coverage report.json |
+  jq -r '.[] | select(.tracked and .scenario_ids == []) | .story_id + "#" + (.sentence_id|tostring)'
 
 # Which scenarios cover one sentence
-jq -r '.coverage[] | select(.story_id == "lend-and-return-a-book" and .sentence_id == 3)
-       | .scenario_ids[]' report.json
+pytest-given coverage report.json |
+  jq -r '.[] | select(.story_id == "lend-and-return-a-book" and .sentence_id == 3) | .scenario_ids[]'
 
 # Every term with its definition
 jq -r '.glossary.terms[] | select(.definition) | .canonical + ": " + .definition.text' report.json

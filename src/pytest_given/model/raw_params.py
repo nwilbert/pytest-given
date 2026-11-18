@@ -1,10 +1,9 @@
 """The parametrize carriers capture, grouping and the plugin pass between
 themselves.
 
-None of it is serialized: `schema.py` is what reaches the JSON report, and the
-reflective serializer walks only what is reachable from `ReportData`. Kept
-apart so "does this end up in the report?" is answerable by which file a type
-is declared in.
+None of it is serialized: the JSON report holds what `ReportDocument` in
+`documents.py` declares, all of it from `schema.py`. Kept apart so "does this
+end up in the report?" is answerable by which file a type is declared in.
 """
 
 import contextlib

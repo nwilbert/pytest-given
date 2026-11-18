@@ -1,6 +1,5 @@
 """`pytest-given delta` end to end."""
 
-import dataclasses
 import json
 from pathlib import Path
 
@@ -9,7 +8,6 @@ import pytest
 from pytest_given import given, scenario, then, when
 from pytest_given.cli import main
 from pytest_given.model import (
-    REPORT_SCHEMA_VERSION,
     Glossary,
     ReportData,
     delta_from_dict,
@@ -27,11 +25,7 @@ from tests.unit.delta.builders import meta, report, scn, step, term
 
 
 def _write_report(path: Path, data: ReportData) -> Path:
-    metadata = dataclasses.replace(data.metadata, schema_version=REPORT_SCHEMA_VERSION)
-    path.write_text(
-        json.dumps(report_to_dict(dataclasses.replace(data, metadata=metadata))),
-        encoding='utf-8',
-    )
+    path.write_text(json.dumps(report_to_dict(data)), encoding='utf-8')
     return path
 
 

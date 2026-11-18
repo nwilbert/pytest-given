@@ -7,7 +7,7 @@ walk that produces them — shared by lint, report and the grouping pass.
 JSON report, and these only ever address a position within it.
 """
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from typing import NewType
 
 from .schema import Narration, Scenario, Step
@@ -23,8 +23,8 @@ type StepPath = tuple[int, ...]
 PartIndex = NewType('PartIndex', int)
 
 
-def walk_steps(steps: list[Step]) -> Iterator[tuple[StepPath, Step]]:
-    def descend(steps: list[Step], prefix: StepPath) -> Iterator[tuple[StepPath, Step]]:
+def walk_steps[T: Step](steps: Sequence[T]) -> Iterator[tuple[StepPath, T]]:
+    def descend(steps: Sequence[T], prefix: StepPath) -> Iterator[tuple[StepPath, T]]:
         for index, step in enumerate(steps):
             path = (*prefix, index)
             yield path, step
@@ -33,11 +33,11 @@ def walk_steps(steps: list[Step]) -> Iterator[tuple[StepPath, Step]]:
     return descend(steps, ())
 
 
-def iter_steps(steps: list[Step]) -> Iterator[Step]:
+def iter_steps[T: Step](steps: Sequence[T]) -> Iterator[T]:
     return (step for _path, step in walk_steps(steps))
 
 
-def iter_narrations(scenario: Scenario) -> Iterator[Narration]:
+def iter_narrations[S: Step](scenario: Scenario[S]) -> Iterator[Narration]:
     """A scenario's own narration followed by every step's, depth-first."""
     yield scenario.narration
     yield from (step.narration for step in iter_steps(scenario.steps))

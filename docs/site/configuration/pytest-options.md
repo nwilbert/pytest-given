@@ -45,6 +45,10 @@ Mind `-k`: it matches any part of a test's keywords, and a scenario's include `p
 
 **pytest-given writes reports and runs the narration lint under `pytest-xdist` with `--dist loadfile`.** Grouping a parametrized scenario needs all its cases on one worker, and `loadfile` sends each file to one worker. When a `-n` run asks for a report (`--given-json`, `--given-html`, `--given-md`) or the narration lint, pytest-given turns a bare `-n` into `--dist loadfile`. Any other `--dist` or `-d`, including one in `addopts`, stops the run with a usage error. The workers send their scenarios to the main process, which writes the report and runs the lint as a run without `-n` does. If a worker crashes, the run fails and writes no report. A run interrupted before every worker reported keeps the previous report. Without a report or the lint, `--dist` is left alone.
 
+## JSON schema
+
+The JSON report follows a published [JSON Schema](../schemas/report-v1.schema.json). Every report names it under a top-level `$schema` key, so an editor can validate and complete the file. `metadata.schema_version` holds the report's version. pytest-given reads only reports of its own version. `pytest-given report`, `citations`, `coverage` and `delta` refuse any other with one line saying to regenerate it.
+
 ## Ini settings
 
 Put ini settings in `[tool.pytest]` in `pyproject.toml` (pytest 9's native TOML table). pytest still reads the older `[tool.pytest.ini_options]`, but you can't use both: pytest raises `UsageError` if both are present.

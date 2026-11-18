@@ -23,9 +23,9 @@ from ..capture import (
     step_descriptor,
 )
 from ..model import (
+    CapturedStep,
     NarrationPlaceholder,
     PytestGivenError,
-    Step,
     placeholder_mismatch,
 )
 from .state import session_collector, session_state
@@ -63,7 +63,7 @@ def pytest_fixture_setup(
         return
     _ensure_teardown_wrapped(fixturedef, collector)
     recording = FixtureRecording(
-        root=Step(
+        root=CapturedStep(
             phase=desc.phase,
             narration=desc.narration,
             pins=desc.pins,

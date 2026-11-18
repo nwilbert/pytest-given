@@ -39,6 +39,7 @@ from .sinks import (
 from .slugs import build_scenario_slug_index
 from .source_link import SOURCE_LINK_HELP, resolve_source_link_template
 from .staged_write import write_all_or_none
+from .story_view import CoverageRecord, build_coverage_records
 from .theme import DEFAULT_THEME, THEME_HELP, Theme, resolve_theme
 
 __all__ = [
@@ -56,12 +57,14 @@ __all__ = [
     'THEME_HELP',
     'Citation',
     'CitationIndex',
+    'CoverageRecord',
     'DeltaSinkConfig',
     'RenderedFile',
     'RenderedSinks',
     'SinkConfig',
     'Target',
     'Theme',
+    'build_coverage_records',
     'build_scenario_slug_index',
     'citation_body_md',
     'emit_delta_sinks',

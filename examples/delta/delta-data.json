@@ -1,9 +1,10 @@
 {
+  "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/delta-v1.schema.json",
   "metadata": {
     "before": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-15T16:15:25.713107+00:00",
+        "timestamp": "2026-11-17T19:48:14.892114+00:00",
         "pytest_version": "9.2.0",
         "plugin_version": "0.5.2",
         "commit_sha": null,
@@ -19,7 +20,7 @@
     "after": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-15T16:15:26.205120+00:00",
+        "timestamp": "2026-11-17T19:48:15.448861+00:00",
         "pytest_version": "9.2.0",
         "plugin_version": "0.5.2",
         "commit_sha": null,
@@ -33,7 +34,7 @@
       ]
     },
     "plugin_version": "0.5.2",
-    "timestamp": "2026-11-15T16:15:26.508585+00:00",
+    "timestamp": "2026-11-17T19:48:15.829134+00:00",
     "title": "Delta Example for v2",
     "kind": "delta",
     "schema_version": 1
@@ -1219,7 +1220,7 @@
           "error-handling"
         ],
         "status": "xfailed",
-        "duration_ms": 43,
+        "duration_ms": 45,
         "steps": [
           {
             "phase": "given",
@@ -1484,7 +1485,7 @@
           "error-handling"
         ],
         "status": "failed",
-        "duration_ms": 42,
+        "duration_ms": 45,
         "steps": [
           {
             "phase": "given",

@@ -6,6 +6,8 @@ from ..model import (
     PytestGivenError,
     ReportData,
     is_delta_dict,
+    is_schema_version,
+    schema_version,
 )
 
 
@@ -17,8 +19,11 @@ def check_schema_versions(
     field its schema lacks; a delta passes, for `report_from_dict` to name."""
     if is_delta_dict(before) or is_delta_dict(after):
         return
-    before_version, after_version = _schema_version(before), _schema_version(after)
-    if before_version == after_version == REPORT_SCHEMA_VERSION:
+    before_version, after_version = schema_version(before), schema_version(after)
+    if all(
+        is_schema_version(version, REPORT_SCHEMA_VERSION)
+        for version in (before_version, after_version)
+    ):
         return
     raise PytestGivenError(
         f'cannot compare {before_source} (report schema version '
@@ -55,11 +60,6 @@ def version_warnings(
                 'delta reads as a change'
             )
     return tuple(warnings)
-
-
-def _schema_version(report_dict: JsonObject) -> object:
-    metadata = report_dict.get('metadata')
-    return metadata.get('schema_version') if isinstance(metadata, dict) else None
 
 
 def _version(version: object) -> str:

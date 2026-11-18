@@ -3,6 +3,7 @@
 import dataclasses
 import math
 from datetime import UTC, datetime
+from enum import Enum, IntEnum
 from typing import cast
 
 import pytest
@@ -402,6 +403,49 @@ def test_a_non_scalar_parametrize_value_still_reaches_the_cell_as_a_string() -> 
     param_info = {nid: ParamSpec(names=['when'], values=[moment])}
     grouped = group_parametrized(scenarios, param_info)
     assert grouped[0].parameters.cases[0].values == [str(moment)]
+
+
+def test_an_enum_parametrize_value_reaches_the_cell_as_its_narrated_text() -> None:
+    """A `str` or `int` mixin enum is no plain JSON value: reading the report
+    back would turn `Color.RED` into its `.value`, unlike the narration."""
+
+    class Color(str, Enum):  # noqa: UP042 — a StrEnum's str() is its value already
+        RED = 'red'
+
+    class Size(IntEnum):
+        LARGE = 3
+
+    values = [Color.RED, Size.LARGE]
+    ids = [NodeId(f't::x[{index}]') for index in range(len(values))]
+    scenarios = [
+        Scenario(id=nid, narration=Narration(text='x'), module='m', status='passed')
+        for nid in ids
+    ]
+    param_info = {
+        nid: ParamSpec(names=['x'], values=[value])
+        for nid, value in zip(ids, values, strict=True)
+    }
+    grouped = group_parametrized(scenarios, param_info)
+    assert [case.values[0] for case in grouped[0].parameters.cases] == [
+        f'{Color.RED}',
+        f'{Size.LARGE}',
+    ]
+
+
+def test_a_number_subclass_reaches_the_cell_as_its_number() -> None:
+    """Only an enum prints unlike its plain value; a NumPy scalar or any other
+    subclass keeps its JSON type."""
+
+    class Meters(float):
+        pass
+
+    nid = NodeId('t::x[0]')
+    scenarios = [
+        Scenario(id=nid, narration=Narration(text='x'), module='m', status='passed')
+    ]
+    param_info = {nid: ParamSpec(names=['x'], values=[Meters(0.5)])}
+    grouped = group_parametrized(scenarios, param_info)
+    assert grouped[0].parameters.cases[0].values == [0.5]
 
 
 def test_a_non_finite_float_reaches_the_cell_as_a_string() -> None:

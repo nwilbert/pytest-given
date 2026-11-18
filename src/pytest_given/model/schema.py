@@ -1,23 +1,35 @@
 """The report schema: what is serialized into the JSON report.
 
 The parametrize carriers capture and grouping pass between themselves live in
-`raw_params.py`, so what reaches a consumer is answerable from this file alone —
-which matters because the serializer is reflective over these dataclasses. The
-one exception is a field marked `serde_exclude`, which stays in memory and out
-of the JSON; `Step.source` is the only one.
+`raw_params.py`, so what reaches a consumer is answerable from this file alone:
+every field of these dataclasses is in the JSON, except `CapturedStep.source`,
+which only a session capture carries.
 """
 
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
-from typing import Final, Literal, NewType
+from typing import Final, Literal, NewType, Self
 
 from ..markdown import unwrapped_text
 from .report_url import ReportUrl
 from .text import name_key, name_keys
 
 # Bumped with every change to the report JSON's shape; a test pins the shape.
-REPORT_SCHEMA_VERSION: Final = 1
+type ReportSchemaVersion = Literal[1]
+REPORT_SCHEMA_VERSION: Final[ReportSchemaVersion] = 1
+
+
+def schema_file_name(kind: Literal['report', 'delta'], version: int) -> str:
+    return f'{kind}-v{version}.schema.json'
+
+
+# Where the documentation site serves each version's JSON Schema, as a written
+# report's `$schema` names it.
+SCHEMAS_URL: Final = 'https://nwilbert.github.io/pytest-given/latest/schemas/'
+REPORT_SCHEMA_URL: Final = SCHEMAS_URL + schema_file_name(
+    'report', REPORT_SCHEMA_VERSION
+)
 
 # A parameter-table column's identity — what the DOM keys on and what a
 # placeholder or attachment badge points at. Distinct from the column's display
@@ -157,10 +169,6 @@ class Narration:
 # None while a term's kind is still deferred to `infer_glossary_kinds`.
 type TermKind = Literal['actor', 'object', 'activity']
 
-# Each `Literal` alias's alphabet, for serde to validate against: a PEP 695
-# alias does not hand its members to `typing.get_args` directly.
-TERM_KINDS: tuple[TermKind, ...] = ('actor', 'object', 'activity')
-
 
 @dataclass(frozen=True)
 class SourceLocation:
@@ -285,20 +293,14 @@ class Glossary:
     them.
     """
 
-    # Public and mutable because the reflective serializer reads it by name.
     # `register` and the constructor are the only writers, and both keep the
-    # index current; rebuild by constructing rather than by mutating in place.
+    # indexes current; rebuild by constructing rather than by mutating in place.
     terms: list[GlossaryTerm] = field(default_factory=list)
-    _by_id: dict[TermId, GlossaryTerm] = field(
-        init=False, repr=False, compare=False, default_factory=dict
-    )
-    _by_name: dict[str, GlossaryTerm] = field(
-        init=False, repr=False, compare=False, default_factory=dict
-    )
 
     def __post_init__(self) -> None:
-        self._by_id = {}
-        self._by_name = {}
+        # Plain attributes, not fields: the JSON and the schema leave them out.
+        self._by_id: dict[TermId, GlossaryTerm] = {}
+        self._by_name: dict[str, GlossaryTerm] = {}
         for term in self.terms:
             self._index(term)
 
@@ -325,15 +327,11 @@ class Glossary:
 # Step phase
 type Phase = Literal['given', 'when', 'then']
 
-# Canonical Given/When/Then order: the alphabet serde validates against and the
-# order the lint reports missing phases in.
+# Canonical Given/When/Then order, the order the lint reports missing phases in.
 PHASES: tuple[Phase, ...] = ('given', 'when', 'then')
 
 # How a scenario or one parametrize case came out. A `str` here would let a
-# typo ('pass') through every comparison site. Static checking only: serde's
-# `cast` at the JSON boundary is a runtime no-op, so a hand-edited report.json
-# can still carry any string — the glyph lookup falls back and every
-# `== 'passed'` reads false.
+# typo ('pass') through every comparison site.
 type Status = Literal['passed', 'failed', 'skipped', 'xfailed']
 
 STATUSES: tuple[Status, ...] = ('passed', 'failed', 'skipped', 'xfailed')
@@ -357,8 +355,6 @@ type ParamValue = str | int | float | bool | None
 
 
 type ContentType = Literal['text', 'json']
-
-CONTENT_TYPES: tuple[ContentType, ...] = ('text', 'json')
 
 
 # What an attachment's payload is called: the plain text an author passes as
@@ -452,22 +448,22 @@ class ErrorInfo:
 class Step:
     phase: Phase
     narration: Narration
-    children: list[Step] = field(default_factory=list)
+    children: list[Self] = field(default_factory=list)
     attachments: list[StepAttachment] = field(default_factory=list)
     pins: tuple[Pin, ...] | None = None
     fixture_name: str | None = None
+
+
+@dataclass
+class CapturedStep(Step):
     # Anchor of the step's body for the narration lint; captured only when
-    # lint is enabled, and never serialized so report artifacts stay
+    # lint is enabled, so the report, which has no field for it, stays
     # byte-identical either way.
-    source: SourceLocation | None = field(
-        default=None, metadata={'serde_exclude': True}
-    )
+    source: SourceLocation | None = None
 
 
 # Which kind of variance a parameter-table column records.
 type ColumnKind = Literal['param', 'derived', 'attachment']
-
-COLUMN_KINDS: tuple[ColumnKind, ...] = ('param', 'derived', 'attachment')
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -487,10 +483,9 @@ class ParameterColumn:
 
 # One table cell. A `param` cell holds the parametrize value as captured, a
 # `derived` cell the already-rendered string or the Boolean behind a phrase, an
-# `attachment` cell the payload object — which is also how serde tells the two
-# apart on read. `None` is a
-# real parametrize value in a `param` cell and "no value here" in a generated
-# one: the column's kind disambiguates, never the cell.
+# `attachment` cell the payload object. `None` is a real parametrize value in a
+# `param` cell and "no value here" in a generated one: the column's kind
+# disambiguates, never the cell.
 type CellValue = ParamValue | Attachment
 
 
@@ -533,14 +528,14 @@ class ParameterTable:
 
 
 @dataclass
-class Scenario:
+class Scenario[S: Step = Step]:
     id: NodeId
     narration: Narration
     module: str
     tags: list[str] = field(default_factory=list)
     status: Status = 'passed'
     duration_ms: int = 0
-    steps: list[Step] = field(default_factory=list)
+    steps: list[S] = field(default_factory=list)
     parameters: ParameterTable | None = None
     error: ErrorInfo | None = None
     skip_reason: str | None = None
@@ -548,6 +543,11 @@ class Scenario:
     source: SourceLocation | None = None
     story_ids: tuple[StoryId, ...] = ()
     pins: tuple[Pin, ...] | None = None
+
+
+# What capture, grouping, the lint and the plugin hold: a scenario whose steps
+# keep their sources, before the report leaves them out.
+type CapturedScenario = Scenario[CapturedStep]
 
 
 @dataclass(frozen=True)
@@ -565,13 +565,13 @@ class Metadata:
     # copies link, and what `pytest-given citations` reads report links
     # against. None leaves the report copying links alone.
     report_url: ReportUrl | None = None
-    schema_version: int | None = None
+    schema_version: ReportSchemaVersion = REPORT_SCHEMA_VERSION
 
 
 @dataclass(frozen=True)
-class ReportData:
+class ReportData[S: Step = Step]:
     metadata: Metadata
-    scenarios: list[Scenario] = field(default_factory=list)
+    scenarios: list[Scenario[S]] = field(default_factory=list)
     glossary: Glossary | None = None
     stories: list[Story] = field(default_factory=list)
 

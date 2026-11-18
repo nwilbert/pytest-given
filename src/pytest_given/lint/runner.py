@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from ..model import Glossary, Scenario, Story
+from ..model import CapturedScenario, Glossary, Story
 from .ast_rules import AST_RULE_IDS, run_ast_rules
 from .catalog import DEFAULTS, LintFinding, RuleId
 from .config import LintConfig, apply_config
@@ -20,7 +20,7 @@ assert set(DEFAULTS) == RULE_SURFACE, (
 
 
 def run_lint(
-    scenarios: list[Scenario],
+    scenarios: list[CapturedScenario],
     glossary: Glossary | None,
     stories: list[Story],
     rootdir: Path,

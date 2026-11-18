@@ -7,6 +7,7 @@ import pytest
 
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.cli import main
+from pytest_given.model import REPORT_SCHEMA_VERSION
 from pytest_given.report import DEFAULT_JSON_PATH
 from tests.ubiquitous_language import pg
 
@@ -26,6 +27,7 @@ def _write_report(
                     'timestamp': 't',
                     'pytest_version': '9',
                     'plugin_version': '0',
+                    'schema_version': REPORT_SCHEMA_VERSION,
                     'report_url': report_url,
                 },
                 'scenarios': [
@@ -163,6 +165,23 @@ def test_check_exits_0_when_every_citation_is_current(tmp_path: Path, capsys) ->
     rc = main(['citations', 'check', str(tmp_path / 'docs'), '--report', str(report)])
     assert rc == 0
     assert 'every report link is current' in capsys.readouterr().out
+
+
+def test_check_refuses_a_report_of_another_schema_version(
+    tmp_path: Path, capsys
+) -> None:
+    report = _write_report(tmp_path)
+    stored = json.loads(report.read_text(encoding='utf-8'))
+    del stored['metadata']['schema_version']
+    report.write_text(json.dumps(stored), encoding='utf-8')
+    _doc(tmp_path, f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n')
+    rc = main(['citations', 'check', str(tmp_path / 'docs'), '--report', str(report)])
+    assert rc == 2
+    assert capsys.readouterr().err == (
+        f'Error: {report.as_posix()} is a report of no schema version; this '
+        'pytest-given reads version 1. Regenerate it by running the suite under '
+        'this pytest-given.\n'
+    )
 
 
 def test_check_exits_1_and_prints_each_finding(tmp_path: Path, capsys) -> None:

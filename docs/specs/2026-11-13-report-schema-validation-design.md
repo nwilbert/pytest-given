@@ -1,12 +1,14 @@
 # Report Schema and Validation — Design Spec
 
+✅ [spec/report-schema-validation](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/report-schema-validation) (4 ✅)
+
 ## Goal
 
-Define the JSON report and the delta report by a published JSON Schema, and read both through Pydantic validation, so that:
+Define the JSON report and the delta report by a published JSON Schema, and read and write both through Pydantic, so that:
 
 - a malformed or foreign report fails with the path and reason of each problem (`scenarios.3.status: Input should be 'passed', 'failed', 'skipped' or 'xfailed'`), not a wrapped `KeyError`;
 - tools other than pytest-given — `jq` users, editors, scripts — have a contract for the JSON they read;
-- the hand-written readers in `model/serde.py` and `model/delta_serde.py` give way to one declaration of the shape: the dataclasses that already exist.
+- the hand-written readers in `model/serde.py` and `model/delta_serde.py`, and the writer's field filter, give way to one declaration of the shape: the dataclasses that already exist.
 
 ## Non-goals
 
@@ -45,7 +47,7 @@ A later change may let `pytest-given delta` take an older report as its before s
 
 ## Reading
 
-A new module in `model/` holds one document type per report kind: `ReportDocument` and `DeltaDocument`, each a Pydantic `BaseModel` describing the whole written JSON. Its fields are the root dataclass's fields (`ReportData`, `DeltaData`), `$schema` by alias, and for the report the derived `coverage` section. The field types are the existing stdlib dataclasses. Pydantic validates those directly, including `NewType` ids, `Literal` aliases, PEP 695 `type` aliases, tuples, and optional fields with defaults.
+`model/` holds one document type per report kind: `ReportDocument` in `documents.py` and `DeltaDocument` in `delta_document.py`, so writing a report never builds the delta's. Each is a Pydantic `BaseModel` describing the whole written JSON. Its fields are the root dataclass's fields (`ReportData`, `DeltaData`) and `$schema` by alias. The field types are the existing stdlib dataclasses. Pydantic validates those directly, including `NewType` ids, `Literal` aliases, PEP 695 `type` aliases, tuples, and optional fields with defaults.
 
 The root is a model because a model takes configuration and passes it on to the stdlib dataclasses nested in it. A `TypeAdapter` over the root dataclass refuses a `config` argument. The configuration is `extra='forbid'`: an unknown key anywhere fails with its path (`scenarios.0.stauts: Unexpected keyword argument`).
 
@@ -54,18 +56,19 @@ The root is a model because a model takes configuration and passes it on to the 
 The `*_from_dict` functions shrink to:
 
 1. the pre-checks that give a better message than validation would: a delta passed where a report is expected and vice versa (`is_delta_dict`), and the schema-version mismatch;
-2. validation through the document type, whose fields make the root dataclass;
-3. the checks that are not shape: `resolve_report_url` on `metadata.report_url`, for the report and for each of the delta's two sides, and the delta's cross-reference checks (`_check_sides`, `_check_lookups`, the table-pairing check). These run on the validated dataclasses and surface as `PytestGivenError`, as now. *Builder's call:* what an empty `report_url` string does, which no writer produces.
+2. validation through the document type, whose fields make the root dataclass.
 
-Validation runs each dataclass's `__post_init__`. `Glossary` builds its indexes there, and its `init=False` index fields are not expected in the JSON. `Definition`'s assertion that its parts spell its text fails as a validation error at the definition's path.
+The checks that are not shape run inside validation, as `AfterValidator`s on the document types' fields, so they run on read and never when a builder constructs the dataclasses. They are `resolve_report_url` on `metadata.report_url`, for the report and for each of the delta's two sides, and the delta's cross-reference checks: the sides each change shows, and the step paths, columns and cases its pairings name. Each raises a `ValueError`, which validation lists with the shape errors at the checked field's path. *Builder's call:* what an empty `report_url` string does, which no writer produces.
 
-A `ValidationError` becomes a `PytestGivenError` naming the source and listing each error as `<dotted path>: <message>`, without Pydantic's documentation URLs (`errors(include_url=False)`). *Builder's call:* how many errors to list before "and N more".
+Validation runs each dataclass's `__post_init__`. `Glossary` builds its indexes there, as plain attributes rather than dataclass fields, so neither the JSON nor the schema has them. `Definition`'s assertion that its parts spell its text fails as a validation error at the definition's path.
+
+A `ValidationError` becomes a `PytestGivenError` naming the source and listing each error as `<dotted path>: <message>`, without Pydantic's documentation URLs (`errors(include_url=False)`). A check's `ValueError` lists as its own message, without the "Value error, " prefix Pydantic adds. *Builder's call:* how many errors to list before "and N more".
 
 Validation runs in Pydantic's lax mode: `"12"` is accepted as 12 where the type is an integer. Strict mode refuses a dict where the type is a dataclass, so it would need the JSON text, and the readers take a dict. The schema is the contract for what is written. The reader accepts slightly more.
 
 Refusing unknown keys costs no compatibility between versions. The version pre-check runs first, so a reader never validates a report whose version has keys it does not know.
 
-`$schema` and `coverage` are optional on read and their values unused. A report without `$schema` reads the same (see [Versioning](#versioning)), and `coverage` is derived again on every write.
+`$schema` is optional on read and its value unused. A report without `$schema` reads the same (see [Versioning](#versioning)).
 
 The public names stay: `report_from_dict`, `delta_from_dict`, `read_report_json`, `report_to_dict`, `delta_to_dict`, and the session capture's pair (see [The session capture](#the-session-capture)). Call sites in `cli/`, `report/`, `plugin/` do not change.
 
@@ -91,19 +94,44 @@ Under pytest-xdist, each worker sends what its session captured to the main proc
 
 - The document-types module gains `SessionCaptureDocument`, a `BaseModel` whose fields are `SessionCapture`'s, under the same configuration as the report's. `session_capture_from_dict` shrinks to validation through it, plus the `ValidationError` conversion, and its hand-written readers go with the report's.
 - It carries no `schema_version`, no `$schema`, no pre-check and no committed schema file: it is no contract with anything outside one run.
-- It carries `Step.source`, which the report leaves out. `Step.source` is an ordinary dataclass field, so validation accepts it. The predicate that skips `serde_exclude` fields (see [Writing](#writing)) is for the report's writer and the schema generator, never for validation. The report reader therefore accepts a step `source` that no report writer emits, an instance of the reader accepting slightly more than the schema.
+- It carries each step's source, which the report has no field for (see [Captured steps](#captured-steps)).
+
+### Captured steps
+
+A step's source is the file and line of the statement that recorded it. The narration lint anchors its AST rules and locates its text findings by it, and capture records it only when the lint is enabled. No code that reads a report back from JSON uses it: not the renderers, the delta or citations. So only the captured types have a field for it:
+
+- `Step` has no `source`, and its `children` are `list[Self]`. `CapturedStep(Step)` adds `source: SourceLocation | None`, and through `Self` its children are captured steps too.
+- `Scenario[S: Step = Step]` holds `steps: list[S]`, and `ReportData[S: Step = Step]` holds `scenarios: list[Scenario[S]]`. The default keeps every reader of a report writing plain `Scenario` and `ReportData`. `type CapturedScenario = Scenario[CapturedStep]` is what capture, grouping, the lint and the plugin handle, and `SessionCapture` holds those.
+- `ReportDocument` and `DeltaDocument` name the plain types, and `SessionCaptureDocument` the captured ones. Reading a report therefore builds steps without a source, and refuses a step `source` as an unknown key. Reading a session capture builds captured steps with theirs.
+- Helpers both sides use take the step type as a parameter, such as `walk_steps[T: Step](steps: Sequence[T])`, and give back the caller's type. They have to: `steps` is a mutable list, so the type parameter is invariant, and a `Scenario[CapturedStep]` is no `Scenario`. A helper that takes a whole scenario, such as `iter_narrations`, is generic too.
 
 ## Writing
 
-The writer stays `asdict_filtered` — reflective, no Pydantic — and every written JSON gains the top-level `$schema` key with the current version's URL. *Builder's call:* whether `report_to_dict` / `delta_to_dict` or the JSON sinks add it.
+The writer is the document types too: `report_to_dict`, `delta_to_dict` and `session_capture_to_dict` build the document with `model_construct`, which validates nothing, and dump it with `model_dump(mode='json', by_alias=True)`. The dumped dict goes through `json.dumps` as before, so the written text keeps its formatting. Every written JSON gains the top-level `$schema` key with the current version's URL, the document's default for it.
 
-`asdict_filtered` skips `_`-prefixed fields and fields marked `serde_exclude`. The schema generator skips the same fields, by one predicate both call, so the `Glossary` indexes and `Step.source` are in neither the JSON nor the schema. `session_capture_to_dict` keeps the `serde_exclude` fields through a flag on `asdict_filtered`, and still skips the `_`-prefixed ones.
+No field needs leaving out, so the writer has no filter. The report types hold only what the JSON holds: the `Glossary` indexes are not fields, and a step's source lives only on `CapturedStep`. Pydantic serializes a value by its declared type, so a session's captured scenarios dumped through `ReportDocument` write `Step`'s fields only, and the same scenarios dumped through `SessionCaptureDocument` keep their sources. `report_to_dict` takes `ReportData[S]` for any step type `S`.
 
-A session that writes any report validates: `render_sinks` reads its own dict back through `report_from_dict` before rendering HTML and Markdown. So every report-writing run checks what it wrote against the reader, and imports Pydantic. Validating costs about what the hand-written reader does on the self-report. The new cost is at start-up, importing Pydantic and building the document type's validator, about 0.1 s together once the files are cached. Run `uv run nox -s benchmark` before and after and compare the session's wall time, not only the rendering.
+The JSON sinks write the dict they are handed as it is. That dict is always one the writer just dumped: the plugin's, and the one `pytest-given delta` builds from two reports. `pytest-given report` writes no JSON, and `pytest-given delta` with one input writes only HTML.
 
-The written report is `ReportData` plus the derived `coverage` section that `render_json` adds, and `$schema`. `ReportDocument` describes exactly that. `CoverageRecord`, a `TypedDict` in `report/story_view.py` holding only ids and a boolean, moves to `model/` so the document type can name it.
+Dumping through Pydantic is faster than the reflective walk it replaces: 28 ms instead of 67 on the benchmark's 12,700 tests.
 
-Defining a `BaseModel` imports Pydantic, which is why the document types have a module of their own. The serde modules list that module in `__lazy_modules__`, and it lists `pydantic` in its own. The lazy-import test (`tests/integration/test_lazy_imports.py`) holds a run that writes no report to not importing Pydantic. An xdist run that lints without writing a report imports it on the main process, which reads the workers' captures through validation.
+A session that writes any report validates: `render_sinks` reads its own dict back through `report_from_dict` before rendering HTML and Markdown. So every report-writing run checks what it wrote against the reader, and imports Pydantic. Validating takes a few milliseconds more than the hand-written reader did, most of it matching the union members: 8 ms instead of 4 on the self-report, 50 instead of 42 on the benchmark's 12,700 tests. The new cost is at start-up, importing Pydantic and building the document type's validator, about 0.1 s together once the files are cached. Run `uv run nox -s benchmark` before and after and compare the session's wall time, not only the rendering.
+
+The written report is `ReportData` plus `$schema`, and `ReportDocument` describes exactly that.
+
+Defining a `BaseModel` imports Pydantic, which is why the document types have a module of their own. The serde modules list that module in `__lazy_modules__`. It lists nothing in its own, since its `BaseModel` subclasses import Pydantic as the module loads. The lazy-import test (`tests/integration/test_lazy_imports.py`) holds a run that writes no report to not importing Pydantic. An xdist run that writes a report or lints imports it on every worker too, which writes its capture through `SessionCaptureDocument`, and on the main process, which reads the captures through validation.
+
+## Story coverage
+
+The JSON report carries no `coverage` section. Which scenarios cover each story sentence is derived from the scenarios and the stories, as the HTML's Stories tab and the citation index derive it, so the report holds nothing a reader of it cannot rebuild. A stored copy would be a second answer, one a hand-edited file or another version's rules could make disagree.
+
+`pytest-given coverage [REPORT]` prints it instead, from a JSON report, as the section printed before:
+
+- `REPORT` defaults to `given-report/report-data.json`, where a bare `--given-json` writes it.
+- stdout gets a JSON array with one record per sentence, in story then sentence order: `story_id`, `sentence_id`, `tracked` and `scenario_ids`. `build_coverage_records` in `report/story_view.py` builds them, and `CoverageRecord` stays there.
+- It exits 1 when a tracked sentence has no scenario, and says on stderr how many have none. It exits 0 when every tracked sentence has one, and 2 when it cannot read the report, under the same rules as `pytest-given report`.
+
+The bundled skills tell an agent to read coverage from the report rather than work the matching rule out. They now pipe this command into `jq` instead of querying the report's `coverage[]`.
 
 ## Committed schemas
 
@@ -112,9 +140,9 @@ The schema files are generated from the document types, committed, and checked:
 - `docs/site/schemas/report-v1.schema.json` and `docs/site/schemas/delta-v1.schema.json`, one file per version. Every bump adds a file next to the earlier ones, a bump between two releases included.
 - Once a release has written reports of a version, that version's file is not changed to accept other JSON. That is a convention: no test tells a released version's file from an unreleased one.
 - A change in how the schema is written that leaves the accepted JSON the same regenerates the current version's file in place, with no bump. A renamed dataclass is one, since its name is a key under `$defs`. A Pydantic upgrade can be another.
-- Generated in **serialization mode** with every field `required`, even when its dataclass field has a default, since the writer always emits it. A reader of the JSON should not have to guard against an absent `status`. `$schema` and `coverage` are required too, and `$schema` is a string.
+- Generated in **serialization mode** with every field `required`, even when its dataclass field has a default, since the writer always emits it. A reader of the JSON should not have to guard against an absent `status`. `$schema` is required too, and is a string.
 - Every object says `additionalProperties: false`, which follows from `extra='forbid'`.
-- Draft 2020-12, with `$schema` and `$id` added by a small `GenerateJsonSchema` subclass. `$id` is the file's hosted URL. The same subclass leaves out the fields the writer skips (see [Writing](#writing)).
+- Draft 2020-12, with `$schema` and `$id` added by a small `GenerateJsonSchema` subclass. `$id` is the file's hosted URL. The schema leaves nothing out of the types, as the writer leaves nothing out (see [Writing](#writing)).
 - The subclass also marks every field required, by overriding `field_is_required` in serialization mode. The `json_schema_serialization_defaults_required` setting cannot do it: set on the root model, it reaches only some of the nested dataclasses, and `Narration.parts`, `Step.children` and `GlossaryTerm.section` stay optional.
 - That subclass also leaves out each class's `description`. Pydantic 2.14 copies a dataclass's docstring there. The docstrings are written for contributors, and with them in the schema an edited docstring would change the committed file.
 - The file is generated under the locked Pydantic, which must be 2.14 or later. Earlier versions validate the same but write another schema: the root's `extra='forbid'` does not reach the nested dataclasses' schemas there, so their `additionalProperties` is missing.
@@ -145,16 +173,19 @@ The `compat` session gains Pydantic as a third floor, pinned for the oldest run 
 - A docs page section on the JSON report's schema: where the file is, that `schema_version` is the version, that only the current version is read. *Builder's call:* whether that goes on an existing page (`cli.md`, `configuration/pytest-options.md`) or a new one. The delta report's page gets the same for the delta schema.
 - `docs/site/cli.md` says that `pytest-given report` and `pytest-given citations` exit 2 on a report of another schema version, as it says for `pytest-given delta` now.
 - The navigating skill's `jq` guidance (`src/pytest_given/.agents/skills/pytest-given-navigating/`) points at the schema file for the full shape.
+- `docs/site/cli.md` gains a section on `pytest-given coverage`. The domain storytelling guide, and the authoring, navigating and reviewing skills, read coverage through it.
 - AGENTS.md's schema-version convention names the committed-schema test instead of the fingerprint test.
-- CHANGELOG, under **Added**: the published schemas, the `$schema` key, and the path-and-reason errors. A **Breaking** entry: `pytest-given report` and `pytest-given citations` refuse a JSON report of another schema version or with an unknown key, which includes every report written by 0.6.0 or earlier. The migration is to regenerate the report.
+- CHANGELOG, under **Added**: the published schemas, the `$schema` key, and the path-and-reason errors. A **Breaking** entry: `pytest-given report` and `pytest-given citations` refuse a JSON report of another schema version or with an unknown key, which includes every report written by 0.6.0 or earlier. The migration is to regenerate the report. A second **Breaking** entry: the JSON report has no `coverage` section, and `pytest-given coverage` prints it. **Added**: the `pytest-given coverage` subcommand.
 
 ## Done when
 
 - `report_from_dict`, `delta_from_dict` and `session_capture_from_dict` validate through the document types, and the hand-written per-class readers are gone.
+- `report_to_dict`, `delta_to_dict` and `session_capture_to_dict` dump through the document types. `asdict_filtered`, `serialized_fields` and `serde_exclude` are gone, and a step's source is a field of `CapturedStep` only.
 - A malformed report fails with the dotted path of each problem, an unknown key included. A report of another schema version gets the one-line mismatch message, from `pytest-given report` and `pytest-given citations` as from `pytest-given delta`.
 - `report-v1.schema.json` and `delta-v1.schema.json` are committed, served from the docs site, and held to the types by the committed-schema test, which replaced the fingerprint test.
 - Every written report and delta carries `$schema`, and the written-JSON test validates both against their committed schemas.
+- No written report has a `coverage` section, and `pytest-given coverage` prints it, exiting 1 on a tracked sentence without a scenario.
 - The example reports, the example delta and the self-report are regenerated and committed, since each JSON gains `$schema`.
-- The self-report has a scenario for each new rule: a malformed report is refused with the path and reason of each problem, a report of another schema version is refused, and a written report names its schema.
+- The self-report has a scenario for each new rule: a malformed report is refused with the path and reason of each problem, a report of another schema version is refused, a written report names its schema, and `pytest-given coverage` prints each sentence's scenarios.
 - A plain `pytest` run without report flags does not import Pydantic on Python 3.15, and the benchmark shows no regression in session wall time worth acting on.
 - `uv run nox` and `uv run nox -s compat` pass.

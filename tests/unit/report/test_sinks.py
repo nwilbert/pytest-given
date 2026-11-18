@@ -6,29 +6,19 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import PytestGivenError, given, scenario, then, when
+from pytest_given import PytestGivenError, scenario, then, when
 from pytest_given.model import (
-    Clause,
-    ClausePart,
-    ClauseTermRef,
-    ClauseWord,
     Definition,
     Glossary,
     GlossaryTerm,
     Metadata,
     Narration,
     NarrationLiteral,
-    NarrationTermRef,
     NodeId,
     ReportData,
     ReportUrl,
     Scenario,
-    Sentence,
-    SentenceId,
     SourceLocation,
-    Step,
-    Story,
-    StoryId,
     TermId,
     report_to_dict,
 )
@@ -36,6 +26,7 @@ from pytest_given.report import sinks
 from pytest_given.report.sinks import SinkConfig, discard_files
 from tests.ubiquitous_language import pg
 from tests.unit.report.app_data import embedded_app_data
+from tests.unit.report.story_report import story_report
 
 
 def test_discarding_removes_the_paths_this_run_would_have_written(
@@ -161,111 +152,32 @@ def _interrupt_temporary(monkeypatch: pytest.MonkeyPatch, *, number: int) -> Non
     monkeypatch.setattr(Path, 'write_text', write_text)
 
 
-def _refs(*term_ids: str) -> tuple[ClausePart, ...]:
-    return tuple(ClauseTermRef(term_id=TermId(tid), display=tid) for tid in term_ids)
-
-
-def _story_report() -> ReportData:
-    """One story of an anchored sentence (`guest search room`), an anchored one
-    nothing narrates (`guest confirm booking`), and an under-anchored one
-    (`guest browses listings`); a single bound scenario whose one step narrates
-    the first."""
-    story = Story(
-        id=StoryId('book'),
-        title='Book',
-        sentences=(
-            Sentence(
-                id=SentenceId(1),
-                clauses=(Clause(parts=_refs('guest', 'search', 'room')),),
-            ),
-            Sentence(
-                id=SentenceId(2),
-                clauses=(Clause(parts=_refs('guest', 'confirm', 'booking')),),
-            ),
-            Sentence(
-                id=SentenceId(3),
-                clauses=(
-                    Clause(
-                        parts=(
-                            *_refs('guest'),
-                            ClauseWord(text='browses'),
-                            ClauseWord(text='listings'),
-                        )
-                    ),
-                ),
-            ),
-        ),
+def test_the_json_sink_writes_the_dict_it_is_handed(tmp_path: Path) -> None:
+    report_dict = report_to_dict(story_report())
+    rendered = sinks.render_sinks(
+        report_dict, SinkConfig(json_path=tmp_path / 'report.json')
     )
-    step = Step(
-        phase='when',
-        narration=Narration(
-            text='guest search room',
-            parts=tuple(
-                NarrationTermRef(term_id=TermId(tid), display=tid)
-                for tid in ('guest', 'search', 'room')
-            ),
-        ),
-    )
-    return ReportData(
-        metadata=Metadata(
-            project='p', timestamp='t', pytest_version='8', plugin_version='0'
-        ),
-        scenarios=[
-            Scenario(
-                id=NodeId('tests/test_demo.py::test_demo'),
-                narration=Narration(text='A demo scenario'),
-                module='tests.test_demo',
-                status='passed',
-                steps=[step],
-                story_ids=(StoryId('book'),),
-            )
-        ],
-        stories=[story],
-    )
+    assert json.loads(rendered.files[0].text) == report_dict
 
 
 @scenario(
-    t"The JSON report carries each {pg['Sentence'].l}'s {pg['Coverage'].l}",
+    t'A written {pg["Report"].l} names its JSON schema',
+    tags=['spec/report-schema-validation'],
 )
-def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
-    with given(
-        t'a {pg["Story"].l} with a covered, an uncovered, an untracked '
-        t'{pg["Sentence"].l}'
-    ):
-        report = _story_report()
-    with when('the JSON report is rendered'):
+def test_a_written_report_names_its_schema(tmp_path: Path) -> None:
+    with when(t'the JSON sink writes a {pg["Report"].l}'):
         rendered = sinks.render_sinks(
-            report_to_dict(report), SinkConfig(json_path=tmp_path / 'report.json')
+            report_to_dict(story_report()),
+            SinkConfig(json_path=tmp_path / 'report.json'),
         )
-        data = json.loads(rendered.files[0].text)
-    with then(t'a top-level `coverage` lists every {pg["Sentence"].l} once'):
-        assert data['coverage'] == [
-            {
-                'story_id': 'book',
-                'sentence_id': 1,
-                'tracked': True,
-                'scenario_ids': ['tests/test_demo.py::test_demo'],
-            },
-            {'story_id': 'book', 'sentence_id': 2, 'tracked': True, 'scenario_ids': []},
-            {
-                'story_id': 'book',
-                'sentence_id': 3,
-                'tracked': False,
-                'scenario_ids': [],
-            },
-        ]
-    with then('the rest of the report is the input dict, unchanged'):
-        del data['coverage']
-        assert data == report_to_dict(report)
-
-
-def test_json_sink_replaces_incoming_coverage(tmp_path: Path) -> None:
-    stale = report_to_dict(_story_report())
-    stale['coverage'] = ['stale']
-    rendered = sinks.render_sinks(stale, SinkConfig(json_path=tmp_path / 'report.json'))
-    data = json.loads(rendered.files[0].text)
-    covered = [row['sentence_id'] for row in data['coverage'] if row['scenario_ids']]
-    assert covered == [1]
+        written = json.loads(rendered.files[0].text)
+    with then('`$schema` is its first key'):
+        assert next(iter(written)) == '$schema'
+    with then('it names the schema the documentation site publishes'):
+        assert written['$schema'] == (
+            'https://nwilbert.github.io/pytest-given/latest/schemas/'
+            'report-v1.schema.json'
+        )
 
 
 def test_md_source_reads_the_test_files_under_the_source_root(tmp_path: Path) -> None:
@@ -297,7 +209,7 @@ def test_md_source_reads_the_test_files_under_the_source_root(tmp_path: Path) ->
 
 
 def _glossary_report(*, definitions: bool = True) -> ReportData:
-    """`_story_report` with a glossary of its three anchors and a report URL."""
+    """`story_report` with a glossary of its three anchors and a report URL."""
     glossary = Glossary()
     for term_id, kind in (
         ('guest', 'actor'),
@@ -319,7 +231,7 @@ def _glossary_report(*, definitions: bool = True) -> ReportData:
                 ),
             )
         )
-    report = _story_report()
+    report = story_report()
     return replace(
         report,
         glossary=glossary,
@@ -357,7 +269,7 @@ def test_glossary_only_html_drops_scenarios_stories_and_report_url(
 def test_glossary_only_refuses_a_report_without_glossary_terms(
     tmp_path: Path, glossary: Glossary | None
 ) -> None:
-    report = replace(_story_report(), glossary=glossary)
+    report = replace(story_report(), glossary=glossary)
     with pytest.raises(PytestGivenError, match='glossary'):
         sinks.render_sinks(
             report_to_dict(report),

@@ -10,6 +10,7 @@ from pytest_given.lint import DEFAULTS
 from pytest_given.lint.catalog import RuleId
 from pytest_given.lint.runtime_rules import _unresolved_bold_spans, run_runtime_rules
 from pytest_given.model import (
+    CapturedStep,
     Clause,
     ClauseTermRef,
     ClauseWord,
@@ -27,7 +28,6 @@ from pytest_given.model import (
     Sentence,
     SentenceId,
     SourceLocation,
-    Step,
     Story,
     StoryId,
     id_derive,
@@ -36,7 +36,7 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def _step(phase, text, line, children=()):
-    return Step(
+    return CapturedStep(
         phase=phase,
         narration=Narration(text=text),
         children=list(children),
@@ -444,7 +444,7 @@ def _avoid_glossary(*avoid, term='Guest'):
 def _worded_scenario(*step_texts, title='Booking', narrations=()):
     steps = [_step('given', text, 10 + index) for index, text in enumerate(step_texts)]
     steps += [
-        Step(
+        CapturedStep(
             phase='given',
             narration=narration,
             source=SourceLocation(relpath='test_x.py', line=40),

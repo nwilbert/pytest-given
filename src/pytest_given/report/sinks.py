@@ -34,7 +34,6 @@ from .function_source import read_function_sources
 from .html_renderer import render_html_string, tab_visibility
 from .md_renderer import render_md
 from .staged_write import write_all_or_none
-from .story_view import build_coverage_records
 from .theme import DEFAULT_THEME, Theme
 
 # Where a bare --given-json / --given-html / `pytest-given report` writes.
@@ -205,7 +204,7 @@ def render_sinks(
     report = report_from_dict(report_dict, source)
     files: list[RenderedFile] = []
     if config.json_path is not None:
-        files.append(RenderedFile(config.json_path, render_json(report_dict, report)))
+        files.append(RenderedFile(config.json_path, json.dumps(report_dict, indent=2)))
     if config.html_path is not None:
         html_report = report
         if config.report_url is not None:
@@ -259,14 +258,6 @@ def _glossary_only(report: ReportData) -> ReportData:
         stories=[],
         metadata=replace(report.metadata, report_url=None),
     )
-
-
-def render_json(report_dict: JsonObject, report: ReportData) -> str:
-    """The dict plus its derived sections. `report_from_dict` reads none of
-    them, so a saved report re-rendered through `pytest-given report` recomputes
-    them rather than carrying a stale copy."""
-    json_dict = {**report_dict, 'coverage': build_coverage_records(report)}
-    return json.dumps(json_dict, indent=2)
 
 
 def sink_failure(error: Exception, config: SinkConfig) -> str:

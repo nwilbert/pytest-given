@@ -1,0 +1,1109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
+  "$defs": {
+    "Attachment": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "content": {
+          "title": "Content",
+          "type": "string"
+        },
+        "content_type": {
+          "$ref": "#/$defs/ContentType",
+          "default": "text"
+        }
+      },
+      "required": [
+        "label",
+        "content",
+        "content_type"
+      ],
+      "title": "Attachment",
+      "type": "object"
+    },
+    "AttachmentRef": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "content_type": {
+          "$ref": "#/$defs/ContentType"
+        },
+        "column_id": {
+          "title": "Column Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "content_type",
+        "column_id"
+      ],
+      "title": "AttachmentRef",
+      "type": "object"
+    },
+    "CellValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ParamValue"
+        },
+        {
+          "$ref": "#/$defs/Attachment"
+        }
+      ]
+    },
+    "Clause": {
+      "additionalProperties": false,
+      "properties": {
+        "parts": {
+          "items": {
+            "$ref": "#/$defs/ClausePart"
+          },
+          "title": "Parts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "parts"
+      ],
+      "title": "Clause",
+      "type": "object"
+    },
+    "ClausePart": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ClauseTermRef"
+        },
+        {
+          "$ref": "#/$defs/ClauseWord"
+        }
+      ]
+    },
+    "ClauseTermRef": {
+      "additionalProperties": false,
+      "properties": {
+        "term_id": {
+          "title": "Term Id",
+          "type": "string"
+        },
+        "display": {
+          "title": "Display",
+          "type": "string"
+        }
+      },
+      "required": [
+        "term_id",
+        "display"
+      ],
+      "title": "ClauseTermRef",
+      "type": "object"
+    },
+    "ClauseWord": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "ClauseWord",
+      "type": "object"
+    },
+    "ColumnKind": {
+      "enum": [
+        "param",
+        "derived",
+        "attachment"
+      ],
+      "type": "string"
+    },
+    "ContentType": {
+      "enum": [
+        "text",
+        "json"
+      ],
+      "type": "string"
+    },
+    "Definition": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "parts": {
+          "items": {
+            "$ref": "#/$defs/DefinitionPart"
+          },
+          "title": "Parts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "parts"
+      ],
+      "title": "Definition",
+      "type": "object"
+    },
+    "DefinitionPart": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NarrationLiteral"
+        },
+        {
+          "$ref": "#/$defs/NarrationTermRef"
+        }
+      ]
+    },
+    "ErrorCause": {
+      "additionalProperties": false,
+      "properties": {
+        "frames": {
+          "items": {
+            "$ref": "#/$defs/TracebackFrame"
+          },
+          "title": "Frames",
+          "type": "array"
+        },
+        "error_tail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Tail"
+        },
+        "connector": {
+          "title": "Connector",
+          "type": "string"
+        }
+      },
+      "required": [
+        "frames",
+        "error_tail",
+        "connector"
+      ],
+      "title": "ErrorCause",
+      "type": "object"
+    },
+    "ErrorInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "frames": {
+          "items": {
+            "$ref": "#/$defs/TracebackFrame"
+          },
+          "title": "Frames",
+          "type": "array"
+        },
+        "error_tail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Tail"
+        },
+        "causes": {
+          "items": {
+            "$ref": "#/$defs/ErrorCause"
+          },
+          "title": "Causes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "message",
+        "frames",
+        "error_tail",
+        "causes"
+      ],
+      "title": "ErrorInfo",
+      "type": "object"
+    },
+    "Glossary": {
+      "additionalProperties": false,
+      "properties": {
+        "terms": {
+          "items": {
+            "$ref": "#/$defs/GlossaryTerm"
+          },
+          "title": "Terms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "terms"
+      ],
+      "title": "Glossary",
+      "type": "object"
+    },
+    "GlossaryTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TermKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "canonical": {
+          "title": "Canonical",
+          "type": "string"
+        },
+        "definition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Definition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "section": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section"
+        },
+        "avoid": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Avoid",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "canonical",
+        "definition",
+        "source",
+        "section",
+        "avoid"
+      ],
+      "title": "GlossaryTerm",
+      "type": "object"
+    },
+    "Metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "project": {
+          "title": "Project",
+          "type": "string"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "pytest_version": {
+          "title": "Pytest Version",
+          "type": "string"
+        },
+        "plugin_version": {
+          "title": "Plugin Version",
+          "type": "string"
+        },
+        "commit_sha": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Commit Sha"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "report_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Report Url"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/ReportSchemaVersion",
+          "default": 1
+        }
+      },
+      "required": [
+        "project",
+        "timestamp",
+        "pytest_version",
+        "plugin_version",
+        "commit_sha",
+        "title",
+        "report_url",
+        "schema_version"
+      ],
+      "title": "Metadata",
+      "type": "object"
+    },
+    "Narration": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "parts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NarrationPart"
+          },
+          "title": "Parts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "parts"
+      ],
+      "title": "Narration",
+      "type": "object"
+    },
+    "NarrationLiteral": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "NarrationLiteral",
+      "type": "object"
+    },
+    "NarrationPart": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NarrationLiteral"
+        },
+        {
+          "$ref": "#/$defs/NarrationValue"
+        },
+        {
+          "$ref": "#/$defs/NarrationPlaceholder"
+        },
+        {
+          "$ref": "#/$defs/NarrationTermRef"
+        }
+      ]
+    },
+    "NarrationPlaceholder": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "column_id": {
+          "title": "Column Id",
+          "type": "string"
+        },
+        "format_spec": {
+          "default": "",
+          "title": "Format Spec",
+          "type": "string"
+        },
+        "conversion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Conversion"
+        }
+      },
+      "required": [
+        "name",
+        "column_id",
+        "format_spec",
+        "conversion"
+      ],
+      "title": "NarrationPlaceholder",
+      "type": "object"
+    },
+    "NarrationTermRef": {
+      "additionalProperties": false,
+      "properties": {
+        "term_id": {
+          "title": "Term Id",
+          "type": "string"
+        },
+        "display": {
+          "title": "Display",
+          "type": "string"
+        },
+        "expression": {
+          "default": "",
+          "title": "Expression",
+          "type": "string"
+        }
+      },
+      "required": [
+        "term_id",
+        "display",
+        "expression"
+      ],
+      "title": "NarrationTermRef",
+      "type": "object"
+    },
+    "NarrationValue": {
+      "additionalProperties": false,
+      "properties": {
+        "rendered": {
+          "title": "Rendered",
+          "type": "string"
+        },
+        "expression": {
+          "title": "Expression",
+          "type": "string"
+        },
+        "format_spec": {
+          "default": "",
+          "title": "Format Spec",
+          "type": "string"
+        },
+        "conversion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Conversion"
+        }
+      },
+      "required": [
+        "rendered",
+        "expression",
+        "format_spec",
+        "conversion"
+      ],
+      "title": "NarrationValue",
+      "type": "object"
+    },
+    "ParamValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ParameterCase": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/CellValue"
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/Status",
+          "default": "passed"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ErrorInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "custom_id": {
+          "default": false,
+          "title": "Custom Id",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "values",
+        "status",
+        "error",
+        "custom_id"
+      ],
+      "title": "ParameterCase",
+      "type": "object"
+    },
+    "ParameterColumn": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ColumnKind"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind"
+      ],
+      "title": "ParameterColumn",
+      "type": "object"
+    },
+    "ParameterTable": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/ParameterColumn"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "cases": {
+          "items": {
+            "$ref": "#/$defs/ParameterCase"
+          },
+          "title": "Cases",
+          "type": "array"
+        }
+      },
+      "required": [
+        "columns",
+        "cases"
+      ],
+      "title": "ParameterTable",
+      "type": "object"
+    },
+    "Phase": {
+      "enum": [
+        "given",
+        "when",
+        "then"
+      ],
+      "type": "string"
+    },
+    "Pin": {
+      "additionalProperties": false,
+      "properties": {
+        "story_id": {
+          "title": "Story Id",
+          "type": "string"
+        },
+        "sentence_id": {
+          "title": "Sentence Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "story_id",
+        "sentence_id"
+      ],
+      "title": "Pin",
+      "type": "object"
+    },
+    "ReportSchemaVersion": {
+      "const": 1,
+      "type": "integer"
+    },
+    "Scenario": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "narration": {
+          "$ref": "#/$defs/Narration"
+        },
+        "module": {
+          "title": "Module",
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/Status",
+          "default": "passed"
+        },
+        "duration_ms": {
+          "default": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "parameters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterTable"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ErrorInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "skip_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Skip Reason"
+        },
+        "xfail_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Xfail Reason"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "story_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Story Ids",
+          "type": "array"
+        },
+        "pins": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Pin"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pins"
+        }
+      },
+      "required": [
+        "id",
+        "narration",
+        "module",
+        "tags",
+        "status",
+        "duration_ms",
+        "steps",
+        "parameters",
+        "error",
+        "skip_reason",
+        "xfail_reason",
+        "source",
+        "story_ids",
+        "pins"
+      ],
+      "title": "Scenario",
+      "type": "object"
+    },
+    "Sentence": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "clauses": {
+          "items": {
+            "$ref": "#/$defs/Clause"
+          },
+          "title": "Clauses",
+          "type": "array"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name"
+        }
+      },
+      "required": [
+        "id",
+        "clauses",
+        "name"
+      ],
+      "title": "Sentence",
+      "type": "object"
+    },
+    "SourceLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "relpath": {
+          "title": "Relpath",
+          "type": "string"
+        },
+        "line": {
+          "title": "Line",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "relpath",
+        "line"
+      ],
+      "title": "SourceLocation",
+      "type": "object"
+    },
+    "Status": {
+      "enum": [
+        "passed",
+        "failed",
+        "skipped",
+        "xfailed"
+      ],
+      "type": "string"
+    },
+    "Step": {
+      "additionalProperties": false,
+      "properties": {
+        "phase": {
+          "$ref": "#/$defs/Phase"
+        },
+        "narration": {
+          "$ref": "#/$defs/Narration"
+        },
+        "children": {
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "title": "Children",
+          "type": "array"
+        },
+        "attachments": {
+          "items": {
+            "$ref": "#/$defs/StepAttachment"
+          },
+          "title": "Attachments",
+          "type": "array"
+        },
+        "pins": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Pin"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pins"
+        },
+        "fixture_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fixture Name"
+        }
+      },
+      "required": [
+        "phase",
+        "narration",
+        "children",
+        "attachments",
+        "pins",
+        "fixture_name"
+      ],
+      "title": "Step",
+      "type": "object"
+    },
+    "StepAttachment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Attachment"
+        },
+        {
+          "$ref": "#/$defs/AttachmentRef"
+        }
+      ]
+    },
+    "Story": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "sentences": {
+          "items": {
+            "$ref": "#/$defs/Sentence"
+          },
+          "title": "Sentences",
+          "type": "array"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "sentences",
+        "source"
+      ],
+      "title": "Story",
+      "type": "object"
+    },
+    "TermKind": {
+      "enum": [
+        "actor",
+        "object",
+        "activity"
+      ],
+      "type": "string"
+    },
+    "TracebackFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "lineno": {
+          "title": "Lineno",
+          "type": "integer"
+        },
+        "func": {
+          "title": "Func",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "is_internal": {
+          "title": "Is Internal",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path",
+        "lineno",
+        "func",
+        "code",
+        "is_internal"
+      ],
+      "title": "TracebackFrame",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "default": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
+      "title": "$Schema",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "scenarios": {
+      "items": {
+        "$ref": "#/$defs/Scenario"
+      },
+      "title": "Scenarios",
+      "type": "array"
+    },
+    "glossary": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Glossary"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "stories": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Story"
+      },
+      "title": "Stories",
+      "type": "array"
+    }
+  },
+  "required": [
+    "$schema",
+    "metadata",
+    "scenarios",
+    "glossary",
+    "stories"
+  ],
+  "title": "ReportDocument",
+  "type": "object"
+}

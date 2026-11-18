@@ -23,6 +23,14 @@
 | citations check doc.md --report missing.json |
 | skills install --dest taken.txt |
 
+## ✓ `pytest-given report` refuses a «report» of another schema version
+`tests/integration/test_cli.py::test_cli_refuses_a_report_of_another_schema_version` · spec/report-schema-validation
+
+- **given** a saved «report» whose metadata names no schema version
+- **when** `pytest-given report` renders it
+- **then** it exits 2
+- **then** stderr is one line naming the version it reads and how to regenerate the report
+
 ## ✓ A `pytest-given report` that cannot read its input removes the earlier «report» · 2 cases
 `tests/integration/test_cli.py::test_cli_input_that_cannot_be_read_also_discards_the_stale_report` · diagnostics
 
@@ -158,6 +166,14 @@
 - **then** only the «citation» of `test_pay` is listed
 - **then** the summary counts the finding it left out
 - **then** it exits 1 for that finding
+
+## ✓ `pytest-given coverage` prints each «sentence»'s «coverage»
+`tests/integration/test_cli_coverage.py::test_coverage_prints_each_sentences_scenarios` · spec/report-schema-validation
+
+- **given** a «report» whose «story» has a covered, an uncovered and an untracked «sentence»
+- **when** `pytest-given coverage` reads it
+- **then** stdout lists every «sentence» once, with its scenarios
+- **then** it exits 1, naming how many tracked «sentence»s have no scenario
 
 ## ✓ `pytest-given delta` writes a «delta report» as JSON and HTML, and exits 0 whether or not anything changed · 2 cases
 `tests/integration/test_cli_delta.py::test_delta_writes_a_delta_json_and_html_and_exits_0` · delta
@@ -4170,6 +4186,23 @@
 - **then** the «lint finding» names the word and the step
 - **then** its «severity» is warn by default
 
+## ✓ A malformed «report» is refused with the path and reason of each problem
+`tests/unit/model/test_serde.py::test_a_malformed_report_lists_the_path_and_reason_of_each_problem` · spec/report-schema-validation
+
+- **given** a «report» dict with an unknown scenario status and a misspelled key
+- **when** it is read
+- **then** a `PytestGivenError` is raised
+- **then** the error names the file it read
+    - 📎 error:
+        ```
+        r.json is not a valid pytest-given report:
+          scenarios.0.status: Input should be 'passed', 'failed', 'skipped' or 'xfailed'
+          scenarios.0.stauts: Unexpected keyword argument
+        ```
+- **then** it names the status's path and the statuses it allows
+- **then** it names the misspelled key's path as unexpected
+- **then** it links no Pydantic documentation
+
 ## ✓ The «glossary» view aggregates «instances» and «activity» forms
 `tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_collects_instances_and_forms`
 
@@ -4177,6 +4210,7 @@
     - 📎 Report data:
         ```
         {
+          "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
           "metadata": {
             "project": "p",
             "timestamp": "t",
@@ -4185,7 +4219,7 @@
             "commit_sha": null,
             "title": null,
             "report_url": null,
-            "schema_version": null
+            "schema_version": 1
           },
           "scenarios": [
             {
@@ -4787,13 +4821,12 @@
 - **then** it holds the steps and the «parameter table» only
 - **then** the full Markdown «report» contains it verbatim
 
-## ✓ The JSON report carries each «sentence»'s «coverage»
-`tests/unit/report/test_sinks.py::test_json_sink_carries_per_sentence_coverage`
+## ✓ A written «report» names its JSON schema
+`tests/unit/report/test_sinks.py::test_a_written_report_names_its_schema` · spec/report-schema-validation
 
-- **given** a «story» with a covered, an uncovered, an untracked «sentence»
-- **when** the JSON report is rendered
-- **then** a top-level `coverage` lists every «sentence» once
-- **then** the rest of the report is the input dict, unchanged
+- **when** the JSON sink writes a «report»
+- **then** `$schema` is its first key
+- **then** it names the schema the documentation site publishes
 
 ## ✓ A «source link» config value resolves to its template · 6 cases
 `tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template`

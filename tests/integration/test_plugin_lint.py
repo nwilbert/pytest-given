@@ -70,8 +70,8 @@ class _ConfigCapture:
 
 def _run_observed(pytester, source, *args):
     """Like `_run`, but also returns all steps (recursively) recorded by the
-    inner session's collector — the only place `Step.source` is observable,
-    since it is never serialized."""
+    inner session's collector — the only place a step's source is observable,
+    since the report has no field for it."""
     pytester.makepyfile(test_sample=source)
     capture = _ConfigCapture()
     result = pytester.runpytest(*args, plugins=[capture])

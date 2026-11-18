@@ -1,15 +1,15 @@
-from dataclasses import replace
-
 import pytest
 
+from pytest_given import attach, given, scenario, then, when_then
 from pytest_given.model import (
+    REPORT_SCHEMA_VERSION,
     Attachment,
     AttachmentRef,
+    CapturedStep,
     Clause,
     ClauseTermRef,
     ClauseWord,
     Definition,
-    ErrorCause,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -36,16 +36,13 @@ from pytest_given.model import (
     Story,
     StoryId,
     TermId,
-    TracebackFrame,
     report_from_dict,
     report_to_dict,
     session_capture_from_dict,
     session_capture_to_dict,
 )
-from pytest_given.model.serde import (
-    _clause_part_from_dict,
-    narration_part_from_dict,
-)
+from tests.ubiquitous_language import pg
+from tests.unit.model.builders import every_field_populated
 
 
 def _round_trip(report):
@@ -111,6 +108,7 @@ def _minimal_metadata_dict() -> dict:
         'timestamp': 't',
         'pytest_version': '9',
         'plugin_version': '0.1',
+        'schema_version': REPORT_SCHEMA_VERSION,
     }
 
 
@@ -194,93 +192,37 @@ def test_scenario_source_optional_defaults_to_none() -> None:
     assert report.scenarios[0].source is None
 
 
-def test_step_source_is_not_serialized() -> None:
-    # Step.source is lint-only capture state; report artifacts must stay
-    # byte-identical whether or not it was captured.
-    step = Step(
+def test_a_report_of_captured_steps_leaves_their_sources_out() -> None:
+    step = CapturedStep(
         phase='given',
         narration=Narration(text='g'),
+        children=[
+            CapturedStep(
+                phase='then',
+                narration=Narration(text='t'),
+                source=SourceLocation(relpath='tests/t.py', line=4),
+            )
+        ],
         source=SourceLocation(relpath='tests/t.py', line=3),
     )
     scenario = Scenario(
         id=NodeId('i'), narration=Narration(text='n'), module='m', steps=[step]
     )
-    report = ReportData(metadata=_meta(), scenarios=[scenario])
-    step_dict = report_to_dict(report)['scenarios'][0]['steps'][0]
+    step_dict = report_to_dict(ReportData(metadata=_meta(), scenarios=[scenario]))[
+        'scenarios'
+    ][0]['steps'][0]
     assert 'source' not in step_dict
-    assert _round_trip(report).scenarios[0].steps[0].source is None
+    assert 'source' not in step_dict['children'][0]
 
 
-def test_step_with_attachment_and_children_drops_a_legacy_status_and_error() -> None:
-    """A report written before step-level failure was removed still loads.
-
-    Failure lives on the scenario (and, for a parametrized run, on the case);
-    a step's `status` / `error` are dropped rather than migrated, since no
-    real run ever set them to anything but the defaults.
-    """
-    report = report_from_dict(
-        {
-            'metadata': _minimal_metadata_dict(),
-            'scenarios': [
-                {
-                    'id': 'i',
-                    'narration': {'text': 'n', 'parts': []},
-                    'module': 'm',
-                    'tags': [],
-                    'status': 'failed',
-                    'duration_ms': 1,
-                    'parameters': None,
-                    'error': {
-                        'message': 'boom',
-                        'frames': [],
-                        'error_tail': '- a\n+ b',
-                    },
-                    'steps': [
-                        {
-                            'phase': 'then',
-                            'narration': {'text': 'check', 'parts': []},
-                            'status': 'failed',
-                            'attachments': [
-                                {
-                                    'label': 'log',
-                                    'content': 'x',
-                                    'content_type': 'text',
-                                }
-                            ],
-                            'error': {
-                                'message': 'boom',
-                                'frames': [],
-                                'error_tail': None,
-                            },
-                            'children': [
-                                {
-                                    'phase': 'then',
-                                    'narration': {'text': 'inner', 'parts': []},
-                                    'status': 'passed',
-                                    'attachments': [],
-                                    'error': None,
-                                    'children': [],
-                                }
-                            ],
-                        }
-                    ],
-                }
-            ],
-        }
-    )
-    s = report.scenarios[0]
-    assert s.error == ErrorInfo(message='boom', error_tail='- a\n+ b')
-    assert len(s.steps) == 1
-    step = s.steps[0]
-    assert isinstance(step, Step)
-    assert step.phase == 'then'
-    assert not hasattr(step, 'status')
-    assert not hasattr(step, 'error')
-    assert step.attachments == [
-        Attachment(label='log', content='x', content_type='text')
-    ]
-    assert len(step.children) == 1
-    assert step.children[0].narration.text == 'inner'
+def test_a_step_with_a_status_is_refused() -> None:
+    payload = report_to_dict(every_field_populated())
+    payload['scenarios'][0]['steps'][0]['status'] = 'failed'
+    with pytest.raises(
+        PytestGivenError,
+        match=r'scenarios\.0\.steps\.0\.status: Unexpected keyword argument',
+    ):
+        report_from_dict(payload)
 
 
 def test_parameter_table_round_trips() -> None:
@@ -500,50 +442,15 @@ def test_narration_placeholder_part() -> None:
     )
 
 
-def test_narration_unknown_part_shape_raises() -> None:
-    with pytest.raises(PytestGivenError) as exc:
-        report_from_dict(
-            {
-                'metadata': _minimal_metadata_dict(),
-                'scenarios': [
-                    {
-                        'id': 'i',
-                        'narration': {
-                            'text': 'S',
-                            'parts': [{'mystery_field': '?'}],
-                        },
-                        'module': 'm',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                    }
-                ],
-            }
-        )
-    assert 'narration' in str(exc.value).lower()
-
-
-def test_report_to_dict_excludes_underscore_fields() -> None:
-    """report_to_dict skips fields whose names start with '_'."""
-    report = ReportData(
-        metadata=Metadata(
-            project='p',
-            timestamp='t',
-            pytest_version='9',
-            plugin_version='0.1',
-        ),
-        scenarios=[],
+def test_a_narration_part_of_no_known_shape_is_refused_at_its_path() -> None:
+    payload = report_to_dict(every_field_populated())
+    payload['scenarios'][0]['narration']['parts'] = [{'mystery_field': '?'}]
+    with pytest.raises(PytestGivenError) as raised:
+        report_from_dict(payload)
+    assert (
+        'scenarios.0.narration.parts.0.NarrationLiteral.value: Field required'
+        in str(raised.value)
     )
-    result = report_to_dict(report)
-    # No underscore-prefixed keys anywhere in the output.
-    assert all(not k.startswith('_') for k in result)
-    assert result['metadata']['project'] == 'p'
-    assert result['scenarios'] == []
-    assert result['glossary'] is None
-    assert result['stories'] == []
 
 
 def test_round_trip_via_to_dict() -> None:
@@ -590,54 +497,44 @@ def test_round_trip_via_to_dict() -> None:
 @pytest.mark.parametrize(
     ('mutate', 'expected'),
     [
-        (lambda d: d['scenarios'][0].update(status='errored'), 'scenario status'),
+        (
+            lambda d: d['scenarios'][0].update(status='errored'),
+            (
+                "scenarios.0.status: Input should be 'passed', 'failed', 'skipped' "
+                "or 'xfailed'"
+            ),
+        ),
         (
             lambda d: d['glossary']['terms'][0].update(kind='thing'),
-            'glossary term kind',
+            "glossary.terms.0.kind: Input should be 'actor', 'object' or 'activity'",
         ),
-        (lambda d: d['scenarios'][0]['steps'][0].update(phase='so'), 'step phase'),
+        (
+            lambda d: d['scenarios'][0]['steps'][0].update(phase='so'),
+            "scenarios.0.steps.0.phase: Input should be 'given', 'when' or 'then'",
+        ),
         (
             lambda d: d['scenarios'][0]['steps'][0]['attachments'][0].update(
                 content_type='yaml'
             ),
-            'attachment content type',
+            (
+                'scenarios.0.steps.0.attachments.0.Attachment.content_type: Input '
+                "should be 'text' or 'json'"
+            ),
         ),
     ],
 )
 def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> None:
-    """`Status` and `TermKind` are erased at runtime, so without this check a
-    hand-edited report would crash the renderers with a bare `KeyError`."""
-    report = ReportData(
-        metadata=_meta(),
-        scenarios=[
-            Scenario(
-                id=NodeId('t.py::t'),
-                narration=Narration(text='x'),
-                module='m',
-                steps=[
-                    Step(
-                        phase='given',
-                        narration=Narration(text='s'),
-                        attachments=[Attachment(label='l', content='c')],
-                    )
-                ],
-            )
-        ],
-        glossary=Glossary(
-            terms=[GlossaryTerm(id=TermId('g'), kind='actor', canonical='G')]
-        ),
-    )
-    payload = report_to_dict(report)
+    payload = report_to_dict(every_field_populated())
     mutate(payload)
-    with pytest.raises(PytestGivenError, match=f'invalid {expected}'):
+    with pytest.raises(PytestGivenError) as raised:
         report_from_dict(payload)
+    assert expected in str(raised.value)
 
 
-def test_report_from_dict_rejects_a_custom_id_that_is_no_bool() -> None:
-    """A hand-edited `"false"` would otherwise read as true."""
+def test_a_hand_edited_string_bool_reads_by_its_meaning() -> None:
     table = ParameterTable(
         columns=[ParameterColumn(id='a', name='a', kind='param')],
-        cases=[ParameterCase(id=NodeId('t.py::t[1]'), values=[1])],
+        cases=[ParameterCase(id=NodeId('t.py::t[1]'), values=[1], custom_id=True)],
     )
     scenario = Scenario(
         id=NodeId('t.py::t'),
@@ -647,8 +544,9 @@ def test_report_from_dict_rejects_a_custom_id_that_is_no_bool() -> None:
     )
     payload = report_to_dict(ReportData(metadata=_meta(), scenarios=[scenario]))
     payload['scenarios'][0]['parameters']['cases'][0]['custom_id'] = 'false'
-    with pytest.raises(PytestGivenError, match="invalid custom_id 'false'"):
-        report_from_dict(payload)
+    parameters = report_from_dict(payload).scenarios[0].parameters
+    assert parameters is not None
+    assert parameters.cases[0].custom_id is False
 
 
 def test_clause_part_variants_round_trip():
@@ -768,15 +666,15 @@ def test_step_pins_round_trip():
     assert rt.scenarios[0].steps[0].pins == pins
 
 
-def test_clause_part_unknown_shape_raises():
-    with pytest.raises(PytestGivenError, match='unknown ClausePart shape'):
-        _clause_part_from_dict({'unknown_key': 'x'})
-
-
-def test_narration_part_unknown_shape_raises():
-    """Pre-existing behavior — covered to keep 100% after extending the branch."""
-    with pytest.raises(PytestGivenError, match='Unknown narration part shape'):
-        narration_part_from_dict({'mystery': 'x'})
+def test_a_clause_part_of_no_known_shape_is_refused_at_its_path():
+    payload = report_to_dict(every_field_populated())
+    payload['stories'][0]['sentences'][0]['clauses'][0]['parts'] = [{'unknown': 'x'}]
+    with pytest.raises(PytestGivenError) as raised:
+        report_from_dict(payload)
+    assert (
+        'stories.0.sentences.0.clauses.0.parts.0.ClauseWord.text: Field required'
+        in str(raised.value)
+    )
 
 
 def test_story_source_roundtrips() -> None:
@@ -850,8 +748,24 @@ def test_a_value_part_in_a_definition_is_refused():
             }
         ]
     }
-    with pytest.raises(PytestGivenError, match='definition part'):
+    with pytest.raises(PytestGivenError) as raised:
         report_from_dict(as_dict)
+    assert (
+        'glossary.terms.0.definition.parts.0.NarrationLiteral.value: Field required'
+        in str(raised.value)
+    )
+
+
+def test_a_definition_whose_parts_do_not_spell_its_text_is_refused_at_its_path():
+    payload = report_to_dict(every_field_populated())
+    payload['glossary']['terms'][0]['definition'] = {
+        'text': 'ab',
+        'parts': [{'value': 'a'}],
+    }
+    with pytest.raises(
+        PytestGivenError, match=r'glossary\.terms\.0\.definition: Assertion failed'
+    ):
+        report_from_dict(payload)
 
 
 def test_glossary_term_source_roundtrips() -> None:
@@ -957,157 +871,9 @@ def test_metadata_title_round_trips() -> None:
     assert report_to_dict(report)['metadata']['title'] == 'Coffee Shop Example'
 
 
-def _every_field_populated() -> ReportData:
-    """A report exercising every optional field and every union variant.
-
-    Deliberately maximal: the writer is reflective over the dataclasses while
-    the reader is hand-written, so a field added to the schema starts appearing
-    in the JSON automatically and is silently dropped on the way back in. Only
-    a round trip over a fully populated report catches that.
-    """
-    term = GlossaryTerm(
-        id=TermId('guest'),
-        kind='actor',
-        canonical='Guest',
-        definition=Definition.literal('someone who books'),
-        source=SourceLocation(relpath='g.py', line=3),
-    )
-    story = Story(
-        id=StoryId('booking'),
-        title='Booking',
-        source=SourceLocation(relpath='s.py', line=1),
-        sentences=(
-            Sentence(
-                id=SentenceId(1),
-                clauses=(
-                    Clause(
-                        parts=(
-                            ClauseTermRef(term_id=TermId('guest'), display='Guest'),
-                            ClauseWord(text='books'),
-                            ClauseTermRef(term_id=TermId('room'), display='Room'),
-                        )
-                    ),
-                ),
-            ),
-        ),
-    )
-    step = Step(
-        phase='given',
-        narration=Narration(
-            text='a Guest with 2 rooms',
-            parts=(
-                NarrationLiteral(value='a '),
-                NarrationTermRef(
-                    term_id=TermId('guest'), display='Guest', expression='pg'
-                ),
-                NarrationValue(
-                    rendered='2', expression='count', conversion='r', format_spec='d'
-                ),
-                NarrationPlaceholder(
-                    name='rooms',
-                    column_id='rooms',
-                    conversion='s',
-                    format_spec='>4',
-                ),
-            ),
-        ),
-        attachments=[
-            Attachment(label='payload', content='{"a": 1}', content_type='json'),
-            AttachmentRef(
-                label='varies', content_type='text', column_id='attachment:0'
-            ),
-        ],
-        fixture_name='shop',
-        pins=(Pin(story_id=StoryId('booking'), sentence_id=SentenceId(1)),),
-        source=SourceLocation(relpath='t.py', line=9),
-        children=[Step(phase='then', narration=Narration(text='it holds'))],
-    )
-    scenario = Scenario(
-        id=NodeId('t.py::test_a[1]'),
-        narration=Narration(
-            text='A booking', parts=(NarrationLiteral(value='A booking'),)
-        ),
-        module='t',
-        tags=['smoke'],
-        status='failed',
-        duration_ms=12,
-        steps=[step],
-        parameters=ParameterTable(
-            columns=[
-                ParameterColumn(id='rooms', name='rooms', kind='param'),
-                ParameterColumn(id='derived:0', name='total', kind='derived'),
-                ParameterColumn(id='attachment:0', name='varies', kind='attachment'),
-            ],
-            cases=[
-                ParameterCase(
-                    id=NodeId('t.py::test_x[5]'),
-                    values=[
-                        2,
-                        'four',
-                        Attachment(label='varies', content='x', content_type='text'),
-                    ],
-                    status='failed',
-                    error=ErrorInfo(
-                        message='boom',
-                        frames=[
-                            TracebackFrame(
-                                path='t.py',
-                                lineno=9,
-                                func='test_a',
-                                code='assert x',
-                                is_internal=False,
-                            )
-                        ],
-                        error_tail='E   AssertionError',
-                        causes=[
-                            ErrorCause(
-                                frames=[
-                                    TracebackFrame(
-                                        path='t.py',
-                                        lineno=3,
-                                        func='load',
-                                        code='raise E',
-                                        is_internal=False,
-                                    )
-                                ],
-                                error_tail='E   ValueError',
-                                connector='During handling of the above '
-                                'exception, another exception occurred:',
-                            )
-                        ],
-                    ),
-                )
-            ],
-        ),
-        error=ErrorInfo(message='boom', frames=[], error_tail=None),
-        skip_reason=None,
-        source=SourceLocation(relpath='t.py', line=5),
-        story_ids=(StoryId('booking'),),
-        pins=(Pin(story_id=StoryId('booking'), sentence_id=SentenceId(1)),),
-    )
-    return ReportData(
-        metadata=Metadata(
-            project='p',
-            timestamp='2026-09-02',
-            pytest_version='9',
-            plugin_version='0.1',
-            commit_sha='abc123',
-            title='A title',
-        ),
-        scenarios=[scenario],
-        stories=[story],
-        glossary=Glossary(terms=[term]),
-    )
-
-
 def test_a_fully_populated_report_survives_the_round_trip() -> None:
-    """Every field the writer emits, the reader has to read back.
-
-    `report_to_dict` is reflective and `report_from_dict` is hand-written, so
-    without this a field added to the schema is written and silently dropped,
-    and `pytest-given report` on a saved JSON quietly loses it.
-    """
-    once = report_to_dict(_every_field_populated())
+    """Every field the writer emits, the reader reads back."""
+    once = report_to_dict(every_field_populated())
     assert report_to_dict(report_from_dict(once)) == once
 
 
@@ -1126,27 +892,13 @@ def test_report_url_round_trips() -> None:
 
 
 def test_a_report_without_report_url_reads_as_none() -> None:
-    data = {
-        'metadata': {
-            'project': 'p',
-            'timestamp': 't',
-            'pytest_version': '9',
-            'plugin_version': '0',
-        },
-        'scenarios': [],
-    }
+    data = {'metadata': _minimal_metadata_dict(), 'scenarios': []}
     assert report_from_dict(data).metadata.report_url is None
 
 
 def test_an_empty_stored_report_url_reads_as_none() -> None:
     data = {
-        'metadata': {
-            'project': 'p',
-            'timestamp': 't',
-            'pytest_version': '9',
-            'plugin_version': '0',
-            'report_url': '',
-        },
+        'metadata': {**_minimal_metadata_dict(), 'report_url': ''},
         'scenarios': [],
     }
     assert report_from_dict(data).metadata.report_url is None
@@ -1157,17 +909,15 @@ def test_an_empty_stored_report_url_reads_as_none() -> None:
 )
 def test_a_stored_report_url_a_citation_cannot_link_is_refused(stored: str) -> None:
     data = {
-        'metadata': {
-            'project': 'p',
-            'timestamp': 't',
-            'pytest_version': '9',
-            'plugin_version': '0',
-            'report_url': stored,
-        },
+        'metadata': {**_minimal_metadata_dict(), 'report_url': stored},
         'scenarios': [],
     }
     with pytest.raises(
-        PytestGivenError, match=r'metadata\.report_url in reports/x\.json must be'
+        PytestGivenError,
+        match=(
+            r'reports/x\.json is not a valid pytest-given report:\n'
+            r'  metadata: report_url must be'
+        ),
     ):
         report_from_dict(data, 'reports/x.json')
 
@@ -1193,12 +943,12 @@ def test_glossary_term_section_and_avoid_round_trip() -> None:
 
 
 def _capture(glossary: Glossary | None) -> SessionCapture:
-    nested = Step(
+    nested = CapturedStep(
         phase='given',
         narration=Narration(text='nested'),
         source=SourceLocation(relpath='t.py', line=8),
     )
-    step = Step(
+    step = CapturedStep(
         phase='given',
         narration=Narration(text='outer'),
         children=[nested],
@@ -1256,13 +1006,95 @@ def test_a_capture_without_glossary_round_trips() -> None:
     assert restored.glossary is None
 
 
-def test_schema_version_round_trips():
-    report = ReportData(metadata=replace(_meta(), schema_version=1))
-    assert _round_trip(report).metadata.schema_version == 1
+@scenario(
+    t'A malformed {pg["Report"].l} is refused with the path and reason of each problem',
+    tags=['spec/report-schema-validation'],
+)
+def test_a_malformed_report_lists_the_path_and_reason_of_each_problem():
+    with given(
+        t'a {pg["Report"].l} dict with an unknown scenario status and a misspelled key'
+    ):
+        payload = report_to_dict(every_field_populated())
+        payload['scenarios'][0]['status'] = 'errored'
+        payload['scenarios'][0]['stauts'] = 'passed'
+    with (
+        when_then('it is read', 'a `PytestGivenError` is raised'),
+        pytest.raises(PytestGivenError) as raised,
+    ):
+        report_from_dict(payload, 'r.json')
+    message = str(raised.value)
+    with then('the error names the file it read'):
+        attach('error', message)
+        assert message.startswith('r.json is not a valid pytest-given report:')
+    with then("it names the status's path and the statuses it allows"):
+        assert (
+            "scenarios.0.status: Input should be 'passed', 'failed', 'skipped' or "
+            "'xfailed'" in message
+        )
+    with then("it names the misspelled key's path as unexpected"):
+        assert 'scenarios.0.stauts: Unexpected keyword argument' in message
+    with then('it links no Pydantic documentation'):
+        assert 'errors.pydantic.dev' not in message
 
 
-def test_a_report_without_schema_version_reads_as_none():
-    assert _round_trip(ReportData(metadata=_meta())).metadata.schema_version is None
+@pytest.mark.parametrize(
+    ('version', 'named'),
+    [
+        (None, 'no schema version'),
+        (2, 'schema version 2'),
+        ('1', "schema version '1'"),
+        (True, 'schema version True'),
+        (1.0, 'schema version 1.0'),
+    ],
+)
+def test_a_report_of_another_schema_version_is_refused_in_one_line(version, named):
+    payload = report_to_dict(ReportData(metadata=_meta()))
+    if version is None:
+        del payload['metadata']['schema_version']
+    else:
+        payload['metadata']['schema_version'] = version
+    payload['scenarios'] = [{'bogus': 1}]
+    with pytest.raises(PytestGivenError) as raised:
+        report_from_dict(payload, 'old.json')
+    assert str(raised.value) == (
+        f'old.json is a report of {named}; this pytest-given reads version 1. '
+        'Regenerate it by running the suite under this pytest-given.'
+    )
+
+
+def test_a_dict_without_metadata_is_refused_by_validation():
+    with pytest.raises(PytestGivenError, match=r'metadata: Field required'):
+        report_from_dict({'scenarios': []}, 'x.json')
+    with pytest.raises(
+        PytestGivenError,
+        match=(
+            r'^x\.json is not a valid pytest-given report:\n'
+            r'  metadata: Input should be'
+        ),
+    ):
+        report_from_dict({'metadata': [], 'scenarios': []}, 'x.json')
+
+
+def test_a_report_with_many_errors_lists_ten_and_counts_the_rest():
+    scenario = Scenario(id=NodeId('t.py::t'), narration=Narration(text='x'), module='m')
+    payload = report_to_dict(ReportData(metadata=_meta(), scenarios=[scenario] * 15))
+    for scenario_dict in payload['scenarios']:
+        scenario_dict['status'] = 'errored'
+    with pytest.raises(PytestGivenError) as raised:
+        report_from_dict(payload)
+    message = str(raised.value)
+    assert message.startswith('input is not a valid pytest-given report:\n')
+    assert message.count('Input should be') == 10
+    assert message.endswith('\n  and 5 more')
+
+
+def test_a_step_source_in_a_report_is_refused():
+    payload = report_to_dict(every_field_populated())
+    payload['scenarios'][0]['steps'][0]['source'] = {'relpath': 't.py', 'line': 9}
+    with pytest.raises(
+        PytestGivenError, match=r'scenarios\.0\.steps\.0\.source: Unexpected keyword'
+    ):
+        report_from_dict(payload)
 
 
 def test_report_from_dict_refuses_a_delta_json():

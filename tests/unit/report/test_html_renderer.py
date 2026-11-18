@@ -11,6 +11,7 @@ from pytest_given.capture.definition_refs import resolve_definition_refs
 from pytest_given.capture.template import narration_from
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
+    REPORT_SCHEMA_VERSION,
     AttachmentRef,
     Clause,
     ClauseTermRef,
@@ -78,6 +79,7 @@ _DEFAULT_METADATA = {
     'timestamp': 't',
     'pytest_version': '9',
     'plugin_version': '0.1',
+    'schema_version': REPORT_SCHEMA_VERSION,
 }
 
 
@@ -276,10 +278,8 @@ def test_render_includes_scenario_data(tmp_path: Path) -> None:
                     {
                         'phase': 'given',
                         'narration': _narration('a thing'),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
                 'parameters': None,
@@ -310,15 +310,12 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
                     {
                         'phase': 'then',
                         'narration': _narration('check value'),
-                        'status': 'failed',
                         'children': [
                             {
                                 'phase': 'then',
                                 'narration': _narration('nested check'),
-                                'status': 'passed',
                                 'children': [],
                                 'attachments': [],
-                                'error': None,
                             }
                         ],
                         'attachments': [
@@ -327,11 +324,6 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
                                 'content': 'some log output',
                             }
                         ],
-                        'error': {
-                            'message': 'assert 1 == 2',
-                            'frames': [],
-                            'error_tail': '- 1\n+ 2',
-                        },
                     }
                 ],
                 'parameters': None,
@@ -403,10 +395,8 @@ def _parametrized_report() -> dict[str, object]:
                                 {'value': ' into shop'},
                             ],
                         ),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
                 'parameters': {
@@ -490,10 +480,8 @@ def test_render_grouped_placeholder_drops_format_spec_and_conversion(
                                 },
                             ],
                         ),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
             }
@@ -527,10 +515,8 @@ def test_render_plain_str_step_with_empty_parts_escapes_braces(
                     {
                         'phase': 'when',
                         'narration': _narration('config: {key: value}'),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
             }
@@ -570,10 +556,8 @@ def test_render_value_part_uses_value_highlight_class(tmp_path: Path) -> None:
                                 },
                             ],
                         ),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
             }
@@ -606,7 +590,6 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
                     {
                         'phase': 'then',
                         'narration': _narration('check'),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [
                             {
@@ -614,7 +597,6 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
                                 'content': '</script><script>alert(1)</script>',
                             }
                         ],
-                        'error': None,
                     }
                 ],
             }
@@ -1100,10 +1082,8 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
                                 },
                             ],
                         ),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
                 'parameters': {
@@ -1635,31 +1615,23 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
                             'Guest searches Room',
                             [
                                 {
-                                    'type': 'term_ref',
                                     'term_id': 'guest',
                                     'display': 'Guest',
-                                    'param_column': None,
                                 },
                                 {'value': ' '},
                                 {
-                                    'type': 'term_ref',
                                     'term_id': 'search',
                                     'display': 'searches',
-                                    'param_column': None,
                                 },
                                 {'value': ' '},
                                 {
-                                    'type': 'term_ref',
                                     'term_id': 'room',
                                     'display': 'Room',
-                                    'param_column': None,
                                 },
                             ],
                         ),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
                 'parameters': None,
@@ -1705,10 +1677,8 @@ def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
                                 {'term_id': 'guest', 'display': 'Guest'},
                             ],
                         ),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
                 'parameters': None,
@@ -1989,7 +1959,7 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                     'pins': [
                         {
                             'story_id': f'story{_BREAKOUT}',
-                            'sentence_id': f'act{_BREAKOUT}',
+                            'sentence_id': 1,
                         }
                     ],
                 }
@@ -2000,7 +1970,7 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                     'title': 'a story',
                     'sentences': [
                         {
-                            'id': f'act{_BREAKOUT}',
+                            'id': 1,
                             'clauses': [{'parts': [{'text': 'does a thing'}]}],
                         }
                     ],
@@ -2194,10 +2164,8 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
                                 {'term_id': 'room', 'display': 'Room'},
                             ],
                         ),
-                        'status': 'passed',
                         'children': [],
                         'attachments': [],
-                        'error': None,
                     }
                 ],
                 'parameters': None,

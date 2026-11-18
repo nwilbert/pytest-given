@@ -10,11 +10,11 @@ from ..citations import CitationsResult, check_citations, markdown_documents
 from ..model import (
     PytestGivenError,
     plural,
-    read_report_json,
-    report_from_dict,
+    read_report,
     resolve_report_url,
 )
 from ..report import DEFAULT_JSON_PATH
+from .arguments import JSON_REPORT_DEFAULT_HELP
 
 
 def add_citations_parser(
@@ -46,8 +46,7 @@ def add_citations_parser(
             type=Path,
             default=DEFAULT_JSON_PATH,
             help=(
-                'The JSON report of a run of every scenario (default: '
-                f'{DEFAULT_JSON_PATH.as_posix()}, where a bare --given-json writes it)'
+                f'The JSON report of a run of every scenario {JSON_REPORT_DEFAULT_HELP}'
             ),
         )
         verb_parser.add_argument(
@@ -91,7 +90,7 @@ def run_citations(args: argparse.Namespace) -> int:
     covering: list[str] = args.covering or []
     try:
         result = check_citations(
-            report_from_dict(read_report_json(report_file), report_file.as_posix()),
+            read_report(report_file),
             markdown_documents(args.documents),
             report_url=resolve_report_url(args.report_url, '--report-url'),
             report_path=args.report_path,

@@ -10,11 +10,14 @@ exception: hover picks its phrase from the cell's Boolean.
 import math
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
+from enum import Enum
 
 from ..capture import try_term_ref
 from ..model import (
     Attachment,
     AttachmentRef,
+    CapturedScenario,
+    CapturedStep,
     CellValue,
     ColumnId,
     ColumnKind,
@@ -28,8 +31,6 @@ from ..model import (
     ParameterTable,
     ParamValue,
     RawParamValue,
-    Scenario,
-    Step,
     boolean_phrases,
     iter_steps,
     param_id,
@@ -64,7 +65,10 @@ class ColumnBuilder:
     )
 
     def table(
-        self, cases: list[Scenario], narrated: list[ColumnId], custom: set[NodeId]
+        self,
+        cases: list[CapturedScenario],
+        narrated: list[ColumnId],
+        custom: set[NodeId],
     ) -> ParameterTable:
         """The finished table: the columns, and one row per case.
 
@@ -204,7 +208,9 @@ class ColumnBuilder:
         return candidate
 
 
-def narrated_column_order(narration: Narration, steps: list[Step]) -> list[ColumnId]:
+def narrated_column_order(
+    narration: Narration, steps: list[CapturedStep]
+) -> list[ColumnId]:
     """Column ids in the order a reader meets them: the scenario title, then
     each step's narration and attachments, depth-first."""
     order: dict[ColumnId, None] = {}
@@ -286,13 +292,16 @@ def _param_value(value: RawParamValue) -> ParamValue:
 
     A glossary term instance unwraps to its display: `str()` on one would store
     a dataclass repr of the whole `Glossary` in the table and the JSON report.
-    JSON primitives pass through; everything else is its `str()` — a
-    non-finite float included, which JSON has no literal for.
+    JSON primitives pass through, a subclass written as its plain value.
+    Everything else is its `str()`: an enum, whose plain value is not the text
+    the narration shows, and a non-finite float, which JSON has no literal for.
     """
     term_ref = try_term_ref(value)
     if term_ref is not None:
         return term_ref.display
-    if isinstance(value, float) and not math.isfinite(value):
+    if isinstance(value, Enum) or (
+        isinstance(value, float) and not math.isfinite(value)
+    ):
         return str(value)
     if value is None or isinstance(value, (str, int, float, bool)):
         return value

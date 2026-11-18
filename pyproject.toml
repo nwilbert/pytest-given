@@ -38,6 +38,8 @@ dependencies = [
     "jinja2>=3.1",
     "markdown-it-py>=3.0",
     "markupsafe>=2.0",
+    "pydantic>=2.12; python_version < '3.15'",
+    "pydantic>=2.14; python_version >= '3.15'",
 ]
 
 [project.urls]
@@ -58,7 +60,10 @@ nox = ["nox>=2026.4.10"]
 typecheck = ["mypy>=2.1.0", { include-group = "nox" }]
 coverage = ["coverage>=7.14.0"]
 # The suite's own: the xdist tests run inner pytester runs with `-n`.
-test = ["pytest-xdist>=3.8.0"]
+test = [
+    "jsonschema>=4.26.0",
+    "pytest-xdist>=3.8.0",
+]
 audit = ["pip-audit>=2.10.0"]
 # only for the example:
 bdd = ["pytest-bdd>=9.0.1"]

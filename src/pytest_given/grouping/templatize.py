@@ -10,6 +10,7 @@ so has nothing to be compared against.
 from dataclasses import replace
 
 from ..model import (
+    CapturedStep,
     CellValue,
     Narration,
     NarrationLiteral,
@@ -20,7 +21,6 @@ from ..model import (
     NodeId,
     ParameterColumn,
     RawParamValue,
-    Step,
     StepPath,
     boolean_phrases,
     param_id,
@@ -42,10 +42,10 @@ from .context import Format, PartSite
 
 
 def templatize_steps(
-    steps: list[Step], prefix: StepPath, builder: ColumnBuilder
-) -> list[Step]:
+    steps: list[CapturedStep], prefix: StepPath, builder: ColumnBuilder
+) -> list[CapturedStep]:
     """Walk the baseline tree, promoting anything that varies into a column."""
-    out: list[Step] = []
+    out: list[CapturedStep] = []
     for index, step in enumerate(steps):
         path = (*prefix, index)
         out.append(
@@ -60,7 +60,7 @@ def templatize_steps(
 
 
 def _templatize_step_narration(
-    step: Step, path: StepPath, builder: ColumnBuilder
+    step: CapturedStep, path: StepPath, builder: ColumnBuilder
 ) -> Narration:
     """The baseline step's narration with varying values promoted.
 

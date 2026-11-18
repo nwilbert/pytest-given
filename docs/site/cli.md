@@ -25,7 +25,7 @@ Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md
 
 With `--format md` and no `-o`, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no `<!-- pytest-given:md:start -->` markers; the plugin only adds them to separate the report from pytest's own output.
 
-`pytest-given report` exits 2 when it cannot read the JSON file, or cannot render or write the report. It also exits 2 when an option value is invalid, such as an unknown `--theme` or `--source-link` preset, or a `--report-url` that is not an absolute http(s) URL. With `--glossary-only`, it exits 2 for Markdown output, for a `--report-url`, and for a report without glossary terms.
+`pytest-given report` exits 2 when it cannot read the JSON file, or cannot render or write the report. It also exits 2 when an option value is invalid, such as an unknown `--theme` or `--source-link` preset, or a `--report-url` that is not an absolute http(s) URL. With `--glossary-only`, it exits 2 for Markdown output, for a `--report-url`, and for a report without glossary terms. A malformed report exits 2 with the path and reason of each problem. A report of another schema version exits 2 with one line saying to regenerate it. That includes every report written by pytest-given 0.6.0 or earlier.
 
 ## Citations
 
@@ -39,7 +39,7 @@ pytest-given citations update …   # same arguments
 
 A directory is searched recursively for `*.md`. Neither command runs tests: both read the JSON report of an earlier run, which must hold every scenario a document may cite (`pytest -m pytest_given --given-json`). `--report` defaults to `given-report/report-data.json`, where a bare `--given-json` writes it. `--report-url` defaults to the URL stored in the report (`--given-report-url`); `--report-path` names where the HTML report sits in the repository once your docs build has placed it, so relative links to it are read too.
 
-`check` writes nothing and exits 1 on any citation finding; `update` exits 1 when a citation finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, when neither a report URL nor a report path is known, or when no document links the report, as a mistyped URL or path would otherwise pass every document.
+`check` writes nothing and exits 1 on any citation finding; `update` exits 1 when a citation finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, when neither a report URL nor a report path is known, or when no document links the report, as a mistyped URL or path would otherwise pass every document. A malformed report and a report of another schema version count as unreadable.
 
 `check` takes two more options, which leave its summary and exit code as they are:
 
@@ -67,14 +67,32 @@ pytest-given delta given-report/delta-data.json [--html PATH]
 
 One input only re-renders, so `--json`, `--renames`, `--before-label`, `--after-label` and `--title` with one input are refused. Run the command from your current checkout, so it reads the current rename log.
 
-It prints a summary of the counts. It exits 0 whether or not anything changed, and 2 when it cannot build the delta. The [exit status](#exit-status) rule applies, and the command never exits 1. A report without the schema version of the pytest-given that compares it, a delta JSON of another delta schema version, a report where a delta JSON is expected (or the reverse), and a malformed rename log all exit 2. A report from a pytest-given that predates the schema version has none, so regenerate it.
+It prints a summary of the counts and exits 0 whether or not anything changed. It exits 2 when it cannot build the delta:
+
+- a report is not of the schema version of the pytest-given that compares it. That includes a report from a pytest-given that predates the schema version, so regenerate it.
+- a delta JSON is of another delta schema version.
+- a report is given where a delta JSON is expected, or the reverse.
+- a report or delta JSON is malformed. The message names the path and reason of each problem.
+- the rename log is malformed.
+
+## Coverage
+
+`pytest-given coverage` prints the [story coverage](guide/domain-storytelling.md#coverage-in-the-report) of a JSON report, as the Stories tab shows it:
+
+```bash
+pytest-given coverage [path/to/report-data.json]
+```
+
+It prints a JSON array to stdout, one record per sentence in story then sentence order: `story_id`, `sentence_id`, `tracked` (false for a sentence narration matching never reaches) and `scenario_ids`. The report defaults to `given-report/report-data.json`, where a bare `--given-json` writes it.
+
+It exits 1 when a tracked sentence has no scenario, and says on stderr how many. It exits 2 when it cannot read the report, under the same rules as `report`.
 
 ## Exit status
 
 Every subcommand uses the same codes, so a script can branch on the code alone:
 
 - `0` means there is nothing to act on. The command succeeded, and every citation or skill is current.
-- `1` means something to act on. A citation finding remains, or `skills install --check` finds drift. Fix it and run again.
+- `1` means something to act on. A citation finding remains, a tracked sentence has no scenario, or `skills install --check` finds drift. Fix it and run again.
 - `2` means the command could not do its job. A file could not be read or written, or a flag value was refused. The message goes to stderr.
 
 `report`, `delta` and a plain `skills install` never exit 1, since none reports findings.

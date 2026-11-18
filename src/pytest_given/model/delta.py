@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Final, Literal
 
 from .schema import (
+    SCHEMAS_URL,
     ColumnId,
     ColumnKind,
     Glossary,
@@ -20,10 +21,13 @@ from .schema import (
     Scenario,
     ScenarioIdentity,
     TermId,
+    schema_file_name,
 )
 from .step_tree import StepPath
 
-DELTA_SCHEMA_VERSION: Final = 1
+type DeltaSchemaVersion = Literal[1]
+DELTA_SCHEMA_VERSION: Final[DeltaSchemaVersion] = 1
+DELTA_SCHEMA_URL: Final = SCHEMAS_URL + schema_file_name('delta', DELTA_SCHEMA_VERSION)
 
 type Change = Literal['added', 'removed', 'changed']
 type ChangedPart = Literal[
@@ -50,20 +54,6 @@ CHANGED_PARTS: tuple[ChangedPart, ...] = (
     'parameters',
     'attachments',
 )
-SCENARIO_PAIRINGS: tuple[ScenarioPairing, ...] = ('rename-log', 'node-id', 'title')
-CASE_PAIRINGS: tuple[CasePairing, ...] = ('rename-log', 'case-id', 'values')
-COLUMN_PAIRINGS: tuple[ColumnPairing, ...] = ('name', 'values')
-TERM_PAIRINGS: tuple[TermPairing, ...] = ('rename-log', 'term-id')
-STEP_CHANGES: tuple[StepChange, ...] = ('equal', 'modified', 'added', 'removed')
-MARKS: tuple[Mark, ...] = ('equal', 'removed', 'added')
-LINE_CHANGES: tuple[LineChange, ...] = ('equal', 'modified', 'removed', 'added')
-ATTACHMENT_CHANGES: tuple[AttachmentChange, ...] = (
-    'equal',
-    'changed',
-    'added',
-    'removed',
-)
-SUGGESTION_OFS: tuple[SuggestionOf, ...] = ('scenario', 'case', 'term')
 # The mark a side's own words carry in a word diff.
 SIDE_MARK: Final[dict[Side, Literal['removed', 'added']]] = {
     'before': 'removed',
@@ -349,7 +339,7 @@ class DeltaMetadata:
     timestamp: str
     title: str | None = None
     kind: Literal['delta'] = 'delta'
-    schema_version: int = DELTA_SCHEMA_VERSION
+    schema_version: DeltaSchemaVersion = DELTA_SCHEMA_VERSION
 
 
 @dataclass(frozen=True, kw_only=True)

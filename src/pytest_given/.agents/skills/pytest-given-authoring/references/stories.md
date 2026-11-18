@@ -48,7 +48,7 @@ def test_select_suite(carol):
         ...
 ```
 
-Name a story in `stories=` only when a step can match or pin one of its sentences; a scenario that covers nothing in it is still listed under the story. Coverage is matched **step by step**: a sentence is covered when *one step's* term refs include all of the sentence's terms. Term refs spread over several steps don't add up. The Stories tab shows a coverage chip for each sentence, with the scenarios that touch it. The JSON report has the same result under `coverage[]` (see below).
+Name a story in `stories=` only when a step can match or pin one of its sentences; a scenario that covers nothing in it is still listed under the story. Coverage is matched **step by step**: a sentence is covered when *one step's* term refs include all of the sentence's terms. Term refs spread over several steps don't add up. The Stories tab shows a coverage chip for each sentence, with the scenarios that touch it. `pytest-given coverage` prints the same result (see below).
 
 What this means when you write:
 
@@ -57,7 +57,7 @@ What this means when you write:
 - **Two sentences are covered together when one's terms are a subset of the other's.** The test is "sentence terms ⊆ step terms". So a step that covers `organizer · adds · guest · booking` also covers an `organizer · adds · guest` sentence, whatever that sentence meant. Narration can never tell the two apart. When two sentences turn out nested like this, you have three options: give the narrower one a term the wider one lacks (a different activity usually works), merge them, or accept the shared chip. A pin on the covering step also separates them, because it reaches only the sentences it names.
 - **Adding a term to a sentence makes it harder to cover.** Every covering step then has to carry that term too. So editing a story can silently uncover a scenario that used to cover it. A pinned step is not affected.
 
-**Check coverage after you change a sentence or a covering step.** Read it from the `coverage[]` of `pytest <selection> --given-json=report.json` instead of working out the rule yourself. Its shape and the query for uncovered sentences are in the navigating skill's [report-json.md](../../pytest-given-navigating/references/report-json.md).
+**Check coverage after you change a sentence or a covering step.** Run `pytest <selection> --given-json=report.json`, then read it from `pytest-given coverage report.json` instead of working out the rule yourself. Its shape and the query for uncovered sentences are in the navigating skill's [report-json.md](../../pytest-given-navigating/references/report-json.md).
 
 A step can also **pin** sentences: `given(text, pins=book_a_group_trip['confirm'])` takes a sentence handle or a list of them. A pin *replaces* narration matching for that step: the step covers exactly the sentences the pin names, in any story. Only a pin can cover a sentence with fewer than two terms. Pin when the sentence is phrased at a higher level than the vocabulary the step narrates, such as a process-level sentence implemented by a technical test. Pin it on the one step that demonstrates it. `pins=[]` and `@scenario(pins=...)` are in [api.md](api.md).
 

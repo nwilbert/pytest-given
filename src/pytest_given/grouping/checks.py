@@ -17,6 +17,8 @@ from typing import NamedTuple
 
 from ..model import (
     AttachmentLabel,
+    CapturedScenario,
+    CapturedStep,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -28,8 +30,6 @@ from ..model import (
     Pin,
     PytestGivenError,
     RawParamValue,
-    Scenario,
-    Step,
     StepPath,
     boolean_phrases,
     case_suffix,
@@ -93,8 +93,8 @@ def check_same_template(group: Group) -> None:
 
 
 def _check_shared_steps(
-    case: Scenario,
-    baseline_steps: list[tuple[StepPath, Step]],
+    case: CapturedScenario,
+    baseline_steps: list[tuple[StepPath, CapturedStep]],
     baseline_keys: list[list[PartKey]],
     group: Group,
 ) -> None:
@@ -113,8 +113,8 @@ def _check_shared_steps(
 
 
 def _check_narration(
-    case: Scenario,
-    step: Step,
+    case: CapturedScenario,
+    step: CapturedStep,
     keys: list[PartKey],
     other: Narration,
     group: Group,
@@ -130,7 +130,7 @@ def _check_narration(
         raise _divergence_error(case, f'{difference} in its {step.phase} step', group)
 
 
-def _varying_str_error(step: Step, group: Group) -> PytestGivenError:
+def _varying_str_error(step: CapturedStep, group: Group) -> PytestGivenError:
     """Rule 1: a `str` narration whose rendered text varies across cases.
 
     A `str` records `parts == []` however it was built, so there is nothing to
@@ -148,7 +148,7 @@ def _varying_str_error(step: Step, group: Group) -> PytestGivenError:
     )
 
 
-def _varying_pins_error(case: Scenario, group: Group) -> PytestGivenError:
+def _varying_pins_error(case: CapturedScenario, group: Group) -> PytestGivenError:
     return _grouping_error(
         group,
         f'case {case_suffix(case.id)} of {_test_name(group.anchor)!r} gives a '
@@ -162,7 +162,7 @@ def _varying_pins_error(case: Scenario, group: Group) -> PytestGivenError:
 
 
 def _divergence_error(
-    case: Scenario, difference: str, group: Group
+    case: CapturedScenario, difference: str, group: Group
 ) -> PytestGivenError:
     return _grouping_error(
         group,
@@ -219,7 +219,7 @@ def check_rebound_params(group: Group) -> None:
         _check_case_params(scenario, group)
 
 
-def _check_case_params(scenario: Scenario, group: Group) -> None:
+def _check_case_params(scenario: CapturedScenario, group: Group) -> None:
     params = group.case_params[scenario.id]
     for step in group.indexed[scenario.id].values():
         for part in step.narration.parts:
@@ -277,14 +277,16 @@ def check_phrase_values(group: Group) -> None:
             _check_phrase_value(slot, case, group.case_params[case.id])
 
 
-def check_case_phrase_values(case: Scenario, params: dict[str, RawParamValue]) -> None:
+def check_case_phrase_values(
+    case: CapturedScenario, params: dict[str, RawParamValue]
+) -> None:
     """Rule 7 for one case. The per-case path holds every case to it, since each
     one's title and labels have to render."""
     for slot in _phrase_slots(case):
         _check_phrase_value(slot, case, params)
 
 
-def _phrase_slots(case: Scenario) -> list[NarrationPlaceholder]:
+def _phrase_slots(case: CapturedScenario) -> list[NarrationPlaceholder]:
     return [
         part
         for narration in iter_narrations(case)
@@ -295,7 +297,7 @@ def _phrase_slots(case: Scenario) -> list[NarrationPlaceholder]:
 
 
 def _check_phrase_value(
-    part: NarrationPlaceholder, case: Scenario, params: dict[str, RawParamValue]
+    part: NarrationPlaceholder, case: CapturedScenario, params: dict[str, RawParamValue]
 ) -> None:
     if part.name not in params:
         return
@@ -383,13 +385,13 @@ def _case_term_refs(site: PartSite, group: Group) -> Iterator[NarrationTermRef]:
 def _grouping_error(group: Group, body: str) -> PytestGivenError:
     """A rejected-form error, located the way a lint finding is.
 
-    A step-level anchor is not available: `Step.source` is captured only when
-    lint is enabled, and these rules must hold with lint off.
+    A step-level anchor is not available: a step's source is captured only
+    when lint is enabled, and these rules must hold with lint off.
     """
     return PytestGivenError(f'{body}{location_suffix(group.anchor.source)}')
 
 
-def _test_name(scenario: Scenario) -> str:
+def _test_name(scenario: CapturedScenario) -> str:
     return node_base(scenario.id).rpartition('::')[2]
 
 
@@ -412,7 +414,7 @@ class PartKey(NamedTuple):
     detail: Format | None = None
 
 
-def step_shape(indexed: Iterable[tuple[StepPath, Step]]) -> list[StepSignature]:
+def step_shape(indexed: Iterable[tuple[StepPath, CapturedStep]]) -> list[StepSignature]:
     """A case's tree reduced to what a grouped tree must share: where each step
     sits, its phase, and the sentences it claims.
 

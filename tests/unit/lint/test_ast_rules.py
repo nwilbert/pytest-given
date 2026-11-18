@@ -13,6 +13,7 @@ from pytest_given.lint import DEFAULTS
 from pytest_given.lint.ast_rules import run_ast_rules
 from pytest_given.lint.catalog import RawLintFinding, RuleId
 from pytest_given.model import (
+    CapturedStep,
     Narration,
     NarrationPlaceholder,
     NarrationTermRef,
@@ -20,7 +21,6 @@ from pytest_given.model import (
     NodeId,
     Scenario,
     SourceLocation,
-    Step,
     TermId,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -49,7 +49,7 @@ def test_ast_rules_parse_nothing_when_every_rule_is_off(tmp_path) -> None:
     )
     scenario_obj = _scenario(
         [
-            Step(
+            CapturedStep(
                 phase='given',
                 narration=Narration(text='a thing'),
                 source=SourceLocation(relpath='test_x.py', line=_line(src, 'pass')),
@@ -76,7 +76,7 @@ def _line(src: str, needle: str) -> int:
 
 
 def _step(phase, text, line, children=()):
-    return Step(
+    return CapturedStep(
         phase=phase,
         narration=Narration(text=text),
         children=list(children),

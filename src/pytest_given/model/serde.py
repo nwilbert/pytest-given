@@ -1,121 +1,38 @@
-"""ReportData ↔ JSON-shaped dict (de)serialization.
+"""ReportData ↔ JSON-shaped dict (de)serialization, both through `documents`.
 
-`report_to_dict` serializes a `ReportData` to a JSON-shaped dict, filtering
-out the two kinds of field that stay out of the report: underscore-prefixed
-ones (e.g. `_by_id` on `Glossary`) and any
-field marked `metadata={'serde_exclude': True}` — which is how `Step.source`
-opts out while keeping a name the lint call sites can read. The session
-capture a pytest-xdist worker sends keeps the excluded fields, since the lint
-on the main process reads `Step.source`.
-`report_from_dict` is the inverse; the renderer reads the JSON, calls it
-once, and operates on typed dataclasses from there.
-
-The non-trivial parts are the unions — narration parts, a case cell, a step
-attachment — each discriminated on read by the keys its variants do not share.
+The renderer reads the JSON, calls `report_from_dict` once, and operates on
+typed dataclasses from there.
 """
 
-import dataclasses
-import functools
+# Only reading or writing needs Pydantic; a session that does neither never
+# loads it.
+__lazy_modules__ = ['pytest_given.model.documents']
+
 import json
 from pathlib import Path
-from typing import Any, TypedDict, cast
 
-from .errors import PytestGivenError
-from .report_url import resolve_report_url
-from .schema import (
-    COLUMN_KINDS,
-    CONTENT_TYPES,
-    PHASES,
-    STATUSES,
-    TERM_KINDS,
-    Attachment,
-    AttachmentLabel,
-    AttachmentRef,
-    CellValue,
-    Clause,
-    ClausePart,
-    ClauseTermRef,
-    ClauseWord,
-    ColumnId,
-    Definition,
-    DefinitionPart,
-    ErrorCause,
-    ErrorInfo,
-    Glossary,
-    GlossaryTerm,
-    Metadata,
-    Narration,
-    NarrationLiteral,
-    NarrationPart,
-    NarrationPlaceholder,
-    NarrationTermRef,
-    NarrationValue,
-    NodeId,
-    ParameterCase,
-    ParameterColumn,
-    ParameterTable,
-    Pin,
-    ReportData,
-    Scenario,
-    Sentence,
-    SentenceId,
-    SentenceName,
-    SourceLocation,
-    Step,
-    StepAttachment,
-    Story,
-    StoryId,
-    TermId,
-    TermKind,
-    TracebackFrame,
+from .documents import (
+    ReportDocument,
+    SessionCaptureDocument,
+    dump_document,
+    load_document,
 )
+from .errors import PytestGivenError
+from .schema import REPORT_SCHEMA_VERSION, ReportData, Step
 from .session_capture import SessionCapture
 
 
-def report_to_dict(report: ReportData) -> JsonObject:
-    result = asdict_filtered(report)
-    assert isinstance(result, dict)
-    return result
+def report_to_dict[S: Step](report: ReportData[S]) -> JsonObject:
+    return dump_document(ReportDocument, report)
 
 
 def session_capture_to_dict(capture: SessionCapture) -> JsonObject:
-    result = asdict_filtered(capture, keep_excluded=True)
-    assert isinstance(result, dict)
-    return result
+    return dump_document(SessionCaptureDocument, capture)
 
 
-def session_capture_from_dict(d: dict[str, Any]) -> SessionCapture:
-    return SessionCapture(
-        scenarios=[scenario_from_dict(s) for s in d['scenarios']],
-        collection_index={
-            NodeId(node_id): index for node_id, index in d['collection_index'].items()
-        },
-        stories=[_story_from_dict(s) for s in d['stories']],
-        glossary=glossary_from_dict(d['glossary']),
-    )
-
-
-def asdict_filtered(obj: Any, *, keep_excluded: bool = False) -> Any:
-    """Recursively convert dataclasses to dicts, skipping underscore fields
-    and, unless `keep_excluded`, fields marked ``metadata={'serde_exclude': True}``."""
-    if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
-        return {
-            name: asdict_filtered(getattr(obj, name), keep_excluded=keep_excluded)
-            for name in _serialized_fields(type(obj), keep_excluded)
-        }
-    if isinstance(obj, (list, tuple)):
-        return [asdict_filtered(x, keep_excluded=keep_excluded) for x in obj]
-    return obj
-
-
-@functools.cache
-def _serialized_fields(cls: type, keep_excluded: bool) -> tuple[str, ...]:
-    """Cached: a report holds thousands of instances of a few classes."""
-    return tuple(
-        field.name
-        for field in dataclasses.fields(cls)
-        if not field.name.startswith('_')
-        and (keep_excluded or not field.metadata.get('serde_exclude'))
+def session_capture_from_dict(d: JsonObject) -> SessionCapture:
+    return load_document(
+        SessionCaptureDocument, SessionCapture, d, 'session capture', None
     )
 
 
@@ -124,42 +41,62 @@ def is_delta_dict(d: JsonObject) -> bool:
     return isinstance(metadata, dict) and metadata.get('kind') == 'delta'
 
 
-def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData:
-    """Rebuild a report from its serialized form.
-
-    A dict that is not one raises `PytestGivenError`, not the bare `KeyError`
-    or `TypeError` that reaching for a missing field produces. `source` names
-    where the dict came from, for the caller that read it from somewhere the
-    user can point at.
-    """
+def report_from_dict(d: JsonObject, source: str | None = None) -> ReportData:
+    """Rebuild a report from its serialized form, or raise `PytestGivenError`.
+    `source` names where the dict came from, for the caller that read it from
+    somewhere the user can point at."""
     if is_delta_dict(d):
         raise PytestGivenError(
             f'{source or "input"} is a delta report, not a report; '
             f'render it with `pytest-given delta {source or "<file>"}`.'
         )
-    try:
-        return ReportData(
-            metadata=metadata_from_dict(d['metadata'], source),
-            scenarios=[scenario_from_dict(s) for s in d['scenarios']],
-            stories=[_story_from_dict(s) for s in d.get('stories', [])],
-            glossary=glossary_from_dict(d.get('glossary')),
-        )
-    except (AttributeError, KeyError, TypeError) as error:
-        raise unreadable('report', source, error) from error
-
-
-def unreadable(kind: str, source: str | None, error: Exception) -> PytestGivenError:
-    return PytestGivenError(
-        f'{source + " is" if source else "input is"} not a pytest-given '
-        f'{kind}, or was written by an incompatible version '
-        f'({type(error).__name__}: {error}).'
+    refuse_another_schema_version(
+        d,
+        'report',
+        REPORT_SCHEMA_VERSION,
+        'Regenerate it by running the suite under this pytest-given.',
+        source,
     )
+    return load_document(ReportDocument, ReportData, d, 'report', source)
+
+
+def refuse_another_schema_version(
+    d: JsonObject, kind: str, current: int, remedy: str, source: str | None
+) -> None:
+    """One line for a document of another version, whose validation errors
+    would only list the fields the versions disagree on. A `metadata` that is
+    no object is left to validation to name."""
+    metadata = d.get('metadata')
+    if not isinstance(metadata, dict):
+        return
+    version = metadata.get('schema_version')
+    if is_schema_version(version, current):
+        return
+    named = 'no schema version' if version is None else f'schema version {version!r}'
+    raise PytestGivenError(
+        f'{source or "input"} is a {kind} of {named}; this pytest-given reads '
+        f'version {current}. {remedy}'
+    )
+
+
+def schema_version(d: JsonObject) -> JsonValue:
+    metadata = d.get('metadata')
+    return metadata.get('schema_version') if isinstance(metadata, dict) else None
+
+
+def is_schema_version(version: JsonValue, current: int) -> bool:
+    # `True == 1`, and validation would read `true` or `1.0` as version 1.
+    return type(version) is int and version == current
 
 
 type JsonValue = (
     str | int | float | bool | list[JsonValue] | dict[str, JsonValue] | None
 )
 type JsonObject = dict[str, JsonValue]
+
+
+def read_report(json_file: Path) -> ReportData:
+    return report_from_dict(read_report_json(json_file), json_file.as_posix())
 
 
 def read_report_json(json_file: Path) -> JsonObject:
@@ -179,307 +116,3 @@ def read_report_json(json_file: Path) -> JsonObject:
             'JSON object.'
         )
     return loaded
-
-
-def metadata_from_dict(d: dict[str, Any], source: str | None) -> Metadata:
-    return Metadata(
-        project=d['project'],
-        timestamp=d['timestamp'],
-        pytest_version=d['pytest_version'],
-        plugin_version=d['plugin_version'],
-        commit_sha=d.get('commit_sha'),
-        title=d.get('title'),
-        report_url=resolve_report_url(
-            d.get('report_url') or '',
-            f'metadata.report_url in {source or "the report"}',
-        ),
-        schema_version=d.get('schema_version'),
-    )
-
-
-def glossary_from_dict(d: dict[str, Any] | None) -> Glossary | None:
-    if d is None:
-        return None
-    return Glossary(
-        terms=[glossary_term_from_dict(t) for t in d.get('terms', [])],
-    )
-
-
-def glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
-    return GlossaryTerm(
-        id=TermId(d['id']),
-        kind=_term_kind(d['kind']),
-        canonical=d['canonical'],
-        definition=_definition_from_dict(d.get('definition')),
-        source=_source_from_dict(d.get('source')),
-        section=d.get('section'),
-        avoid=tuple(d.get('avoid', ())),
-    )
-
-
-def _definition_from_dict(definition: dict[str, Any] | None) -> Definition | None:
-    if definition is None:
-        return None
-    return Definition(
-        definition['text'],
-        tuple(_definition_part_from_dict(part) for part in definition['parts']),
-    )
-
-
-def _definition_part_from_dict(part_dict: dict[str, Any]) -> DefinitionPart:
-    part = narration_part_from_dict(part_dict)
-    if isinstance(part, NarrationLiteral | NarrationTermRef):
-        return part
-    raise PytestGivenError(
-        f'invalid definition part (keys: {sorted(part_dict)!r}) in JSON report; '
-        'expected a literal or a term ref.'
-    )
-
-
-def _source_from_dict(d: dict[str, Any] | None) -> SourceLocation | None:
-    """The optional `source` a term, story, or scenario carries."""
-    if d is None:
-        return None
-    return SourceLocation(relpath=d['relpath'], line=d['line'])
-
-
-def _story_from_dict(d: dict[str, Any]) -> Story:
-    return Story(
-        id=StoryId(d['id']),
-        title=d['title'],
-        sentences=tuple(
-            _sentence_from_dict(sentence) for sentence in d.get('sentences', [])
-        ),
-        source=_source_from_dict(d.get('source')),
-    )
-
-
-def _sentence_from_dict(d: dict[str, Any]) -> Sentence:
-    return Sentence(
-        id=SentenceId(d['id']),
-        clauses=tuple(_clause_from_dict(p) for p in d.get('clauses', [])),
-        name=SentenceName(d['name']) if d.get('name') is not None else None,
-    )
-
-
-def _clause_from_dict(d: dict[str, Any]) -> Clause:
-    return Clause(
-        parts=tuple(_clause_part_from_dict(p) for p in d.get('parts', [])),
-    )
-
-
-def _clause_part_from_dict(d: dict[str, Any]) -> ClausePart:
-    if 'term_id' in d:
-        return ClauseTermRef(term_id=TermId(d['term_id']), display=d['display'])
-    if 'text' in d:
-        return ClauseWord(text=d['text'])
-    raise PytestGivenError(
-        f'unknown ClausePart shape (keys: {sorted(d)!r}). Expected one of '
-        '"term_id", "text".'
-    )
-
-
-def scenario_from_dict(d: dict[str, Any]) -> Scenario:
-    status = literal(d.get('status', 'passed'), STATUSES, 'scenario status')
-    return Scenario(
-        id=NodeId(d['id']),
-        narration=_narration_from_dict(d['narration']),
-        module=d['module'],
-        tags=list(d.get('tags', [])),
-        status=status,
-        duration_ms=d.get('duration_ms', 0),
-        steps=[_step_from_dict(s) for s in d.get('steps', [])],
-        parameters=_param_table_from_dict(d.get('parameters')),
-        error=_error_from_dict(d.get('error')),
-        skip_reason=d.get('skip_reason'),
-        xfail_reason=d.get('xfail_reason'),
-        source=_source_from_dict(d.get('source')),
-        story_ids=tuple(StoryId(story_id) for story_id in d.get('story_ids') or ()),
-        pins=_pins_from_list(d.get('pins')),
-    )
-
-
-def _step_from_dict(d: dict[str, Any]) -> Step:
-    phase = literal(d['phase'], PHASES, 'step phase')
-    return Step(
-        phase=phase,
-        narration=_narration_from_dict(d['narration']),
-        children=[_step_from_dict(c) for c in d.get('children', [])],
-        attachments=[_step_attachment_from_dict(a) for a in d.get('attachments', [])],
-        pins=_pins_from_list(d.get('pins')),
-        fixture_name=d.get('fixture_name'),
-        # Only a session capture carries it; a JSON report never does.
-        source=_source_from_dict(d.get('source')),
-    )
-
-
-class _PinDict(TypedDict):
-    story_id: str
-    sentence_id: int
-
-
-def _pins_from_list(items: list[_PinDict] | None) -> tuple[Pin, ...] | None:
-    """`null` is "not pinned", distinct from `[]`, which pins nothing."""
-    if items is None:
-        return None
-    return tuple(
-        Pin(
-            story_id=StoryId(item['story_id']),
-            sentence_id=SentenceId(item['sentence_id']),
-        )
-        for item in items
-    )
-
-
-def _step_attachment_from_dict(d: dict[str, Any]) -> StepAttachment:
-    """A promoted attachment carries no `content` — only a pointer to its column."""
-    if 'content' in d:
-        return _attachment_from_dict(d)
-    content_type = literal(
-        d.get('content_type', 'text'), CONTENT_TYPES, 'attachment content type'
-    )
-    return AttachmentRef(
-        label=d['label'],
-        content_type=content_type,
-        column_id=ColumnId(d['column_id']),
-    )
-
-
-def _attachment_from_dict(d: dict[str, Any]) -> Attachment:
-    content_type = literal(
-        d.get('content_type', 'text'), CONTENT_TYPES, 'attachment content type'
-    )
-    return Attachment(
-        label=AttachmentLabel(d['label']),
-        content=d['content'],
-        content_type=content_type,
-    )
-
-
-def _error_from_dict(d: dict[str, Any] | None) -> ErrorInfo | None:
-    if d is None:
-        return None
-    return ErrorInfo(
-        message=d['message'],
-        frames=[_frame_from_dict(f) for f in d.get('frames', [])],
-        error_tail=d.get('error_tail'),
-        causes=[
-            ErrorCause(
-                frames=[_frame_from_dict(f) for f in cause['frames']],
-                error_tail=cause['error_tail'],
-                connector=cause['connector'],
-            )
-            for cause in d.get('causes', [])
-        ],
-    )
-
-
-def _frame_from_dict(d: dict[str, Any]) -> TracebackFrame:
-    return TracebackFrame(
-        path=d['path'],
-        lineno=d['lineno'],
-        func=d['func'],
-        code=d['code'],
-        is_internal=d['is_internal'],
-    )
-
-
-def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
-    if d is None:
-        return None
-    return ParameterTable(
-        columns=[_param_column_from_dict(c) for c in d['columns']],
-        cases=[_param_case_from_dict(c) for c in d.get('cases', [])],
-    )
-
-
-def literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
-    """`value` as one of `allowed`, or a `PytestGivenError` naming the field.
-
-    The `Status` / `Phase` / `TermKind` / `ColumnKind` annotations are erased at
-    runtime, so this is what stops a hand-edited report from reaching a
-    renderer's lookup table with an unknown string.
-    """
-    if value in allowed:
-        return cast('T', value)
-    raise PytestGivenError(
-        f'invalid {field} {value!r} in JSON report; expected one of '
-        f'{", ".join(repr(option) for option in allowed)}.'
-    )
-
-
-def _term_kind(value: object) -> TermKind | None:
-    """A glossary term's kind, which is legitimately absent while deferred."""
-    return None if value is None else literal(value, TERM_KINDS, 'glossary term kind')
-
-
-def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
-    kind = literal(d['kind'], COLUMN_KINDS, 'parameter column kind')
-    return ParameterColumn(id=ColumnId(d['id']), name=d['name'], kind=kind)
-
-
-def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
-    status = literal(d.get('status', 'passed'), STATUSES, 'parameter case status')
-    return ParameterCase(
-        id=NodeId(d['id']),
-        values=[_cell_from_json(v) for v in d['values']],
-        status=status,
-        error=_error_from_dict(d.get('error')),
-        custom_id=_bool(d['custom_id'], 'custom_id'),
-    )
-
-
-def _bool(value: object, field: str) -> bool:
-    """`value` as a bool: a hand-edited `"false"` would otherwise read as true."""
-    if isinstance(value, bool):
-        return value
-    raise PytestGivenError(
-        f'invalid {field} {value!r} in JSON report; expected a bool.'
-    )
-
-
-def _cell_from_json(value: Any) -> CellValue:
-    """An object cell is an attachment payload; anything else is a scalar."""
-    if isinstance(value, dict):
-        return _attachment_from_dict(value)
-    scalar: CellValue = value
-    return scalar
-
-
-def _narration_from_dict(d: dict[str, Any]) -> Narration:
-    return Narration(
-        text=d['text'],
-        parts=tuple(narration_part_from_dict(p) for p in d.get('parts', [])),
-    )
-
-
-def narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
-    """Discriminate by unique key: `value` → Literal, `term_id` → TermRef,
-    `rendered` → Value, `name` → Placeholder. Unknown shapes are a
-    serialization bug; raise."""
-    if 'value' in d:
-        return NarrationLiteral(value=d['value'])
-    if 'term_id' in d:
-        return NarrationTermRef(
-            term_id=TermId(d['term_id']),
-            display=d['display'],
-            expression=d.get('expression', ''),
-        )
-    if 'rendered' in d:
-        return NarrationValue(
-            rendered=d['rendered'],
-            expression=d['expression'],
-            format_spec=d.get('format_spec', ''),
-            conversion=d.get('conversion'),
-        )
-    if 'name' in d:
-        return NarrationPlaceholder(
-            name=d['name'],
-            column_id=ColumnId(d['column_id']),
-            format_spec=d.get('format_spec', ''),
-            conversion=d.get('conversion'),
-        )
-    raise PytestGivenError(
-        f'Unknown narration part shape (keys: {sorted(d)!r}). Expected one of '
-        '"value", "rendered", "name", or "term_id".'
-    )

@@ -10,14 +10,14 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 
 from ..model import (
+    CapturedScenario,
+    CapturedStep,
     NarrationPart,
     NodeId,
     ParamInfo,
     PartIndex,
     Phase,
     RawParamValue,
-    Scenario,
-    Step,
     StepPath,
     walk_steps,
 )
@@ -45,18 +45,18 @@ class PartSite:
 class Group:
     """One parametrized test's cases, and everything derived from them."""
 
-    cases: list[Scenario]
+    cases: list[CapturedScenario]
     param_names: list[str]
     # The case a grouped scenario takes its identity from: the first, so the
     # report keeps the file's declaration order.
-    anchor: Scenario
+    anchor: CapturedScenario
     # The case whose tree defines the shared structure the walk templatizes.
-    baseline: Scenario
+    baseline: CapturedScenario
     # The passed cases — every one of them. Rule 6 has already refused a group
     # whose passed cases narrate different templates, so positional comparison
     # is safe by construction. A non-passed case drops out: a skipped one
     # records no steps and a failed one may abort mid-tree.
-    comparable: list[Scenario]
+    comparable: list[CapturedScenario]
     # Each case's raw parametrize arguments by name. A `Template` slot — in a
     # step or in the scenario title — records no per-case rendering to compare
     # against, so what it renders has to be recomputed from these; see
@@ -64,7 +64,7 @@ class Group:
     case_params: dict[NodeId, dict[str, RawParamValue]]
     # Each case's tree keyed by position, so "the same position in every other
     # case" is a lookup rather than a parallel descent through several trees.
-    indexed: dict[NodeId, dict[StepPath, Step]]
+    indexed: dict[NodeId, dict[StepPath, CapturedStep]]
 
     def parts_at(self, site: PartSite) -> Iterator[tuple[NodeId, NarrationPart]]:
         """Each comparable case's narration part at the baseline's position.
@@ -79,7 +79,7 @@ class Group:
             yield case.id, step.narration.parts[site.index]
 
 
-def build_group(cases: list[Scenario], param_info: ParamInfo) -> Group:
+def build_group(cases: list[CapturedScenario], param_info: ParamInfo) -> Group:
     comparable = [case for case in cases if case.status == 'passed']
     return Group(
         cases=cases,
@@ -92,7 +92,9 @@ def build_group(cases: list[Scenario], param_info: ParamInfo) -> Group:
     )
 
 
-def _baseline(cases: list[Scenario], comparable: list[Scenario]) -> Scenario:
+def _baseline(
+    cases: list[CapturedScenario], comparable: list[CapturedScenario]
+) -> CapturedScenario:
     """The first passed case; failing that, the first case that recorded a
     tree; failing that, `cases[0]`.
 

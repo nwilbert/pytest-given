@@ -18,15 +18,22 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `metadata.schema_version` in the JSON report, bumped with every change to the report's shape.
 - `pytest-given delta BEFORE.json AFTER.json` writes a delta report — the added, removed and changed scenarios and glossary terms between two JSON reports — with a `given-renames.toml` rename log for renamed tests and terms.
 - The `pytest-given-delta` agent skill: building a delta between two commits and recording renames in `given-renames.toml`.
+- A malformed JSON report or delta is refused with the path and reason of each problem.
+- JSON Schemas for the report and the delta are published on the documentation site, and every written report and delta names its schema under a top-level `$schema` key.
+- `pytest-given coverage` prints which scenarios cover each story sentence of a JSON report, and exits 1 when a tracked sentence has none.
 
 ### Changed
 
+- pytest-given now depends on Pydantic 2.12 or later.
+- **Breaking.** `pytest-given report` and `pytest-given citations` refuse a JSON report of another schema version or with an unknown key, which includes every report written by 0.6.0 or earlier. Regenerate the report under the current pytest-given.
+- **Breaking.** The JSON report has no top-level `coverage` section. Read story coverage from `pytest-given coverage report.json` instead.
 - The HTML report's browser tab and the Markdown report's heading show only the report's title, without "pytest-given".
 - The `pytest-given-authoring` skill asks for attachment content that is the same on every run.
 - `pytest-given report` now removes the previous output when its input can't be read, as it already did when rendering failed.
 
 ### Fixed
 
+- A `str` or `int` enum parametrize value shows in the parameter table, the JSON report and a re-rendered report as the narration renders it, not as its plain value.
 - A test session writing a report no longer crashes on a git remote URL that the system's locale encoding can't decode.
 - `pytest-given report` refuses an `-o` path that is its input file, which a failed render could delete.
 

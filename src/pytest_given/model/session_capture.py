@@ -4,7 +4,7 @@ pytest-xdist worker sends the main process. Never part of `ReportData`."""
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from .schema import Glossary, NodeId, Scenario, Story, StoryId
+from .schema import CapturedScenario, Glossary, NodeId, Story, StoryId
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -13,7 +13,7 @@ class SessionCapture:
     holds each one's position as collected, for the order's last tie-break.
     """
 
-    scenarios: list[Scenario]
+    scenarios: list[CapturedScenario]
     collection_index: dict[NodeId, int]
     stories: list[Story]
     glossary: Glossary | None

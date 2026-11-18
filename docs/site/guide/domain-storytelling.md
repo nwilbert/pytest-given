@@ -85,7 +85,7 @@ A step covers a sentence when the step's text mentions every glossary term in th
 
 The Stories tab shows each story as a timeline of its sentences. Each sentence has a coverage chip and lists the scenarios that cover it. Select a sentence and choose *Open in Scenarios* to see only those scenarios. Below the timeline, the story's scenarios open in place to show their steps, and selecting sentences shows only the scenarios covering one of them. Every story you declare appears in the tab, even if no scenario covers it.
 
-The JSON report contains the same data under the top-level `coverage` key.
+`pytest-given coverage` prints the same data from a JSON report (see [Standalone CLI](../cli.md#coverage)).
 
 Story coverage helps a reader find the scenarios behind a part of the flow, and see the flow behind a scenario. It is not a measure of how completely the suite tests the system: a covered sentence means a step talks about it, not that its behavior is tested. To ask what the scenarios exercise, measure the code coverage of [`-m pytest_given`](../configuration/pytest-options.md#selecting-scenarios).
 

@@ -1,5 +1,5 @@
 """The Stories view's rollups: which sentences each scenario covers, and the
-per-story tallies the Stories tab and the JSON `coverage` section read.
+per-story tallies the Stories tab reads.
 """
 
 from dataclasses import dataclass, field
@@ -116,8 +116,8 @@ def scenarios_by_story(
 
 
 class CoverageRecord(TypedDict):
-    """One sentence's coverage as the JSON report carries it, under the
-    top-level `coverage` key — in story then sentence order."""
+    """One sentence's coverage as `pytest-given coverage` prints it, in story
+    then sentence order."""
 
     story_id: StoryId
     sentence_id: SentenceId
@@ -126,8 +126,8 @@ class CoverageRecord(TypedDict):
 
 
 def build_coverage_records(report: ReportData) -> list[CoverageRecord]:
-    """Built from the rollups the Stories tab renders, so the JSON and the
-    HTML cannot disagree on what is covered."""
+    """Built from the rollups the Stories tab renders, so the printed coverage
+    and the HTML cannot disagree on what is covered."""
     rollups = build_story_rollups(report, build_coverage_map(report))
     return [
         CoverageRecord(

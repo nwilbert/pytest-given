@@ -1,16 +1,18 @@
 # Story coverage from the JSON report
 
-`--given-md` has no Stories section, and the Stories tab is HTML. So read coverage from the top-level `coverage[]` of the JSON report, and don't recompute it from `steps[]`. Its shape and the query for uncovered sentences are in the navigating skill's [report-json.md](../../pytest-given-navigating/references/report-json.md). Review adds two queries:
+`--given-md` has no Stories section, and the Stories tab is HTML. So read coverage with `pytest-given coverage`, and don't recompute it from `steps[]`. Its shape and the query for uncovered sentences are in the navigating skill's [report-json.md](../../pytest-given-navigating/references/report-json.md). Review adds two queries:
 
 ```bash
 pytest <selection> --given-json=report.json
+# exits 1 when a tracked sentence is uncovered, after writing the file
+pytest-given coverage report.json > coverage.json || true
 
 # untracked sentences: the report can say nothing about them
-jq -r '.coverage[] | select(.tracked | not)
-       | .story_id + "#" + (.sentence_id|tostring)' report.json
+jq -r '.[] | select(.tracked | not)
+       | .story_id + "#" + (.sentence_id|tostring)' coverage.json
 
 # scenarios that name a story yet cover none of its sentences
-jq -r '[.coverage[].scenario_ids[]] as $covering
+jq -r --slurpfile coverage coverage.json '[$coverage[0][].scenario_ids[]] as $covering
        | .scenarios[] | select(.story_ids != [] and (.id | IN($covering[]) | not))
        | .id' report.json
 ```
@@ -24,9 +26,9 @@ The matching rule is in the authoring skill's [stories.md](../../pytest-given-au
 - **A pin is a claim that no narration backs.** A scenario pin even covers its sentence when the test fails early or is skipped. Check that the test body really exercises each pinned sentence, for scenario pins and step pins alike. Report a pin whose sentence the body never touches. If a sentence is covered mostly by scenarios pinned to it for lack of a better sentence, it has become a catch-all: the story is missing the sentence those scenarios demonstrate. Coverage is mainly a way to navigate from a sentence to its scenarios, and a catch-all sends the reader to scenarios about something else. To spot one, list each sentence's scenarios with how they cover it, and read the pinned titles against the sentence:
 
   ```bash
-  jq -r '
+  jq -r --slurpfile coverage coverage.json '
     .scenarios as $all
-    | .coverage[] | . as $c
+    | $coverage[0][] | . as $c
     | .scenario_ids[] as $id
     | ($all[] | select(.id == $id)) as $s
     | ([($s.pins // [])[], ($s.steps | .. | objects | .pins? // empty | .[])]

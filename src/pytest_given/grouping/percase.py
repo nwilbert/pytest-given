@@ -10,14 +10,14 @@ from dataclasses import replace
 
 from ..capture import resolved_placeholder_part
 from ..model import (
+    CapturedScenario,
+    CapturedStep,
     Narration,
     NarrationPart,
     NarrationPlaceholder,
     ParamInfo,
     ParamSpec,
     RawParamValue,
-    Scenario,
-    Step,
     placeholder_mismatch,
     rebuilt,
     with_case_id,
@@ -25,7 +25,9 @@ from ..model import (
 from .checks import check_case_phrase_values
 
 
-def per_case_scenarios(cases: list[Scenario], param_info: ParamInfo) -> list[Scenario]:
+def per_case_scenarios(
+    cases: list[CapturedScenario], param_info: ParamInfo
+) -> list[CapturedScenario]:
     """Each case of an opted-out group as its own scenario, titled by its
     parametrize id.
 
@@ -40,7 +42,7 @@ def per_case_scenarios(cases: list[Scenario], param_info: ParamInfo) -> list[Sce
     ]
 
 
-def _substituted(scenario: Scenario, spec: ParamSpec) -> Scenario:
+def _substituted(scenario: CapturedScenario, spec: ParamSpec) -> CapturedScenario:
     """The case with every placeholder — in its name and in its steps — filled
     from its own parameters."""
     params = spec.mapping()
@@ -53,8 +55,8 @@ def _substituted(scenario: Scenario, spec: ParamSpec) -> Scenario:
 
 
 def _substituted_steps(
-    steps: list[Step], params: dict[str, RawParamValue]
-) -> list[Step]:
+    steps: list[CapturedStep], params: dict[str, RawParamValue]
+) -> list[CapturedStep]:
     return [
         replace(
             step,

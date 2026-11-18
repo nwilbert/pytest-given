@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from ..markdown import unwrapped_text
 from ..model import (
     PHASES,
+    CapturedScenario,
     ClauseTermRef,
     ClauseWord,
     Definition,
@@ -19,7 +20,6 @@ from ..model import (
     NarrationTermRef,
     NarrationValue,
     NodeId,
-    Scenario,
     SourceLocation,
     Story,
     TermId,
@@ -45,7 +45,7 @@ from .catalog import (
 
 
 def run_runtime_rules(
-    grouped: list[Scenario],
+    grouped: list[CapturedScenario],
     glossary: Glossary | None,
     stories: list[Story],
     enabled: Container[RuleId],
@@ -66,7 +66,7 @@ class _Context:
     """What every runtime rule reads. `glossary` is None when the run has no
     glossary at all, which the term rules treat as nothing to say."""
 
-    grouped: list[Scenario]
+    grouped: list[CapturedScenario]
     glossary: Glossary | None
     stories: list[Story]
 
@@ -314,7 +314,7 @@ def _spaced(key: str) -> str:
 _SEPARATOR = r'[\s-]+'
 
 
-def _scenario_texts(scenario: Scenario) -> Iterator[_Text]:
+def _scenario_texts(scenario: CapturedScenario) -> Iterator[_Text]:
     yield from _narration_texts('scenario title', scenario.source, scenario.narration)
     for step in iter_steps(scenario.steps):
         yield from _narration_texts('step text', step.source, step.narration)

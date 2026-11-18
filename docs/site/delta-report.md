@@ -125,3 +125,7 @@ A malformed log exits 2 and names the entry. Malformed means:
 An entry that is well formed but does not apply is not an error.
 
 A working directory without `given-renames.toml` is no error. `--renames` naming a file that does not exist is.
+
+## JSON schema
+
+The delta JSON follows a published [JSON Schema](schemas/delta-v1.schema.json) and names it under a top-level `$schema` key. `metadata.schema_version` holds the delta's version. `pytest-given delta` re-renders only a delta of its own version. It refuses another with one line saying to build it again from its two reports.

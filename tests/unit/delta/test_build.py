@@ -535,6 +535,17 @@ def test_a_before_report_at_another_schema_version_is_refused() -> None:
         )
 
 
+def test_a_boolean_schema_version_is_no_version_one() -> None:
+    boolean = _versioned_dict(REPORT_SCHEMA_VERSION)
+    metadata = boolean['metadata']
+    assert isinstance(metadata, dict)
+    metadata['schema_version'] = True
+    with pytest.raises(PytestGivenError, match='report schema version True'):
+        check_schema_versions(
+            boolean, _versioned_dict(REPORT_SCHEMA_VERSION), 'a.json', 'b.json'
+        )
+
+
 def test_a_report_without_metadata_counts_as_no_schema_version() -> None:
     with pytest.raises(PytestGivenError, match='report schema version none'):
         check_schema_versions(

@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING, Literal, NoReturn
 from ..model import (
     Attachment,
     AttachmentLabel,
+    CapturedScenario,
+    CapturedStep,
     ContentType,
     ErrorInfo,
     Narration,
@@ -24,7 +26,6 @@ from ..model import (
     Scenario,
     SourceLocation,
     Status,
-    Step,
     StoryId,
 )
 from .source import PACKAGE_ROOT
@@ -56,8 +57,8 @@ class FixtureRecording:
     `with given(...)` inside the body works.
     """
 
-    root: Step
-    stack: list[Step] = field(default_factory=list)
+    root: CapturedStep
+    stack: list[CapturedStep] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if not self.stack:
@@ -134,9 +135,9 @@ class Collector:
         # Whether steps record their body's source anchor (narration lint
         # only); off is the zero-cost default — no frame walking happens.
         self.capture_step_source = capture_step_source
-        self._scenarios: dict[NodeId, Scenario] = {}
-        self._current_scenario: Scenario | None = None
-        self._step_stack: list[Step] = []
+        self._scenarios: dict[NodeId, CapturedScenario] = {}
+        self._current_scenario: CapturedScenario | None = None
+        self._step_stack: list[CapturedStep] = []
         # When the active scenario's clock was started, or None before it is.
         # A single slot rather than a dict keyed by node ID: scenarios never
         # overlap.
@@ -170,7 +171,7 @@ class Collector:
         return self._current_scenario.id
 
     @property
-    def scenarios(self) -> list[Scenario]:
+    def scenarios(self) -> list[CapturedScenario]:
         return list(self._scenarios.values())
 
     @property
@@ -221,7 +222,7 @@ class Collector:
         status: Status,
         skip_reason: str | None = None,
         xfail_reason: str | None = None,
-    ) -> Scenario:
+    ) -> CapturedScenario:
         """Close the active scenario and return it.
 
         The duration is what `begin_timing` measured — including for a
@@ -296,7 +297,7 @@ class Collector:
 
     def graft_recording(
         self,
-        root: Step,
+        root: CapturedStep,
         *,
         annotation: StepDescriptor | None = None,
     ) -> None:
@@ -327,7 +328,7 @@ class Collector:
         """
         assert self._current_scenario is not None
         self._current_scenario.steps.append(
-            Step(phase='given', narration=narration, pins=pins)
+            CapturedStep(phase='given', narration=narration, pins=pins)
         )
 
     def push_step(
@@ -337,7 +338,7 @@ class Collector:
         *,
         pins: tuple[Pin, ...] | None = None,
         source: SourceLocation | None = None,
-    ) -> Step:
+    ) -> CapturedStep:
         if not self.recording:
             self.refuse_recording(f"record '{phase}: {narration.text}'")
         stack = self._target_stack()
@@ -347,7 +348,7 @@ class Collector:
                 ' — close the open step first, or call a helper without a '
                 'phase decorator'
             )
-        step = Step(phase=phase, narration=narration, pins=pins, source=source)
+        step = CapturedStep(phase=phase, narration=narration, pins=pins, source=source)
         if stack:
             stack[-1].children.append(step)
         else:
@@ -362,7 +363,7 @@ class Collector:
         stack.append(step)
         return step
 
-    def pop_step(self) -> Step | None:
+    def pop_step(self) -> CapturedStep | None:
         stack = self._target_stack()
         if not stack:
             return None
@@ -415,7 +416,7 @@ class Collector:
             )
         raise _no_scenario_error(action)
 
-    def _target_stack(self) -> list[Step]:
+    def _target_stack(self) -> list[CapturedStep]:
         if self._state == 'fixture_setup' and self._active_recording is not None:
             return self._active_recording.stack
         return self._step_stack
@@ -471,7 +472,7 @@ class Collector:
         if scenario.xfail_reason is None:
             scenario.xfail_reason = reason
 
-    def _scenario_for(self, node_id: NodeId) -> Scenario | None:
+    def _scenario_for(self, node_id: NodeId) -> CapturedScenario | None:
         if self._current_scenario is not None and self._current_scenario.id == node_id:
             return self._current_scenario
         return self._scenarios.get(node_id)

@@ -2,7 +2,7 @@ import json
 
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.cli import main
-from pytest_given.model import read_report_json, report_from_dict
+from pytest_given.model import read_report
 from pytest_given.report.glossary_view import build_glossary_view
 from pytest_given.report.html_renderer import _app_data
 from tests.ubiquitous_language import pg
@@ -146,7 +146,7 @@ def test_saved_json_rerenders_sections_and_avoid(pytester):
         html_path = pytester.path / 'report.html'
     with when(t'it runs with --given-json and the {pg["Report"].l} is re-rendered'):
         result = pytester.runpytest_subprocess('--given-json', str(json_path))
-        report = report_from_dict(read_report_json(json_path))
+        report = read_report(json_path)
         exit_code = main(['report', str(json_path), '-o', str(html_path)])
     with then('the run passes and the re-render succeeds'):
         result.assert_outcomes(passed=1)

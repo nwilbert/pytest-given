@@ -104,24 +104,34 @@ def test(session: nox.Session) -> None:
 )
 def compat(session: nox.Session, pytest_version: str) -> None:
     """Run the suite on every supported Python against pytest 9.0.x and the newest,
-    with the oldest supported markdown-it-py and the newest alike.
+    with the oldest supported markdown-it-py and Pydantic and the newest alike.
 
-    `latest` installs the newest releases rather than trusting the lock, which
-    only moves on `uv lock --upgrade`. pytest 9.0 predates the `max_warnings`
-    option, so there an unknown-option warning replaces the warnings gate.
+    Pydantic's oldest is per Python, as `pyproject.toml` declares it: 2.12 for
+    3.14, 2.14 for 3.15. `latest` installs the newest releases rather than trusting the
+    lock, which only moves on `uv lock --upgrade`. pytest 9.0 predates the
+    `max_warnings` option, so there an unknown-option warning replaces the
+    warnings gate.
     """
     _sync(session, 'test', include_project=True)
     if pytest_version == 'latest':
         installs = [
             'pytest',
             'markdown-it-py',
+            'pydantic',
             '--upgrade-package',
             'pytest',
             '--upgrade-package',
             'markdown-it-py',
+            '--upgrade-package',
+            'pydantic',
         ]
     else:
-        installs = [f'pytest~={pytest_version}.0', 'markdown-it-py~=3.0.0']
+        oldest_pydantic = {'3.14': '2.12.0', '3.15': '2.14.0'}[str(session.python)]
+        installs = [
+            f'pytest~={pytest_version}.0',
+            'markdown-it-py~=3.0.0',
+            f'pydantic~={oldest_pydantic}',
+        ]
     session.run('uv', 'pip', 'install', *installs, external=True)
     session.run('pytest')
 
@@ -919,6 +929,47 @@ def _rerender_kept_deltas(session: nox.Session) -> None:
                 session.log(
                     f'{delta_json.name} is unreadable: its HTML keeps its last render'
                 )
+
+
+@nox.session
+def schemas(session: nox.Session) -> None:
+    """Write the current versions' JSON Schemas under `docs/site/schemas/`.
+
+    Never deletes an older version's file: the site keeps serving the schema
+    every report of that version names. Refuses to change an existing file,
+    which would make it describe JSON its version's reports lack, unless
+    `-- --same-contract` says the new schema accepts the same JSON.
+    """
+    _sync(session, include_project=True)
+    session.run('python', '-c', _WRITE_SCHEMAS, *session.posargs)
+
+
+_WRITE_SCHEMAS = """
+import json
+import sys
+from pathlib import Path
+
+from pytest_given import model
+from pytest_given.model.delta_document import DeltaDocument
+from pytest_given.model.documents import ReportDocument, json_schema
+
+for kind, version, schema in [
+    ('report', model.REPORT_SCHEMA_VERSION, json_schema(ReportDocument)),
+    ('delta', model.DELTA_SCHEMA_VERSION, json_schema(DeltaDocument)),
+]:
+    path = Path('docs/site/schemas') / model.schema_file_name(kind, version)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    text = json.dumps(schema, indent=2) + '\\n'
+    if path.exists() and path.read_text(encoding='utf-8') == text:
+        continue
+    if path.exists() and '--same-contract' not in sys.argv[1:]:
+        sys.exit(
+            f'{path.as_posix()} would change: bump the {kind} schema version, or '
+            'rerun with `-- --same-contract` if the schema accepts the same JSON.'
+        )
+    path.write_text(text, encoding='utf-8', newline='\\n')
+    print(f'wrote {path.as_posix()}')
+"""
 
 
 @nox.session

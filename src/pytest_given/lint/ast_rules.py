@@ -9,12 +9,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..model import (
+    CapturedScenario,
+    CapturedStep,
     NarrationPlaceholder,
     NarrationValue,
     Phase,
-    Scenario,
     SourceLocation,
-    Step,
     StepPath,
     walk_steps,
 )
@@ -38,7 +38,7 @@ type _BodyNode = ast.With | ast.FunctionDef | ast.AsyncFunctionDef
 
 
 def run_ast_rules(
-    scenarios: list[Scenario], rootdir: Path, enabled: Container[RuleId]
+    scenarios: list[CapturedScenario], rootdir: Path, enabled: Container[RuleId]
 ) -> list[RawLintFinding]:
     """Run the `enabled` AST-surface rules over every step with a source anchor.
 
@@ -80,7 +80,7 @@ class _Resolved:
     """
 
     path: StepPath
-    step: Step
+    step: CapturedStep
     source: SourceLocation
     pair_role: Phase | None
     node: _BodyNode
@@ -91,14 +91,14 @@ class _Scan:
     """One scenario's resolved steps, plus the path index the rules look
     siblings and children up in."""
 
-    scenario: Scenario
+    scenario: CapturedScenario
     steps: list[_Resolved]
     by_path: dict[StepPath, _Resolved]
-    all_steps: dict[StepPath, Step]
+    all_steps: dict[StepPath, CapturedStep]
 
 
 def _scan_scenario(
-    scenario: Scenario,
+    scenario: CapturedScenario,
     rootdir: Path,
     indexes: dict[str, dict[int, _BodyNode] | None],
 ) -> _Scan:
@@ -141,7 +141,10 @@ def _scan_scenario(
 
 
 def _pair_role(
-    step: Step, before: Step | None, after: Step | None, source: SourceLocation
+    step: CapturedStep,
+    before: CapturedStep | None,
+    after: CapturedStep | None,
+    source: SourceLocation,
 ) -> Phase | None:
     """Which half of a `when_then` pair `step` is, or None when it is in none."""
     if (
