@@ -44,27 +44,31 @@ from pytest_given.model import (
     report_from_dict,
     report_to_dict,
 )
+from pytest_given.report.app_data import app_data
 from pytest_given.report.citation_index import (
     CitationIndex,
     Target,
     citation_templates,
 )
-from pytest_given.report.html_renderer import (
-    _BLOCK_COMMENT,
-    _COMMENT_LINE,
-    _TEMPLATES_DIR,
+from pytest_given.report.html_assets import (
+    BLOCK_COMMENT,
+    COMMENT_LINE,
+    TEMPLATES_DIR,
+    neutralize_script_data,
+    strip_comments,
+)
+from pytest_given.report.html_narration import (
     TermRefTarget,
-    _app_data,
-    _avoid_html,
-    _make_clause_part_filter,
-    _make_definition_filter,
-    _neutralize_script_data,
-    _strip_comments,
+    avoid_html,
+    make_clause_part_filter,
+    make_definition_filter,
+    make_narration_filter,
+)
+from pytest_given.report.html_renderer import render_html_string
+from pytest_given.report.step_layout import (
     build_param_color_map,
     column_phase_blocks,
-    make_narration_filter,
     phase_blocks,
-    render_html_string,
     repr_columns,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -131,7 +135,7 @@ _STEP = _DEFINITION_GLOSSARY.terms[0]
 
 
 def test_definition_filter_renders_an_undefined_term_empty() -> None:
-    render = _make_definition_filter(_DEFINITION_GLOSSARY)
+    render = make_definition_filter(_DEFINITION_GLOSSARY)
     assert render(term_('Phase')) == ''
 
 
@@ -148,7 +152,7 @@ def test_the_glossary_tab_renders_each_definition_ref_as_a_term_ref() -> None:
         glossary, step = _DEFINITION_GLOSSARY, _STEP
     with when('the Glossary tab renders the Step definition'):
         # A copy of the term, as a report rebuilt from JSON holds, is the term.
-        rendered = str(_make_definition_filter(glossary)(replace(step)))
+        rendered = str(make_definition_filter(glossary)(replace(step)))
         attach('definition', rendered)
     with then(
         t'Phase and attachments are {pg["Term ref"].l.s}, in the words its author '
@@ -172,7 +176,7 @@ def test_definition_filter_renders_a_ref_to_a_term_the_glossary_lacks_as_text() 
             ),
         ),
     )
-    rendered = str(_make_definition_filter(Glossary(terms=[step]))(step))
+    rendered = str(make_definition_filter(Glossary(terms=[step]))(step))
     assert rendered == 'In one Phase.'
 
 
@@ -187,7 +191,7 @@ def test_definition_filter_reads_a_literal_s_edge_against_the_ref_beside_it() ->
             ),
         ),
     )
-    rendered = str(_make_definition_filter(_DEFINITION_GLOSSARY)(step))
+    rendered = str(make_definition_filter(_DEFINITION_GLOSSARY)(step))
     assert referenced_ids(rendered) == ['phase']
     assert rendered.endswith('**(b)**')
 
@@ -195,7 +199,7 @@ def test_definition_filter_reads_a_literal_s_edge_against_the_ref_beside_it() ->
 def test_a_tooltip_definition_references_no_term() -> None:
     """The tooltip closes before the pointer reaches it, so a link in it
     could never be followed."""
-    data = _app_data(report_(terms=tuple(_DEFINITION_GLOSSARY.terms)))
+    data = app_data(report_(terms=tuple(_DEFINITION_GLOSSARY.terms)))
     assert data['glossary'] is not None
     [step, *_] = data['glossary']['terms']
     assert '<strong>Phase</strong>' in step['definition_html']
@@ -672,7 +676,7 @@ def test_neutralized_script_data_stays_valid_json() -> None:
     """The escapes must leave the blob parseable with the value unchanged —
     `\\/` and `\\u003C` are chosen over e.g. `\\!` for exactly that reason."""
     payload = {'a': '</script>', 'b': '<!--<script>'}
-    neutralized = _neutralize_script_data(json.dumps(payload))
+    neutralized = neutralize_script_data(json.dumps(payload))
     assert '</' not in neutralized
     assert '<!--' not in neutralized
     assert json.loads(neutralized) == payload
@@ -703,7 +707,7 @@ def test_strip_comments_keeps_code_and_line_numbers() -> None:
         'b = 1; // a trailing note stays: telling it from a string needs a parser\n'
         "c = 'http://x'; /* inline */ d = 2;\n"
     )
-    stripped = _strip_comments(source)
+    stripped = strip_comments(source)
     assert stripped.count('\n') == source.count('\n')
     assert stripped.splitlines() == [
         '',
@@ -721,10 +725,10 @@ def test_render_inlines_assets_without_their_comments() -> None:
     strip and keeps its licence line."""
     report = _report({})
     content = render_html_string(report, source_link_template=None)
-    css_comments = _BLOCK_COMMENT.findall(
-        (_TEMPLATES_DIR / 'styles.css').read_text('utf-8')
+    css_comments = BLOCK_COMMENT.findall(
+        (TEMPLATES_DIR / 'styles.css').read_text('utf-8')
     )
-    js_comments = _COMMENT_LINE.findall((_TEMPLATES_DIR / 'app.js').read_text('utf-8'))
+    js_comments = COMMENT_LINE.findall((TEMPLATES_DIR / 'app.js').read_text('utf-8'))
     assert len(css_comments) > 10
     assert len(js_comments) > 10
     assert not [comment for comment in css_comments if comment in content]
@@ -1424,7 +1428,7 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
         scenarios=[],
         glossary=g,
     )
-    glossary_data = _app_data(report)['glossary']
+    glossary_data = app_data(report)['glossary']
     assert isinstance(glossary_data, dict)
     [term] = glossary_data['terms']
     assert term['canonical'] == 'Guest'
@@ -1502,7 +1506,7 @@ def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
 def test_clause_part_filter_actor_term_ref():
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
-    f = _make_clause_part_filter(g)
+    f = make_clause_part_filter(g)
     out = str(f(ClauseTermRef(term_id=TermId('guest'), display='Alice')))
     assert 'term-ref-actor' in out
     assert 'Alice' in out
@@ -1511,13 +1515,13 @@ def test_clause_part_filter_actor_term_ref():
 def test_clause_part_filter_object_term_ref():
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
-    f = _make_clause_part_filter(g)
+    f = make_clause_part_filter(g)
     out = str(f(ClauseTermRef(term_id=TermId('room'), display='Room')))
     assert 'term-ref-object' in out
 
 
 def test_clause_part_filter_unknown_term_ref_falls_back():
-    f = _make_clause_part_filter(Glossary())  # empty glossary
+    f = make_clause_part_filter(Glossary())  # empty glossary
     out = str(f(ClauseTermRef(term_id=TermId('missing'), display='X')))
     assert 'term-ref-unknown' in out
 
@@ -1525,14 +1529,14 @@ def test_clause_part_filter_unknown_term_ref_falls_back():
 def test_clause_part_filter_activity_term_ref_renders_activity_class():
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('search'), kind='activity', canonical='search'))
-    f = _make_clause_part_filter(g)
+    f = make_clause_part_filter(g)
     out = str(f(ClauseTermRef(term_id=TermId('search'), display='searches')))
     assert 'term-ref-activity' in out
     assert 'searches' in out
 
 
 def test_clause_part_filter_word_renders_clause_word_class():
-    f = _make_clause_part_filter(None)
+    f = make_clause_part_filter(None)
     out = str(f(ClauseWord(text='for')))
     assert 'clause-word' in out
     assert 'for' in out
@@ -2357,7 +2361,7 @@ def test_the_search_box_finds_either_phrase_in_a_title() -> None:
         Scenario(id=NodeId('t.py::test_x'), narration=title, module='m'),
         report_url=None,
     )
-    scenarios = _app_data(report)['scenarios']
+    scenarios = app_data(report)['scenarios']
     assert isinstance(scenarios, list)
     assert scenarios[0]['search_text'] == 'it {pins it / does not pin it}'
 
@@ -2380,7 +2384,7 @@ def test_the_search_box_matches_a_title_as_it_shows() -> None:
             Scenario(id=NodeId('t.py::test_x'), narration=narration, module='m')
         ],
     )
-    scenarios = _app_data(report)['scenarios']
+    scenarios = app_data(report)['scenarios']
     assert isinstance(scenarios, list)
     assert scenarios[0]['search_text'] == 'a paid pay for Guest in {room}'
 
@@ -2391,7 +2395,7 @@ def test_app_data_carries_each_terms_section_key_and_plain_avoided_words() -> No
         replace(term_('Room'), section='other', avoid=('**Unit**', 'Flat')),
         replace(term_('Bill')),
     )
-    data = _app_data(report_(terms=sectioned))
+    data = app_data(report_(terms=sectioned))
     assert data['glossary'] is not None
     terms = {term['id']: term for term in data['glossary']['terms']}
     assert terms['guest']['section_key'] == 'People'
@@ -2403,13 +2407,13 @@ def test_app_data_carries_each_terms_section_key_and_plain_avoided_words() -> No
 
 
 def test_app_data_has_no_section_key_in_an_unsectioned_glossary() -> None:
-    data = _app_data(report_(terms=(replace(term_('Guest'), section='Terms'),)))
+    data = app_data(report_(terms=(replace(term_('Guest'), section='Terms'),)))
     assert data['glossary'] is not None
     assert [term['section_key'] for term in data['glossary']['terms']] == [None]
 
 
 def test_the_avoid_filter_renders_each_entry_as_written_joined_by_commas() -> None:
     term = replace(term_('Guest'), avoid=('**Customer** (too broad)', 'a <b>'))
-    assert str(_avoid_html(term)) == (
+    assert str(avoid_html(term)) == (
         '<strong>Customer</strong> (too broad), a &lt;b&gt;'
     )

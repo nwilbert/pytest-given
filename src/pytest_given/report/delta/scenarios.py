@@ -32,8 +32,9 @@ from ...model import (
     Scenario,
     Step,
 )
-from ..html_renderer import column_phase_blocks, repr_columns, shown_text
+from ..html_narration import shown_text
 from ..slugs import build_scenario_slug_index
+from ..step_layout import column_phase_blocks, repr_columns
 from .attachments import DiffRow, diff_rows
 from .steps import BlockKey, StepsView, block_keys, steps_view
 

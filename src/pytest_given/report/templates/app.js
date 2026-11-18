@@ -175,7 +175,7 @@ function commonDepth(modules) {
 }
 
 function reportApp() {
-  // The slim projection `html_renderer._app_data` emits, not the whole report.
+  // The slim projection `app_data.app_data` emits, not the whole report.
   const data = window.__REPORT_DATA__;
   const storyIds = data.story_ids || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];

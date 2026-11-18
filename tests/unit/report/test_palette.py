@@ -4,11 +4,11 @@ import re
 
 import pytest
 
-from pytest_given.report.html_renderer import _TEMPLATES_DIR
+from pytest_given.report.html_assets import TEMPLATES_DIR
 from pytest_given.report.palette import Surface, param_column_colors
 
 _HEX = re.compile(r'^#[0-9a-f]{6}$')
-_STYLES = (_TEMPLATES_DIR / 'styles.css').read_text(encoding='utf-8')
+_STYLES = (TEMPLATES_DIR / 'styles.css').read_text(encoding='utf-8')
 
 
 def _srgb(hex_color: str) -> tuple[float, float, float]:

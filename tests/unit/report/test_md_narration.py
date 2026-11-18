@@ -11,7 +11,7 @@ from pytest_given.model import (
     narration_of,
     param_id,
 )
-from pytest_given.report.html_renderer import make_narration_filter
+from pytest_given.report.html_narration import make_narration_filter
 from pytest_given.report.md_narration import narration_markdown
 
 _MARKDOWN = MarkdownIt('commonmark').enable(['table', 'strikethrough'])

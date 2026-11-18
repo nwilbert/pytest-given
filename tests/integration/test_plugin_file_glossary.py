@@ -3,8 +3,8 @@ import json
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.cli import main
 from pytest_given.model import read_report
+from pytest_given.report.app_data import app_data
 from pytest_given.report.glossary_view import build_glossary_view
-from pytest_given.report.html_renderer import _app_data
 from tests.ubiquitous_language import pg
 
 GLOSSARY_MD = """# Glossary
@@ -162,7 +162,7 @@ def test_saved_json_rerenders_sections_and_avoid(pytester):
         [guest] = view.section_groups[0].entries
         assert guest.term.avoid == ('Customer (too broad)', '**Client**')
     with then(t'the page data carries each {pg["Avoided word"].l} as a plain word'):
-        data = _app_data(report)['glossary']
+        data = app_data(report)['glossary']
         assert isinstance(data, dict)
         terms = {term['id']: term for term in data['terms']}
         assert terms['guest']['avoid'] == ['Customer', 'Client']

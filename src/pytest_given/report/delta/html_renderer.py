@@ -34,17 +34,11 @@ from ...model import (
     narration_text,
     texts_in_context,
 )
+from ..app_data import term_app_data
 from ..glyphs import STATUS_LABEL
-from ..html_renderer import (
-    base_env,
-    bundled_assets,
-    bundled_script,
-    make_narration_filter,
-    make_source_url_filter,
-    script_json_parse,
-    shown_text,
-    term_app_data,
-)
+from ..html_assets import bundled_assets, bundled_script, script_json_parse
+from ..html_narration import make_narration_filter, make_source_url_filter, shown_text
+from ..html_renderer import base_env
 from ..theme import DEFAULT_THEME, Theme
 from .attachments import FoldRow
 from .glossary import (

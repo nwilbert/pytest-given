@@ -10,7 +10,7 @@ from pytest_given.model import (
 )
 from pytest_given.report import CitationIndex, Target
 from pytest_given.report.citation_index import citation_templates
-from pytest_given.report.html_renderer import make_narration_filter
+from pytest_given.report.html_narration import make_narration_filter
 from pytest_given.report.md_renderer import render_md
 from tests.ubiquitous_language import pg
 from tests.unit.citation_reports import URL, filled, report_, scenario_

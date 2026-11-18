@@ -27,7 +27,7 @@ from ...model import (
     narration_text,
     walk_steps,
 )
-from ..html_renderer import phase_blocks
+from ..step_layout import phase_blocks
 from .attachments import AttachmentRow, attachment_rows
 
 # A phase block's `data-block`, which its table columns carry too. An after

@@ -95,7 +95,7 @@ Outputs are opt-in; a bare `uv run pytest` writes nothing. The workflow for read
 
 ## Report testing
 
-Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `html_renderer.py` **must** be Playwright-verified before commit. The project has no JS-side UI tests, and Python tests on rendered HTML cannot stand in: a substring match passes on a broken Alpine expression or a malformed `:class` binding. So:
+Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filter in `html_narration.py` **must** be Playwright-verified before commit. The project has no JS-side UI tests, and Python tests on rendered HTML cannot stand in: a substring match passes on a broken Alpine expression or a malformed `:class` binding. So:
 
 - **No Python tests that pin frontend markup** (class names, wrapper structure, inline-handler shape, SVG strings) — they check implementation, not behavior, and rot on every renderer refactor. Python tests stay on the renderer's data-shaped contract (which `data-param` value, which scenario IDs, which counts).
 - **No TDD for frontend changes**: apply the change, regenerate `examples/`, drive it in Playwright, capture the result.

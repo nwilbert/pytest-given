@@ -18,7 +18,7 @@ from ...delta import (
 )
 from ...model import Glossary, GlossaryTerm, TermId, build_term_crossrefs, plural
 from ..glossary_view import KindGrouping, group_by_kind, plural_if_any
-from ..html_renderer import TermRefTarget
+from ..html_narration import TermRefTarget
 from .scenarios import REMOVED, ListedScenario
 from .steps import MarkedRun, side_runs
 
