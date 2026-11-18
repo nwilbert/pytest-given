@@ -6,15 +6,15 @@ from collections.abc import Sequence
 import pytest
 
 from pytest_given import given, scenario, then, when
-from pytest_given.delta import (
-    DeltaData,
+from pytest_given.delta import DeltaData, ScenarioDelta
+from pytest_given.delta.build import (
     DeltaInputs,
-    ScenarioDelta,
+    DeltaResult,
     build_delta,
-    check_schema_versions,
-    version_warnings,
+    comparable_title,
+    is_per_case,
 )
-from pytest_given.delta.build import DeltaResult, comparable_title, is_per_case
+from pytest_given.delta.check import check_schema_versions, version_warnings
 from pytest_given.delta.renames import RenameEntry, RenameLog
 from pytest_given.delta.schema import IdentityPair
 from pytest_given.model import (

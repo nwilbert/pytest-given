@@ -79,8 +79,8 @@ What no filename tells you:
   a session that renders no delta loads no delta code.
 - Each package exposes the *whole* job, not its parts: `report.emit_sinks`
   (render → write → discard-on-failure, so a failure leaves no half-written
-  report), `lint.run_lint` and `citations.check_citations` (every document
-  read before any is written). Both entry points reach the sinks through
+  report), `lint.run_lint`, `citations.check_citations` (every document
+  read before any is written) and `delta.compare_reports`. Both entry points reach the sinks through
   `emit_sinks`, which is what keeps `pytest-given report` behaving like the
   plugin; the lint is the plugin's alone, since the CLI re-renders a report
   rather than running a suite.

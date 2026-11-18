@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given.delta import revs, revs_outside_range
+from pytest_given.delta import revs
+from pytest_given.delta.revs import revs_outside_range
 from tests.git_repo import GitRepo
 
 

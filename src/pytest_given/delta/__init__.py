@@ -4,10 +4,7 @@ two reports, and the JSON schema `report/` renders it from.
 Imports `model/`, `markdown/` and `git/`. It runs no pytest.
 """
 
-from .build import DeltaInputs, build_delta
-from .check import check_schema_versions, version_warnings
-from .renames import read_rename_log
-from .revs import revs_outside_range
+from .compare import compare_reports
 from .schema import (
     CHANGED_PARTS,
     SIDE_MARK,
@@ -44,7 +41,6 @@ __all__ = [
     'CasePair',
     'Change',
     'DeltaData',
-    'DeltaInputs',
     'DeltaSide',
     'DiffSegment',
     'LineChange',
@@ -58,15 +54,11 @@ __all__ = [
     'TermDelta',
     'TermFacts',
     'TextSegment',
-    'build_delta',
     'change_counts',
-    'check_schema_versions',
+    'compare_reports',
     'delta_from_dict',
     'delta_to_dict',
     'on_side',
     'other_side',
-    'read_rename_log',
-    'revs_outside_range',
     'terms_read_the_same',
-    'version_warnings',
 ]

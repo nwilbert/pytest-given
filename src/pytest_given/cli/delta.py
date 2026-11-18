@@ -7,30 +7,10 @@ __lazy_modules__ = ['pytest_given.delta', 'pytest_given.model', 'pytest_given.re
 
 import argparse
 import sys
-from datetime import UTC, datetime
-from importlib.metadata import version
 from pathlib import Path
 
-from ..delta import (
-    Change,
-    DeltaData,
-    DeltaInputs,
-    build_delta,
-    change_counts,
-    check_schema_versions,
-    delta_to_dict,
-    read_rename_log,
-    revs_outside_range,
-    version_warnings,
-)
-from ..git import tags_by_commit
-from ..model import (
-    JsonObject,
-    PytestGivenError,
-    plural,
-    read_report_json,
-    report_from_dict,
-)
+from ..delta import Change, DeltaData, change_counts, compare_reports, delta_to_dict
+from ..model import JsonObject, PytestGivenError, plural, read_report_json
 from ..report import (
     DEFAULT_DELTA_HTML_PATH,
     DEFAULT_DELTA_JSON_PATH,
@@ -182,49 +162,20 @@ def _sink_config(args: argparse.Namespace, inputs: list[Path]) -> DeltaSinkConfi
 def _compare(
     args: argparse.Namespace, before_dict: JsonObject, after_dict: JsonObject
 ) -> tuple[JsonObject, str | None]:
-    before_source, after_source = args.first.as_posix(), args.second.as_posix()
-    check_schema_versions(before_dict, after_dict, before_source, after_source)
-    before = report_from_dict(before_dict, before_source)
-    after = report_from_dict(after_dict, after_source)
-    warnings = list(version_warnings(before, after, before_source, after_source))
-    renames = read_rename_log(args.renames)
-    repo = Path.cwd()
-    before_sha, after_sha = before.metadata.commit_sha, after.metadata.commit_sha
-    skipped_revs, rev_warnings = revs_outside_range(
-        renames.revs(), before_sha, after_sha, repo
+    result = compare_reports(
+        before_dict,
+        after_dict,
+        before_source=args.first.as_posix(),
+        after_source=args.second.as_posix(),
+        before_label=args.before_label,
+        after_label=args.after_label,
+        title=args.title or None,
+        rename_log=args.renames,
+        repo=Path.cwd(),
     )
-    before_label, after_label = _labels(
-        [(args.before_label, before_sha), (args.after_label, after_sha)], repo
-    )
-    result = build_delta(
-        DeltaInputs(
-            before=before,
-            after=after,
-            renames=renames,
-            skipped_revs=skipped_revs,
-            before_label=before_label,
-            after_label=after_label,
-            title=args.title or None,
-            plugin_version=version('pytest-given'),
-            timestamp=datetime.now(tz=UTC).isoformat(),
-        )
-    )
-    for warning in [*warnings, *rev_warnings, *result.warnings]:
+    for warning in result.warnings:
         print(f'Warning: {warning}', file=sys.stderr)
     return delta_to_dict(result.delta), None
-
-
-def _labels(sides: list[tuple[str | None, str | None]], repo: Path) -> list[str | None]:
-    """Each side's label as passed, else its commit's highest tag: git is
-    asked once for both sides, and not at all when neither needs a tag."""
-    wanted = any(not label and sha for label, sha in sides)
-    tags = tags_by_commit(repo) if wanted else {}
-    return [label or _highest_tag(tags, sha) for label, sha in sides]
-
-
-def _highest_tag(tags: dict[str, list[str]], sha: str | None) -> str | None:
-    found = tags.get(sha, []) if sha else []
-    return found[0] if found else None
 
 
 def _summary(delta: DeltaData) -> str:

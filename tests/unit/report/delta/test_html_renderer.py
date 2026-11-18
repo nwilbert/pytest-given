@@ -7,15 +7,8 @@ import re
 import typing
 from collections.abc import Iterator
 
-from pytest_given.delta import (
-    DeltaData,
-    DeltaInputs,
-    DeltaSide,
-    ScenarioDelta,
-    Side,
-    TextSegment,
-    build_delta,
-)
+from pytest_given.delta import DeltaData, DeltaSide, ScenarioDelta, Side, TextSegment
+from pytest_given.delta.build import DeltaInputs, build_delta
 from pytest_given.delta.renames import parse_rename_log
 from pytest_given.delta.schema import CHANGES, DeltaMetadata
 from pytest_given.model import (
