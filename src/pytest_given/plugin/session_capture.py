@@ -4,7 +4,7 @@ pytest-xdist worker sends the main process. Never part of `ReportData`."""
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from .schema import CapturedScenario, Glossary, NodeId, Story, StoryId
+from ..model import CapturedScenario, Glossary, NodeId, Story, StoryId
 
 
 @dataclass(frozen=True, kw_only=True)

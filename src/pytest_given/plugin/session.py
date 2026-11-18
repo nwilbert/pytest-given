@@ -31,12 +31,12 @@ from ..model import (
     PytestGivenError,
     PytestGivenWarning,
     ReportData,
-    SessionCapture,
     Story,
     iter_steps,
     report_to_dict,
 )
 from ..report import emit_sinks, in_report_order, sink_failure, write_console_as_utf8
+from .session_capture import SessionCapture
 from .state import (
     capture_bootstrapped,
     given_config,

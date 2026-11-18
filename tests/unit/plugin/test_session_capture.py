@@ -1,10 +1,5 @@
-from pytest_given.model import (
-    Glossary,
-    NodeId,
-    SessionCapture,
-    Story,
-    merge_captures,
-)
+from pytest_given.model import Glossary, NodeId, Story
+from pytest_given.plugin.session_capture import SessionCapture, merge_captures
 from tests.unit.citation_reports import scenario_, story_
 
 

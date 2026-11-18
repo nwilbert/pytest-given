@@ -114,10 +114,7 @@ from .serde import (
     report_from_dict,
     report_to_dict,
     schema_version,
-    session_capture_from_dict,
-    session_capture_to_dict,
 )
-from .session_capture import SessionCapture, merge_captures
 from .step_tree import (
     StepPath,
     iter_narrations,
@@ -195,7 +192,6 @@ __all__ = [
     'Sentence',
     'SentenceId',
     'SentenceName',
-    'SessionCapture',
     'SourceLocation',
     'Status',
     'Step',
@@ -225,7 +221,6 @@ __all__ = [
     'l_form',
     'load_document',
     'location_suffix',
-    'merge_captures',
     'merged_literals',
     'name_key',
     'name_keys',
@@ -252,8 +247,6 @@ __all__ = [
     'scenario_identity',
     'schema_file_name',
     'schema_version',
-    'session_capture_from_dict',
-    'session_capture_to_dict',
     'spanned_part',
     'texts_in_context',
     'walk_steps',

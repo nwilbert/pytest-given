@@ -90,9 +90,9 @@ A malformed member matches no variant, and Pydantic then reports every variant's
 
 ### The session capture
 
-Under pytest-xdist, each worker sends what its session captured to the main process: a `SessionCapture` (`model/session_capture.py`) holding the worker's grouped scenarios, their collection index, the stories and the glossary. `session_capture_to_dict` and `session_capture_from_dict` in `model/serde.py` convert it, and the dict travels in xdist's `workeroutput` as JSON text, since execnet refuses a `str` or `int` subclass such as an enum value. It is never written to disk, and the same installation writes and reads it within one run.
+Under pytest-xdist, each worker sends what its session captured to the main process: a `SessionCapture` (`plugin/session_capture.py`, since only the plugin handles it) holding the worker's grouped scenarios, their collection index, the stories and the glossary. `session_capture_to_dict` and `session_capture_from_dict` in `plugin/capture_document.py` convert it, and the dict travels in xdist's `workeroutput` as JSON text, since execnet refuses a `str` or `int` subclass such as an enum value. It is never written to disk, and the same installation writes and reads it within one run.
 
-- The document-types module gains `SessionCaptureDocument`, a `BaseModel` whose fields are `SessionCapture`'s, under the same configuration as the report's. `session_capture_from_dict` shrinks to validation through it, plus the `ValidationError` conversion, and its hand-written readers go with the report's.
+- That module also defines `SessionCaptureDocument`, a `BaseModel` whose fields are `SessionCapture`'s, under the same configuration as the report's. `session_capture_from_dict` shrinks to validation through it, plus the `ValidationError` conversion, and its hand-written readers go with the report's.
 - It carries no `schema_version`, no `$schema`, no pre-check and no committed schema file: it is no contract with anything outside one run.
 - It carries each step's source, which the report has no field for (see [Captured steps](#captured-steps)).
 
@@ -119,7 +119,7 @@ A session that writes any report validates: `render_sinks` reads its own dict ba
 
 The written report is `ReportData` plus `$schema`, and `ReportDocument` describes exactly that.
 
-Defining a `BaseModel` imports Pydantic, which is why the document types have a module of their own. The serde modules list that module in `__lazy_modules__`. It lists nothing in its own, since its `BaseModel` subclasses import Pydantic as the module loads. The lazy-import test (`tests/integration/test_lazy_imports.py`) holds a run that writes no report to not importing Pydantic. An xdist run that writes a report or lints imports it on every worker too, which writes its capture through `SessionCaptureDocument`, and on the main process, which reads the captures through validation.
+Defining a `BaseModel` imports Pydantic, which is why the document types have a module of their own. The serde modules list that module in `__lazy_modules__`, as `plugin/workers.py` lists the capture's. Neither document module lists anything in its own, since their `BaseModel` subclasses import Pydantic as the module loads. The lazy-import test (`tests/integration/test_lazy_imports.py`) holds a run that writes no report to not importing Pydantic. An xdist run that writes a report or lints imports it on every worker too, which writes its capture through `SessionCaptureDocument`, and on the main process, which reads the captures through validation.
 
 ## Story coverage
 

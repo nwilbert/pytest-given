@@ -8,7 +8,8 @@ from types import SimpleNamespace
 import pytest
 
 from pytest_given import given, scenario, then, when
-from pytest_given.model import SessionCapture, session_capture_to_dict
+from pytest_given.plugin.capture_document import session_capture_to_dict
+from pytest_given.plugin.session_capture import SessionCapture
 from pytest_given.plugin.state import WorkerOutput
 from tests.ubiquitous_language import pg
 

@@ -5,19 +5,18 @@ pytest-given never imports xdist. Its xdist hooks are optional, so the plugin
 registers whether xdist is installed or not.
 """
 
+# Only a pytest-xdist run reads or writes a capture, and only that needs Pydantic.
+__lazy_modules__ = ['pytest_given.plugin.capture_document']
+
 import json
 from collections.abc import Callable
 from typing import Protocol
 
 import pytest
 
-from ..model import (
-    PytestGivenError,
-    SessionCapture,
-    merge_captures,
-    session_capture_from_dict,
-    session_capture_to_dict,
-)
+from ..model import PytestGivenError
+from .capture_document import session_capture_from_dict, session_capture_to_dict
+from .session_capture import SessionCapture, merge_captures
 from .state import WorkerOutput, given_config, session_state
 
 _OUTPUT_KEY = 'pytest_given'

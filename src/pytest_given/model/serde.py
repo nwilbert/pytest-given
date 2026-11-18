@@ -11,29 +11,13 @@ __lazy_modules__ = ['pytest_given.model.documents']
 import json
 from pathlib import Path
 
-from .documents import (
-    ReportDocument,
-    SessionCaptureDocument,
-    dump_document,
-    load_document,
-)
+from .documents import ReportDocument, dump_document, load_document
 from .errors import PytestGivenError
 from .schema import REPORT_SCHEMA_VERSION, ReportData, Step
-from .session_capture import SessionCapture
 
 
 def report_to_dict[S: Step](report: ReportData[S]) -> JsonObject:
     return dump_document(ReportDocument, report)
-
-
-def session_capture_to_dict(capture: SessionCapture) -> JsonObject:
-    return dump_document(SessionCaptureDocument, capture)
-
-
-def session_capture_from_dict(d: JsonObject) -> SessionCapture:
-    return load_document(
-        SessionCaptureDocument, SessionCapture, d, 'session capture', None
-    )
 
 
 def is_delta_dict(d: JsonObject) -> bool:

@@ -6,8 +6,10 @@ from pydantic import BaseModel
 
 from pytest_given.delta import DeltaData
 from pytest_given.delta.document import DeltaDocument
-from pytest_given.model import ReportData, Scenario, SessionCapture
-from pytest_given.model.documents import ReportDocument, SessionCaptureDocument
+from pytest_given.model import ReportData, Scenario
+from pytest_given.model.documents import ReportDocument
+from pytest_given.plugin.capture_document import SessionCaptureDocument
+from pytest_given.plugin.session_capture import SessionCapture
 
 _SCHEMA_URL = [('schema_url', str)]
 

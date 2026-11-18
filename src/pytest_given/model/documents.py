@@ -26,10 +26,8 @@ from .errors import PytestGivenError
 from .report_url import resolve_report_url
 from .schema import (
     REPORT_SCHEMA_URL,
-    CapturedScenario,
     Glossary,
     Metadata,
-    NodeId,
     Scenario,
     Story,
 )
@@ -67,13 +65,6 @@ class ReportDocument(Document):
     scenarios: list[Scenario]
     glossary: Glossary | None = None
     stories: list[Story] = []
-
-
-class SessionCaptureDocument(Document):
-    scenarios: list[CapturedScenario]
-    collection_index: dict[NodeId, int]
-    stories: list[Story]
-    glossary: Glossary | None
 
 
 def dump_document(document_type: type[Document], root: DataclassInstance) -> JsonObject:
