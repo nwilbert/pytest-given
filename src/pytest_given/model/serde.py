@@ -13,7 +13,7 @@ from pathlib import Path
 
 from .documents import ReportDocument, dump_document, load_document
 from .errors import PytestGivenError
-from .schema import REPORT_SCHEMA_VERSION, ReportData, Step
+from .schema import ReportData, Step
 
 
 def report_to_dict[S: Step](report: ReportData[S]) -> JsonObject:
@@ -34,43 +34,12 @@ def report_from_dict(d: JsonObject, source: str | None = None) -> ReportData:
             f'{source or "input"} is a delta report, not a report; '
             f'render it with `pytest-given delta {source or "<file>"}`.'
         )
-    refuse_another_schema_version(
-        d,
-        'report',
-        REPORT_SCHEMA_VERSION,
-        'Regenerate it by running the suite under this pytest-given.',
-        source,
-    )
     return load_document(ReportDocument, ReportData, d, 'report', source)
-
-
-def refuse_another_schema_version(
-    d: JsonObject, kind: str, current: int, remedy: str, source: str | None
-) -> None:
-    """One line for a document of another version, whose validation errors
-    would only list the fields the versions disagree on. A `metadata` that is
-    no object is left to validation to name."""
-    metadata = d.get('metadata')
-    if not isinstance(metadata, dict):
-        return
-    version = metadata.get('schema_version')
-    if is_schema_version(version, current):
-        return
-    named = 'no schema version' if version is None else f'schema version {version!r}'
-    raise PytestGivenError(
-        f'{source or "input"} is a {kind} of {named}; this pytest-given reads '
-        f'version {current}. {remedy}'
-    )
 
 
 def schema_version(d: JsonObject) -> JsonValue:
     metadata = d.get('metadata')
     return metadata.get('schema_version') if isinstance(metadata, dict) else None
-
-
-def is_schema_version(version: JsonValue, current: int) -> bool:
-    # `True == 1`, and validation would read `true` or `1.0` as version 1.
-    return type(version) is int and version == current
 
 
 type JsonValue = (

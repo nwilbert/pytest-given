@@ -31,8 +31,8 @@ Both reports carry their version as an integer, `metadata.schema_version`, as no
 
 The reader checks `schema_version` before validating the rest, so a report or delta of another version gets a one-line message, not a list of field errors:
 
-- `delta_from_dict` has that check (`_refuse_another_schema_version` in `model/delta_serde.py`).
-- `report_from_dict` gains the same check with the same wording. `pytest-given report` and `pytest-given citations` then refuse a report of another version, which includes every report written by pytest-given ≤ 0.6.0.
+- `load_document` in `model/documents.py` makes that check for every document type that declares a `current_version`, which the report's and the delta's do. Each names its own remedy in `stale_remedy`.
+- So `report_from_dict` and `delta_from_dict` refuse with the same wording. `pytest-given report` and `pytest-given citations` refuse a report of another version, which includes every report written by pytest-given ≤ 0.6.0.
 - `check_schema_versions` in `delta/check.py` stays. `pytest-given delta` runs it before reading either report, and its message names both.
 
 The type of the field is `Literal[1]` (resp. the delta's), with that constant as its default and no `None`, so validation would refuse another version anyway, and the schema states the version as a constant. The pre-check exists for the message. The number then stands in the annotation and in `REPORT_SCHEMA_VERSION` / `DELTA_SCHEMA_VERSION`. *Builder's call:* how the two are held equal.

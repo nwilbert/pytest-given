@@ -12,7 +12,7 @@ Its field validators check what is not shape, on read alone.
 
 import dataclasses
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Annotated, Final
+from typing import TYPE_CHECKING, Annotated, ClassVar, Final
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, ValidationError
 from pydantic.json_schema import (
@@ -26,6 +26,7 @@ from .errors import PytestGivenError
 from .report_url import resolve_report_url
 from .schema import (
     REPORT_SCHEMA_URL,
+    REPORT_SCHEMA_VERSION,
     Glossary,
     Metadata,
     Scenario,
@@ -36,7 +37,7 @@ if TYPE_CHECKING:
     from _typeshed import DataclassInstance
 
     # Type-only: `serde` imports this module.
-    from .serde import JsonObject
+    from .serde import JsonObject, JsonValue
 
 _LISTED_ERRORS: Final = 10
 
@@ -44,6 +45,10 @@ _LISTED_ERRORS: Final = 10
 class Document(BaseModel):
     # `defer_build`: a module that loads builds no validator it never uses.
     model_config = ConfigDict(extra='forbid', defer_build=True)
+    # A versioned document of another version is refused before validation,
+    # whose errors would only list the fields the versions disagree on.
+    current_version: ClassVar[int | None] = None
+    stale_remedy: ClassVar[str] = ''
 
 
 def with_resolved_report_url[M: Metadata](metadata: M, setting: str) -> M:
@@ -60,6 +65,10 @@ def _with_citable_report_url(metadata: Metadata) -> Metadata:
 
 
 class ReportDocument(Document):
+    current_version: ClassVar[int | None] = REPORT_SCHEMA_VERSION
+    stale_remedy: ClassVar[str] = (
+        'Regenerate it by running the suite under this pytest-given.'
+    )
     schema_url: str = Field(default=REPORT_SCHEMA_URL, alias='$schema')
     metadata: Annotated[Metadata, AfterValidator(_with_citable_report_url)]
     scenarios: list[Scenario]
@@ -86,6 +95,14 @@ def load_document[Root: DataclassInstance](
 ) -> Root:
     """The root rebuilt from the validated document, whose fields are the
     root's in name and type."""
+    if document_type.current_version is not None:
+        _refuse_another_schema_version(
+            data,
+            kind,
+            document_type.current_version,
+            document_type.stale_remedy,
+            source,
+        )
     try:
         document = document_type.model_validate(data)
     except ValidationError as error:
@@ -95,6 +112,32 @@ def load_document[Root: DataclassInstance](
             field.name: getattr(document, field.name)
             for field in dataclasses.fields(root_type)
         }
+    )
+
+
+def is_schema_version(version: JsonValue, current: int) -> bool:
+    # `True == 1`, and validation would read `true` or `1.0` as version 1.
+    return type(version) is int and version == current
+
+
+def _refuse_another_schema_version(
+    data: Mapping[str, object],
+    kind: str,
+    current: int,
+    remedy: str,
+    source: str | None,
+) -> None:
+    """A `metadata` that is no object is left to validation to name."""
+    metadata = data.get('metadata')
+    if not isinstance(metadata, dict):
+        return
+    version = metadata.get('schema_version')
+    if is_schema_version(version, current):
+        return
+    named = 'no schema version' if version is None else f'schema version {version!r}'
+    raise PytestGivenError(
+        f'{source or "input"} is a {kind} of {named}; this pytest-given reads '
+        f'version {current}. {remedy}'
     )
 
 

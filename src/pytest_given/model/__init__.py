@@ -11,6 +11,7 @@ __lazy_modules__ = ['pytest_given.model.documents']
 from .documents import (
     Document,
     dump_document,
+    is_schema_version,
     load_document,
     with_resolved_report_url,
 )
@@ -107,10 +108,8 @@ from .schema import (
 from .serde import (
     JsonObject,
     is_delta_dict,
-    is_schema_version,
     read_report,
     read_report_json,
-    refuse_another_schema_version,
     report_from_dict,
     report_to_dict,
     schema_version,
@@ -237,7 +236,6 @@ __all__ = [
     'read_narration',
     'read_report',
     'read_report_json',
-    'refuse_another_schema_version',
     'render_interpolation',
     'report_from_dict',
     'report_to_dict',

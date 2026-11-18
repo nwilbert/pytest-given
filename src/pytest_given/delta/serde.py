@@ -9,10 +9,9 @@ from ..model import (
     dump_document,
     is_delta_dict,
     load_document,
-    refuse_another_schema_version,
 )
 from .document import DeltaDocument
-from .schema import DELTA_SCHEMA_VERSION, DeltaData
+from .schema import DeltaData
 
 
 def delta_to_dict(delta: DeltaData) -> JsonObject:
@@ -34,11 +33,4 @@ def delta_from_dict(d: JsonObject, source: str | None = None) -> DeltaData:
                 'a second report: `pytest-given delta BEFORE.json AFTER.json`.'
             )
         raise PytestGivenError(f'{source or "input"} is not a delta report.')
-    refuse_another_schema_version(
-        d,
-        'delta',
-        DELTA_SCHEMA_VERSION,
-        'Build it again from its two reports.',
-        source,
-    )
     return load_document(DeltaDocument, DeltaData, d, 'delta', source)

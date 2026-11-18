@@ -10,7 +10,7 @@ attachment diff's indices and a changed attachment cell's column go unchecked.
 # this module loads.
 
 import dataclasses
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from pydantic import AfterValidator, Field
 
@@ -25,6 +25,7 @@ from ..model import (
 )
 from .schema import (
     DELTA_SCHEMA_URL,
+    DELTA_SCHEMA_VERSION,
     Change,
     DeltaMetadata,
     GlossaryDelta,
@@ -66,6 +67,8 @@ def _checked_terms(glossary: GlossaryDelta) -> GlossaryDelta:
 
 
 class DeltaDocument(Document):
+    current_version: ClassVar[int | None] = DELTA_SCHEMA_VERSION
+    stale_remedy: ClassVar[str] = 'Build it again from its two reports.'
     schema_url: str = Field(default=DELTA_SCHEMA_URL, alias='$schema')
     metadata: Annotated[DeltaMetadata, AfterValidator(_with_citable_report_urls)]
     scenarios: tuple[
