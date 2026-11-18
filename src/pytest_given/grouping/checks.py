@@ -29,7 +29,6 @@ from ..model import (
     Phase,
     Pin,
     PytestGivenError,
-    RawParamValue,
     StepPath,
     boolean_phrases,
     case_suffix,
@@ -40,6 +39,7 @@ from ..model import (
     render_interpolation,
 )
 from .context import Format, Group, PartSite
+from .raw_params import RawParamValue
 
 
 def check_same_template(group: Group) -> None:

@@ -5,24 +5,26 @@ from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
 
 from ..model import (
-    DiffSegment,
     Glossary,
-    GlossaryDelta,
     GlossaryTerm,
-    IdentityPair,
     Narration,
     ReportData,
-    TermDelta,
-    TermFacts,
     TermId,
     TermKind,
     build_term_crossrefs,
-    terms_read_the_same,
 )
 from .chains import rewrite_identities
 from .narration import Reading, placeholder_name, same_term_id, word_diff
 from .order import interleaved
 from .renames import RenameLog
+from .schema import (
+    DiffSegment,
+    GlossaryDelta,
+    IdentityPair,
+    TermDelta,
+    TermFacts,
+    terms_read_the_same,
+)
 
 
 @dataclass(frozen=True)

@@ -16,7 +16,6 @@ from ..model import (
     boolean_phrases,
     narration_of,
     param_id,
-    placeholder_value,
     render_interpolation,
     spanned_part,
 )
@@ -254,9 +253,7 @@ def resolved_placeholder_part(
     """One `Template` slot resolved against the value bound to its name.
 
     A glossary term instance becomes a real term ref, the same thing a t-string
-    interpolation of that handle records; `placeholder_value` alone would
-    render the whole `Glossary` dataclass repr, since `model` is the leaf and
-    cannot reach `try_term_ref`.
+    interpolation of that handle records, not its rendered dataclass repr.
 
     Only an unformatted slot unwraps: a term ref can hold no spec, and the
     grouped path renders a spec'd slot through `render_interpolation` too, so
@@ -266,4 +263,9 @@ def resolved_placeholder_part(
         term_ref = try_term_ref(value, part.name)
         if term_ref is not None:
             return term_ref
-    return placeholder_value(part, value)
+    return NarrationValue(
+        rendered=render_interpolation(value, part.conversion, part.format_spec),
+        expression=part.name,
+        format_spec=part.format_spec,
+        conversion=part.conversion,
+    )

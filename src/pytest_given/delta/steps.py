@@ -6,14 +6,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Literal
 
-from ..model import (
-    AttachmentDelta,
-    ColumnId,
-    Step,
-    StepDelta,
-    StepPath,
-    walk_step_deltas,
-)
+from ..model import ColumnId, Step, StepPath
 from .attachments import align_attachments
 from .lcs import greedy_pairs, lcs_gaps
 from .narration import (
@@ -30,6 +23,7 @@ from .narration import (
     word_counts,
     words_of,
 )
+from .schema import AttachmentDelta, StepDelta, walk_step_deltas
 
 
 def align_steps(

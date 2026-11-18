@@ -1,5 +1,5 @@
-"""The delta's JSON document, apart from `documents` so that only the delta's
-code builds its model.
+"""The delta's JSON document, apart from `serde` so that only reading or
+writing a delta builds its model.
 
 Its validators also check what rendering looks up: the sides a change shows,
 and the step paths, columns and cases the step and table pairings name. An
@@ -14,7 +14,16 @@ from typing import Annotated
 
 from pydantic import AfterValidator, Field
 
-from .delta import (
+from ..model import (
+    Document,
+    ParameterTable,
+    Scenario,
+    ScenarioIdentity,
+    StepPath,
+    walk_steps,
+    with_resolved_report_url,
+)
+from .schema import (
     DELTA_SCHEMA_URL,
     Change,
     DeltaMetadata,
@@ -24,9 +33,6 @@ from .delta import (
     Suggestion,
     walk_step_deltas,
 )
-from .documents import Document, with_resolved_report_url
-from .schema import ParameterTable, Scenario, ScenarioIdentity
-from .step_tree import StepPath, walk_steps
 
 
 def _with_citable_report_urls(metadata: DeltaMetadata) -> DeltaMetadata:

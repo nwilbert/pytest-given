@@ -19,14 +19,8 @@ from ..capture import (
     parse_short_repr,
     set_active_collector,
 )
-from ..model import (
-    ErrorCause,
-    ErrorInfo,
-    NodeId,
-    ParamSpec,
-    Status,
-    snapshot_param_value,
-)
+from ..grouping import ParamSpec, snapshot_param_value
+from ..model import ErrorCause, ErrorInfo, NodeId, Status
 from .case_ids import is_custom_id
 from .fixtures import graft_fixture_recordings
 from .state import given_config, scenario_marker, session_collector, session_state

@@ -6,15 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given.model import (
-    DeltaData,
-    Glossary,
-    PytestGivenError,
-    ReportData,
-    SourceLocation,
-    delta_from_dict,
-    delta_to_dict,
-)
+from pytest_given.delta import DeltaData, delta_from_dict, delta_to_dict
+from pytest_given.model import Glossary, PytestGivenError, ReportData, SourceLocation
 from pytest_given.report.delta import sinks as delta_sinks
 from pytest_given.report.delta.html_renderer import (
     ListedScenario,

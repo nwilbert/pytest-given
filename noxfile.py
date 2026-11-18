@@ -950,12 +950,13 @@ import sys
 from pathlib import Path
 
 from pytest_given import model
-from pytest_given.model.delta_document import DeltaDocument
+from pytest_given.delta.document import DeltaDocument
+from pytest_given.delta.schema import DELTA_SCHEMA_VERSION
 from pytest_given.model.documents import ReportDocument, json_schema
 
 for kind, version, schema in [
     ('report', model.REPORT_SCHEMA_VERSION, json_schema(ReportDocument)),
-    ('delta', model.DELTA_SCHEMA_VERSION, json_schema(DeltaDocument)),
+    ('delta', DELTA_SCHEMA_VERSION, json_schema(DeltaDocument)),
 ]:
     path = Path('docs/site/schemas') / model.schema_file_name(kind, version)
     path.parent.mkdir(parents=True, exist_ok=True)

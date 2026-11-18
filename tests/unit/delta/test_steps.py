@@ -1,6 +1,7 @@
 """Aligning two step trees into equal, modified, added and removed steps."""
 
 from pytest_given import given, scenario, then, when
+from pytest_given.delta import AttachmentDelta, LineDelta, StepChange, StepDelta
 from pytest_given.delta.narration import (
     MODIFIED_SIMILARITY,
     Reading,
@@ -9,17 +10,7 @@ from pytest_given.delta.narration import (
     tokens_equal,
 )
 from pytest_given.delta.steps import align_steps, steps_changed
-from pytest_given.model import (
-    Attachment,
-    AttachmentDelta,
-    AttachmentLabel,
-    Glossary,
-    LineDelta,
-    Step,
-    StepChange,
-    StepDelta,
-    TermId,
-)
+from pytest_given.model import Attachment, AttachmentLabel, Glossary, Step, TermId
 from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import step
 

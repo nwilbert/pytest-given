@@ -4,13 +4,9 @@ import typing
 import pytest
 from pydantic import BaseModel
 
-from pytest_given.model import (
-    DeltaData,
-    ReportData,
-    Scenario,
-    SessionCapture,
-)
-from pytest_given.model.delta_document import DeltaDocument
+from pytest_given.delta import DeltaData
+from pytest_given.delta.document import DeltaDocument
+from pytest_given.model import ReportData, Scenario, SessionCapture
 from pytest_given.model.documents import ReportDocument, SessionCaptureDocument
 
 _SCHEMA_URL = [('schema_url', str)]

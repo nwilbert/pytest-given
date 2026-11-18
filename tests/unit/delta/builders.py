@@ -3,13 +3,12 @@
 import dataclasses
 from collections.abc import Sequence
 
-from pytest_given.delta import DeltaInputs, build_delta
+from pytest_given.delta import DeltaData, DeltaInputs, build_delta
 from pytest_given.model import (
     CellValue,
     ColumnId,
     ColumnKind,
     Definition,
-    DeltaData,
     Glossary,
     GlossaryTerm,
     Metadata,

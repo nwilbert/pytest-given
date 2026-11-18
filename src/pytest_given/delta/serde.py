@@ -1,16 +1,18 @@
-"""DeltaData ↔ JSON-shaped dict (de)serialization, both through `documents`."""
+"""DeltaData ↔ JSON-shaped dict (de)serialization, both through `model`."""
 
 # Only reading or writing a delta needs Pydantic.
-__lazy_modules__ = [
-    'pytest_given.model.delta_document',
-    'pytest_given.model.documents',
-]
+__lazy_modules__ = ['pytest_given.delta.document', 'pytest_given.model']
 
-from .delta import DELTA_SCHEMA_VERSION, DeltaData
-from .delta_document import DeltaDocument
-from .documents import dump_document, load_document
-from .errors import PytestGivenError
-from .serde import JsonObject, is_delta_dict, refuse_another_schema_version
+from ..model import (
+    JsonObject,
+    PytestGivenError,
+    dump_document,
+    is_delta_dict,
+    load_document,
+    refuse_another_schema_version,
+)
+from .document import DeltaDocument
+from .schema import DELTA_SCHEMA_VERSION, DeltaData
 
 
 def delta_to_dict(delta: DeltaData) -> JsonObject:

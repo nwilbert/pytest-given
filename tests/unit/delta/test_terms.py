@@ -1,9 +1,10 @@
 """Pairing two glossaries' terms: the rename log, kinds, changes, derived facts."""
 
 from pytest_given import given, scenario, then, when
+from pytest_given.delta import TermFacts
 from pytest_given.delta.renames import RenameEntry, RenameLog
 from pytest_given.delta.terms import align_terms, term_facts
-from pytest_given.model import GlossaryTerm, TermFacts, TermId
+from pytest_given.model import GlossaryTerm, TermId
 from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import (
     glossary_of,

@@ -4,7 +4,7 @@ neither the run order nor how pytest-xdist spread the tests changes it."""
 from collections.abc import Iterable, Mapping
 from pathlib import PurePosixPath
 
-from .schema import NodeId, Scenario, Step
+from ..model import NodeId, Scenario, Step
 
 type _SortKey = tuple[tuple[str, ...], bool, int, int]
 

@@ -6,8 +6,7 @@ import pytest
 
 from pytest_given import given, scenario, then, when
 from pytest_given.capture.definition_refs import resolve_definition_refs
-from pytest_given.lint import DEFAULTS
-from pytest_given.lint.catalog import RuleId
+from pytest_given.lint.catalog import DEFAULTS, RuleId
 from pytest_given.lint.runtime_rules import _unresolved_bold_spans, run_runtime_rules
 from pytest_given.model import (
     CapturedStep,

@@ -3,17 +3,14 @@
 import pytest
 
 from pytest_given import given, scenario, then, when
-from pytest_given.delta import attachments
+from pytest_given.delta import AttachmentDelta, LineDelta, TextSegment, attachments
 from pytest_given.delta.attachments import align_attachments, line_diff
 from pytest_given.model import (
     Attachment,
-    AttachmentDelta,
     AttachmentLabel,
     AttachmentRef,
     ColumnId,
     ContentType,
-    LineDelta,
-    TextSegment,
 )
 from tests.ubiquitous_language import pg
 

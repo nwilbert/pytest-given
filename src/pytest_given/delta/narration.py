@@ -17,10 +17,8 @@ from typing import Literal
 
 from ..markdown import CodeSpan, EmphasisSpan, PlainSpan, located_spans
 from ..model import (
-    DiffSegment,
     Glossary,
     GlossaryTerm,
-    Mark,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -35,6 +33,7 @@ from ..model import (
     s_form,
 )
 from .lcs import lcs_pairs, marked_items
+from .schema import DiffSegment, Mark
 
 # The `similarity` from which a reworded step or line reads as modified, not
 # as removed and added.

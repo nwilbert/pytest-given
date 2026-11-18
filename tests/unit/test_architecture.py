@@ -32,7 +32,7 @@ ALLOWED: dict[str, frozenset[str]] = {
     'model': LEAVES,
     'capture': LEAVES | {'model'},
     'lint': LEAVES | {'model'},
-    'report': LEAVES | {'model'},
+    'report': LEAVES | {'model', 'delta'},
     'grouping': LEAVES | {'model', 'capture'},
     'delta': LEAVES | {'model'},
     'citations': LEAVES | {'model', 'report'},

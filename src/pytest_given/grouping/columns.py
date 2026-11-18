@@ -30,13 +30,13 @@ from ..model import (
     ParameterColumn,
     ParameterTable,
     ParamValue,
-    RawParamValue,
     boolean_phrases,
     iter_steps,
     param_id,
     render_interpolation,
 )
 from .context import Format, Group
+from .raw_params import RawParamValue
 
 type _SharedDerivedKey = tuple[str, tuple[tuple[NodeId, CellValue], ...]]
 

@@ -5,7 +5,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from ...model import DeltaData, JsonObject, delta_from_dict
+from ...delta import DeltaData, delta_from_dict
+from ...model import JsonObject
 from ..sinks import RenderedFile, emit_files, require_suffix
 from ..theme import DEFAULT_THEME, Theme
 from .html_renderer import render_delta_html

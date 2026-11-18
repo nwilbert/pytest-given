@@ -12,21 +12,21 @@ from importlib.metadata import version
 from pathlib import Path
 
 from ..delta import (
+    Change,
+    DeltaData,
     DeltaInputs,
     build_delta,
+    change_counts,
     check_schema_versions,
+    delta_to_dict,
     read_rename_log,
     revs_outside_range,
     version_warnings,
 )
 from ..git import tags_by_commit
 from ..model import (
-    Change,
-    DeltaData,
     JsonObject,
     PytestGivenError,
-    change_counts,
-    delta_to_dict,
     plural,
     read_report_json,
     report_from_dict,

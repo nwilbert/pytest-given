@@ -83,7 +83,10 @@ from .story_view import (
 from .theme import DEFAULT_THEME, Theme
 
 if TYPE_CHECKING:
-    from ..model import Change, Side
+    from ..delta import (
+        Change,
+        Side,
+    )
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 

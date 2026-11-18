@@ -33,11 +33,10 @@ from ..model import (
     ReportData,
     SessionCapture,
     Story,
-    in_report_order,
     iter_steps,
     report_to_dict,
 )
-from ..report import emit_sinks, sink_failure, write_console_as_utf8
+from ..report import emit_sinks, in_report_order, sink_failure, write_console_as_utf8
 from .state import (
     capture_bootstrapped,
     given_config,

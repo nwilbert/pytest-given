@@ -7,15 +7,7 @@ from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, replace
 from itertools import groupby, islice, takewhile
 
-from ..model import (
-    Attachment,
-    AttachmentDelta,
-    AttachmentRef,
-    ColumnId,
-    LineDelta,
-    StepAttachment,
-    TextSegment,
-)
+from ..model import Attachment, AttachmentRef, ColumnId, StepAttachment
 from .lcs import (
     Anchor,
     anchor_gaps,
@@ -26,6 +18,7 @@ from .lcs import (
 )
 from .narration import MODIFIED_SIMILARITY, pieces, similarity
 from .order import interleaved
+from .schema import AttachmentDelta, LineDelta, TextSegment
 
 # `lcs_pairs` builds a table of len(a) * len(b) cells. Past this many, lines
 # align on the lines unique to both sides, a line goes without a word diff, and

@@ -8,21 +8,23 @@ from itertools import groupby
 from operator import itemgetter
 from typing import Protocol
 
-from ...model import (
+from ...delta import (
     SIDE_MARK,
     DiffSegment,
     Mark,
-    NarrationPart,
-    Phase,
     ScenarioDelta,
     Side,
-    Step,
     StepChange,
     StepDelta,
+    on_side,
+)
+from ...model import (
+    NarrationPart,
+    Phase,
+    Step,
     StepPath,
     merged_literals,
     narration_text,
-    on_side,
     walk_steps,
 )
 from ..html_renderer import phase_blocks

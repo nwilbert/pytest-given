@@ -47,12 +47,13 @@ strict dependency direction (held by `tests/unit/test_architecture.py`):
 markdown/                  a leaf — reading Markdown (blocks, tables, inline
                            spans), writing spans back, rendering them as HTML
 git/                       a leaf — every `git` subprocess call
-model/                     schema, serde (report and delta), errors, shared text rules,
-                           term cross-references (`term_refs`)
-capture/  lint/  report/   each on model/ only, never on each other
+model/                     the report's schema and serde, errors, shared text
+                           rules, term cross-references (`term_refs`)
+capture/  lint/            each on model/ only, never on each other
+delta/                     on model/ only: the delta's schema and serde, pairing
+                           two reports, the rename log, word diffs; no pytest
+report/                    on model/ + delta/
 grouping/                  on model/ + capture/
-delta/                     on model/ only: pairing two reports, the rename log,
-                           word diffs; no pytest
 citations/                 on model/ + report/
 plugin/   cli/             the entry points; may import all nine, and hold
                            nothing the nine could
@@ -72,8 +73,10 @@ What no filename tells you:
   should say comes from `report`: its glyph, link text and summary from
   `CitationIndex`, since the HTML's copy buttons write the same lines, and a
   `<details>` citation's body from `citation_body_md`.
-- `delta/` pairs two reports into a `model.DeltaData`, and `report/delta/`
-  renders it with the report's own renderer helpers and templates.
+- `delta/` pairs two reports into a `delta.DeltaData`, and `report/delta/`
+  renders it with the report's own renderer helpers and templates. Only
+  `report/delta/` imports `delta/` at run time, and `report` loads it lazily, so
+  a session that renders no delta loads no delta code.
 - Each package exposes the *whole* job, not its parts: `report.emit_sinks`
   (render → write → discard-on-failure, so a failure leaves no half-written
   report), `lint.run_lint` and `citations.check_citations` (every document

@@ -1,16 +1,11 @@
-"""The parametrize carriers capture, grouping and the plugin pass between
-themselves.
-
-None of it is serialized: the JSON report holds what `ReportDocument` in
-`documents.py` declares, all of it from `schema.py`. Kept apart so "does this
-end up in the report?" is answerable by which file a type is declared in.
-"""
+"""The parametrize carriers the plugin hands grouping. None of it is in the
+JSON report."""
 
 import contextlib
 import copy
 from typing import NamedTuple
 
-from .schema import NodeId
+from ..model import NodeId
 
 # A parametrize argument as pytest handed it over — an arbitrary object. Kept
 # raw on ParamSpec so grouping can re-apply an interpolation's conversion and

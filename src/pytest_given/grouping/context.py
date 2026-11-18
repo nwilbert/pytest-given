@@ -14,13 +14,12 @@ from ..model import (
     CapturedStep,
     NarrationPart,
     NodeId,
-    ParamInfo,
-    PartIndex,
     Phase,
-    RawParamValue,
     StepPath,
     walk_steps,
 )
+from .narration import PartIndex
+from .raw_params import ParamInfo, RawParamValue
 
 # A slot's rendering details as the author wrote them: `(conversion,
 # format_spec)`. `None` for the pair as a whole means "no formatting at all",

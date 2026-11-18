@@ -20,6 +20,8 @@ from pytest_given import (
 )
 from pytest_given.capture.template import narration_from
 from pytest_given.grouping import (
+    ParamInfo,
+    ParamSpec,
     checks,
     columns,
     group_parametrized,
@@ -36,8 +38,6 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     NodeId,
-    ParamInfo,
-    ParamSpec,
     Pin,
     PytestGivenError,
     Scenario,
@@ -48,11 +48,11 @@ from pytest_given.model import (
     StepPath,
     StoryId,
     TermId,
-    in_report_order,
     narration_of,
     narration_text,
     walk_steps,
 )
+from pytest_given.report import in_report_order
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
 

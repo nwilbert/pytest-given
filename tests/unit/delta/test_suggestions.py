@@ -5,17 +5,10 @@ import time
 import pytest
 
 from pytest_given import given, scenario, then, when
-from pytest_given.delta import DeltaInputs, build_delta, suggestions
+from pytest_given.delta import DeltaData, DeltaInputs, build_delta, suggestions
 from pytest_given.delta.build import DeltaResult
-from pytest_given.model import (
-    DeltaData,
-    IdentityPair,
-    ParameterTable,
-    ReportData,
-    Scenario,
-    Step,
-    Suggestion,
-)
+from pytest_given.delta.schema import IdentityPair, Suggestion
+from pytest_given.model import ParameterTable, ReportData, Scenario, Step
 from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import (
     glossary_of,

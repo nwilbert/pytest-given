@@ -20,12 +20,10 @@ from ..model import (
     NarrationValue,
     NodeId,
     ParameterColumn,
-    RawParamValue,
     StepPath,
     boolean_phrases,
     param_id,
     placeholder_mismatch,
-    rebuilt,
 )
 from .attachments import templatize_attachments
 from .checks import (
@@ -39,6 +37,8 @@ from .columns import (
     param_cell,
 )
 from .context import Format, PartSite
+from .narration import rebuilt
+from .raw_params import RawParamValue
 
 
 def templatize_steps(

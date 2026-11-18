@@ -5,18 +5,16 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import groupby
 
-from ...model import (
-    Attachment,
+from ...delta import (
     AttachmentChange,
     AttachmentDelta,
     LineChange,
     LineDelta,
     Side,
-    Step,
-    StepAttachment,
     TextSegment,
     on_side,
 )
+from ...model import Attachment, Step, StepAttachment
 
 CONTEXT_LINES = 3
 MIN_FOLDED = 4  # fewer hidden lines than this stay shown

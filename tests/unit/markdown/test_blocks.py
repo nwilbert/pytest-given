@@ -10,10 +10,10 @@ from pytest_given.markdown import (
     Table,
     document_blocks,
     html_blocks,
-    table_cell_spans,
     tables,
     text_runs,
 )
+from pytest_given.markdown.blocks import table_cell_spans
 
 
 @pytest.mark.parametrize(

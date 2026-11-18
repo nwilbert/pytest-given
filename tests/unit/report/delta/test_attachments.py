@@ -2,8 +2,9 @@
 
 import dataclasses
 
+from pytest_given.delta import AttachmentDelta
 from pytest_given.delta.attachments import line_diff
-from pytest_given.model import Attachment, AttachmentDelta
+from pytest_given.model import Attachment
 from pytest_given.report.delta.attachments import (
     CONTEXT_LINES,
     MIN_FOLDED,

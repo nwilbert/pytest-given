@@ -1,19 +1,16 @@
 """Pairing a paired scenario's parameter-table columns and cases."""
 
 from pytest_given import given, scenario, then, when
+from pytest_given.delta import CasePair, LineDelta, ParameterDelta
 from pytest_given.delta.order import interleaved
+from pytest_given.delta.schema import CellDelta, ColumnPair
 from pytest_given.delta.table import align_table
 from pytest_given.model import (
     Attachment,
     AttachmentLabel,
-    CasePair,
-    CellDelta,
     CellValue,
     ColumnId,
-    ColumnPair,
-    LineDelta,
     NodeId,
-    ParameterDelta,
     ParameterTable,
 )
 from tests.ubiquitous_language import pg

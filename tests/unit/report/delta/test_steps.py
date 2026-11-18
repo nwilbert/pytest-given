@@ -1,17 +1,15 @@
 """A changed scenario's steps side by side (`report/delta/steps.py`): the rows,
 blocks and marked words the delta page renders, never the markup."""
 
-from pytest_given.delta import DeltaInputs, build_delta
-from pytest_given.delta.renames import parse_rename_log
-from pytest_given.model import (
+from pytest_given.delta import (
+    DeltaInputs,
     DiffSegment,
-    Glossary,
-    NarrationTermRef,
-    Scenario,
     ScenarioDelta,
     Side,
-    narration_text,
+    build_delta,
 )
+from pytest_given.delta.renames import parse_rename_log
+from pytest_given.model import Glossary, NarrationTermRef, Scenario, narration_text
 from pytest_given.report.delta.steps import (
     MarkedRun,
     StepRow,

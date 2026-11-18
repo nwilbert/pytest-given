@@ -27,8 +27,9 @@ from ..capture import (
 from ..capture import (
     scenario_marker as capture_scenario_marker,
 )
+from ..grouping import ParamInfo
 from ..lint import LintConfig, LintFinding
-from ..model import Glossary, NodeId, ParamInfo, ReportUrl, SourceLocation
+from ..model import Glossary, NodeId, ReportUrl, SourceLocation
 from ..report import SinkConfig
 
 

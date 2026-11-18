@@ -2,7 +2,7 @@
 
 from collections.abc import Callable, Iterable, Iterator, Sequence
 
-from ..model import Mark
+from .schema import Mark
 
 type Anchor = tuple[int, int]
 type Gap = tuple[range, range, Anchor | None]

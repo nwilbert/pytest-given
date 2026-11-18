@@ -1,8 +1,6 @@
 """The report schema: what is serialized into the JSON report.
 
-The parametrize carriers capture and grouping pass between themselves live in
-`raw_params.py`, so what reaches a consumer is answerable from this file alone:
-every field of these dataclasses is in the JSON, except `CapturedStep.source`,
+Every field of these dataclasses is in the JSON, except `CapturedStep.source`,
 which only a session capture carries.
 """
 

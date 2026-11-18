@@ -4,23 +4,19 @@ that refer to it, and the terms a ref's tooltip reads."""
 from dataclasses import dataclass
 from typing import Literal
 
-from ...model import (
+from ...delta import (
     SIDE_MARK,
     Change,
     DeltaData,
-    Glossary,
-    GlossaryTerm,
     Side,
     TermDelta,
     TermFacts,
-    TermId,
-    build_term_crossrefs,
     change_counts,
     on_side,
     other_side,
-    plural,
     terms_read_the_same,
 )
+from ...model import Glossary, GlossaryTerm, TermId, build_term_crossrefs, plural
 from ..glossary_view import KindGrouping, group_by_kind, plural_if_any
 from ..html_renderer import TermRefTarget
 from .scenarios import REMOVED, ListedScenario

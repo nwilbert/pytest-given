@@ -10,23 +10,17 @@ from itertools import groupby
 
 from ..model import (
     ColumnId,
-    DiffSegment,
-    GlossaryDelta,
     GlossaryTerm,
-    IdentityPair,
     Narration,
     NarrationPart,
     NarrationTermRef,
     NodeId,
     ParameterTable,
     Scenario,
-    ScenarioDelta,
-    Suggestion,
     TermId,
     case_id,
     iter_steps,
     scenario_identity,
-    walk_step_deltas,
 )
 from .narration import (
     Reading,
@@ -35,6 +29,14 @@ from .narration import (
     bag_similarity,
     reading_words,
     word_counts,
+)
+from .schema import (
+    DiffSegment,
+    GlossaryDelta,
+    IdentityPair,
+    ScenarioDelta,
+    Suggestion,
+    walk_step_deltas,
 )
 from .table import CellKey, cells_of
 from .terms import kinds_pair

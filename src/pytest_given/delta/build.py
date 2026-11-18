@@ -5,27 +5,17 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
 from ..model import (
-    CHANGED_PARTS,
-    ChangedPart,
     ColumnId,
-    DeltaData,
-    DeltaMetadata,
-    DeltaSide,
-    IdentityPair,
     Narration,
     NarrationPlaceholder,
     ReportData,
     Scenario,
-    ScenarioDelta,
     ScenarioIdentity,
-    ScenarioPairing,
-    StepDelta,
     case_id,
     case_node_id,
     case_suffix,
     node_base,
     scenario_identity,
-    walk_step_deltas,
     without_case_id,
 )
 from .chains import Rewrites, rewrite_case_id, rewrite_identities, undo_case_merges
@@ -42,6 +32,18 @@ from .narration import (
 )
 from .order import interleaved
 from .renames import RenameLog
+from .schema import (
+    CHANGED_PARTS,
+    ChangedPart,
+    DeltaData,
+    DeltaMetadata,
+    DeltaSide,
+    IdentityPair,
+    ScenarioDelta,
+    ScenarioPairing,
+    StepDelta,
+    walk_step_deltas,
+)
 from .steps import align_steps, steps_changed
 from .suggestions import suggest
 from .table import align_table

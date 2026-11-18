@@ -22,14 +22,13 @@ from .delta import DeltaSinkConfig, emit_delta_sinks
 from .glyphs import CITATION_GLYPH, STATUS_GLYPH
 from .link_text import html_link_text, link_text
 from .md_renderer import citation_body_md
+from .order import in_report_order
 from .sinks import (
     DEFAULT_DELTA_HTML_PATH,
     DEFAULT_DELTA_JSON_PATH,
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
     MD_SUFFIXES,
-    RenderedFile,
-    RenderedSinks,
     SinkConfig,
     emit_sinks,
     refuse_writing_over_an_input,
@@ -39,7 +38,7 @@ from .sinks import (
 from .slugs import build_scenario_slug_index
 from .source_link import SOURCE_LINK_HELP, resolve_source_link_template
 from .staged_write import write_all_or_none
-from .story_view import CoverageRecord, build_coverage_records
+from .story_view import build_coverage_records
 from .theme import DEFAULT_THEME, THEME_HELP, Theme, resolve_theme
 
 __all__ = [
@@ -57,10 +56,7 @@ __all__ = [
     'THEME_HELP',
     'Citation',
     'CitationIndex',
-    'CoverageRecord',
     'DeltaSinkConfig',
-    'RenderedFile',
-    'RenderedSinks',
     'SinkConfig',
     'Target',
     'Theme',
@@ -70,6 +66,7 @@ __all__ = [
     'emit_delta_sinks',
     'emit_sinks',
     'html_link_text',
+    'in_report_order',
     'link_text',
     'refuse_writing_over_an_input',
     'report_fragment',

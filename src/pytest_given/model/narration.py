@@ -9,7 +9,7 @@ Only rules that need nothing but the parts. `try_term_ref` stays in
 `capture/template.py`, where the glossary handle types it matches on live.
 """
 
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from string import Formatter
 from typing import Literal, assert_never
 
@@ -33,7 +33,6 @@ from .schema import (
     case_id,
     definition_part_text,
 )
-from .step_tree import PartIndex
 
 type InterpolatedPart = NarrationValue | NarrationPlaceholder | NarrationTermRef
 type NarrationPiece = InlineSpan | InterpolatedPart
@@ -243,25 +242,6 @@ def merged_literals(parts: Iterable[NarrationPart]) -> tuple[NarrationPart, ...]
     return tuple(merged)
 
 
-def rebuilt(
-    narration: Narration, part_of: Callable[[PartIndex, NarrationPart], NarrationPart]
-) -> Narration:
-    """The narration with every part mapped, and its text re-derived from them.
-
-    Lives here with `narration_text`, which is the rule it has to reapply. A
-    part-less narration passes through: its text is all it has, and there is
-    nothing to rebuild it from.
-
-    `part_of` takes the part's `PartIndex` as well as the part: a grouping slot
-    is identified by its position, and a mapper that does not care ignores it.
-    """
-    if not narration.parts:
-        return narration
-    return narration_of(
-        part_of(PartIndex(index), part) for index, part in enumerate(narration.parts)
-    )
-
-
 def render_interpolation(
     value: object, conversion: str | None, format_spec: str
 ) -> str:
@@ -292,18 +272,3 @@ def phrase_value_mismatch(value: object, conversion: str | None) -> str | None:
     if isinstance(value, bool) and not conversion:
         return None
     return type(value).__name__ + (f' with !{conversion}' if conversion else '')
-
-
-def placeholder_value(part: NarrationPlaceholder, value: object) -> NarrationValue:
-    """One `Template` placeholder resolved against the value bound to its name.
-
-    Each caller keeps its own lookup, since what a missing name means differs —
-    a helper's signature has already been bound, while a per-case placeholder
-    naming no column is an author's typo.
-    """
-    return NarrationValue(
-        rendered=render_interpolation(value, part.conversion, part.format_spec),
-        expression=part.name,
-        format_spec=part.format_spec,
-        conversion=part.conversion,
-    )

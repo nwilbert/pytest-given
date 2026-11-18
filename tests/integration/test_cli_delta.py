@@ -7,12 +7,8 @@ import pytest
 
 from pytest_given import given, scenario, then, when
 from pytest_given.cli import main
-from pytest_given.model import (
-    Glossary,
-    ReportData,
-    delta_from_dict,
-    report_to_dict,
-)
+from pytest_given.delta import delta_from_dict
+from pytest_given.model import Glossary, ReportData, report_to_dict
 from pytest_given.report import DEFAULT_DELTA_HTML_PATH, DEFAULT_DELTA_JSON_PATH
 from pytest_given.report.delta.html_renderer import (
     RangeSide,

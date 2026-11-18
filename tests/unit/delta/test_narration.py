@@ -3,6 +3,7 @@
 from collections.abc import Mapping
 
 from pytest_given import given, scenario, then, when
+from pytest_given.delta import DiffSegment, Mark
 from pytest_given.delta.narration import (
     Reading,
     narrations_equal,
@@ -15,10 +16,8 @@ from pytest_given.delta.narration import (
 )
 from pytest_given.model import (
     ColumnId,
-    DiffSegment,
     Glossary,
     GlossaryTerm,
-    Mark,
     Narration,
     NarrationLiteral,
     NarrationPart,

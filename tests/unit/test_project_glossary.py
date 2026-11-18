@@ -5,7 +5,7 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
-from pytest_given.markdown import table_cell_spans
+from pytest_given.markdown.blocks import table_cell_spans
 
 _GLOSSARY = Path(__file__).parents[2] / 'GLOSSARY.md'
 

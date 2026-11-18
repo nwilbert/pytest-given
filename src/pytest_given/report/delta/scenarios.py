@@ -7,28 +7,30 @@ from dataclasses import dataclass, field
 from functools import cached_property
 from typing import Literal
 
-from ...model import (
+from ...delta import (
     SIDE_MARK,
+    CasePair,
+    Change,
+    DeltaData,
+    ParameterDelta,
+    ScenarioDelta,
+    Side,
+    StepDelta,
+    on_side,
+)
+from ...model import (
     Attachment,
     AttachmentRef,
-    CasePair,
     CellValue,
-    Change,
     ColumnId,
-    DeltaData,
     Narration,
     NarrationPart,
     NarrationPlaceholder,
     ParameterCase,
     ParameterColumn,
-    ParameterDelta,
     ParameterTable,
     Scenario,
-    ScenarioDelta,
-    Side,
     Step,
-    StepDelta,
-    on_side,
 )
 from ..html_renderer import column_phase_blocks, repr_columns, shown_text
 from ..slugs import build_scenario_slug_index

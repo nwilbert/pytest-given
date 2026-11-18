@@ -5,25 +5,27 @@ from collections.abc import Callable, Hashable, Mapping, Sequence
 
 from ..model import (
     Attachment,
-    CasePair,
-    CasePairing,
-    CellDelta,
     CellValue,
     ColumnId,
     ColumnKind,
-    ColumnPair,
-    ColumnPairing,
-    LineDelta,
     NodeId,
     ParameterCase,
     ParameterColumn,
-    ParameterDelta,
     ParameterTable,
     ParamValue,
     case_id,
 )
 from .attachments import line_diff
 from .order import interleaved
+from .schema import (
+    CasePair,
+    CasePairing,
+    CellDelta,
+    ColumnPair,
+    ColumnPairing,
+    LineDelta,
+    ParameterDelta,
+)
 
 type CellKey = tuple[str, ParamValue]  # (type name, value): 1, 1.0 and True differ
 type CaseCells = dict[ColumnId, CellKey]

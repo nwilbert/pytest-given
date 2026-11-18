@@ -8,15 +8,15 @@ import jsonschema
 import pydantic
 import pytest
 
+from pytest_given.delta import delta_to_dict
+from pytest_given.delta.document import DeltaDocument
+from pytest_given.delta.schema import DELTA_SCHEMA_VERSION
 from pytest_given.model import (
-    DELTA_SCHEMA_VERSION,
     REPORT_SCHEMA_VERSION,
     JsonObject,
-    delta_to_dict,
     report_to_dict,
     schema_file_name,
 )
-from pytest_given.model.delta_document import DeltaDocument
 from pytest_given.model.documents import Document, ReportDocument, json_schema
 from pytest_given.report import SinkConfig
 from pytest_given.report.delta.sinks import DeltaSinkConfig, emit_delta_sinks

@@ -1,15 +1,11 @@
-"""The delta report's JSON schema.
-
-`report/` renders a delta from these dataclasses without importing the `delta/`
-package that computes it, so the shape lives in the leaf both depend on.
-"""
+"""The delta report's JSON schema."""
 
 from collections import Counter
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from typing import Final, Literal
 
-from .schema import (
+from ..model import (
     SCHEMAS_URL,
     ColumnId,
     ColumnKind,
@@ -20,10 +16,10 @@ from .schema import (
     NodeId,
     Scenario,
     ScenarioIdentity,
+    StepPath,
     TermId,
     schema_file_name,
 )
-from .step_tree import StepPath
 
 type DeltaSchemaVersion = Literal[1]
 DELTA_SCHEMA_VERSION: Final[DeltaSchemaVersion] = 1

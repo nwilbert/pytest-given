@@ -15,14 +15,12 @@ from ..model import (
     Narration,
     NarrationPart,
     NarrationPlaceholder,
-    ParamInfo,
-    ParamSpec,
-    RawParamValue,
     placeholder_mismatch,
-    rebuilt,
     with_case_id,
 )
 from .checks import check_case_phrase_values
+from .narration import rebuilt
+from .raw_params import ParamInfo, ParamSpec, RawParamValue
 
 
 def per_case_scenarios(

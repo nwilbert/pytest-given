@@ -14,20 +14,22 @@ from typing import NamedTuple
 import jinja2
 from markupsafe import Markup
 
-from ...markdown import definition_html
-from ...model import (
+from ...delta import (
     CHANGED_PARTS,
     SIDE_MARK,
     Change,
     DeltaData,
     DeltaSide,
-    GlossaryTerm,
     Mark,
-    Narration,
     Side,
-    SourceLocation,
     TextSegment,
     change_counts,
+)
+from ...markdown import definition_html
+from ...model import (
+    GlossaryTerm,
+    Narration,
+    SourceLocation,
     narration_of,
     narration_text,
     texts_in_context,

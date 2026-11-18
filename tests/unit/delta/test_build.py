@@ -7,22 +7,23 @@ import pytest
 
 from pytest_given import given, scenario, then, when
 from pytest_given.delta import (
+    DeltaData,
     DeltaInputs,
+    ScenarioDelta,
     build_delta,
     check_schema_versions,
     version_warnings,
 )
 from pytest_given.delta.build import DeltaResult, comparable_title, is_per_case
 from pytest_given.delta.renames import RenameEntry, RenameLog
+from pytest_given.delta.schema import IdentityPair
 from pytest_given.model import (
     REPORT_SCHEMA_VERSION,
     Attachment,
     AttachmentLabel,
     ColumnKind,
-    DeltaData,
     ErrorInfo,
     Glossary,
-    IdentityPair,
     JsonObject,
     NarrationValue,
     NodeId,
@@ -30,7 +31,6 @@ from pytest_given.model import (
     PytestGivenError,
     ReportData,
     Scenario,
-    ScenarioDelta,
     SentenceId,
     SourceLocation,
     Step,

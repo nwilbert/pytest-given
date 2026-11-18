@@ -10,17 +10,12 @@ baseline, comparable cases, cells, cases — happens here; the promoting is
 from collections.abc import Iterable
 from dataclasses import replace
 
-from ..model import (
-    CapturedScenario,
-    ParamInfo,
-    iter_steps,
-    node_base,
-    rolled_up_status,
-)
+from ..model import CapturedScenario, iter_steps, node_base, rolled_up_status
 from .checks import check_phrase_values, check_rebound_params, check_same_template
 from .columns import ColumnBuilder, narrated_column_order, param_cell_formats
 from .context import build_group
 from .percase import per_case_scenarios
+from .raw_params import ParamInfo
 from .templatize import templatize_scenario_title, templatize_steps
 
 # What cases group on: one test function, one name.

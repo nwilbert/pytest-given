@@ -8,13 +8,12 @@ and severity resolution underneath stay in their own modules
 (docs/specs/2026-07-05-narration-lint-design.md).
 """
 
-from .catalog import DEFAULTS, LintFinding
+from .catalog import LintFinding
 from .config import LintConfig, parse_lint_config
 from .runner import run_lint
 from .summary import error_count, summary_rows, summary_title
 
 __all__ = [
-    'DEFAULTS',
     'LintConfig',
     'LintFinding',
     'error_count',

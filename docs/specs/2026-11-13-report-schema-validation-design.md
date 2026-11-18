@@ -21,7 +21,7 @@ Define the JSON report and the delta report by a published JSON Schema, and read
 
 ## Anti-goals
 
-- Pydantic types in the model. `model/schema.py` and `model/delta.py` keep stdlib dataclasses: no `BaseModel`, no `pydantic.dataclasses`, no `Field`, no `Discriminator` marker. Pydantic appears only in the module that holds the document types (see [Reading](#reading)).
+- Pydantic types in the model. `model/schema.py` and `delta/schema.py` keep stdlib dataclasses: no `BaseModel`, no `pydantic.dataclasses`, no `Field`, no `Discriminator` marker. Pydantic appears only in the module that holds the document types (see [Reading](#reading)).
 - Pydantic imported by a plain `pytest` run that writes no report, on Python 3.15. Python 3.14 has no lazy imports, so every run imports it there.
 - A published schema that disagrees with the JSON written. Two tests hold them together (see [Committed schemas](#committed-schemas)).
 
@@ -47,7 +47,7 @@ A later change may let `pytest-given delta` take an older report as its before s
 
 ## Reading
 
-`model/` holds one document type per report kind: `ReportDocument` in `documents.py` and `DeltaDocument` in `delta_document.py`, so writing a report never builds the delta's. Each is a Pydantic `BaseModel` describing the whole written JSON. Its fields are the root dataclass's fields (`ReportData`, `DeltaData`) and `$schema` by alias. The field types are the existing stdlib dataclasses. Pydantic validates those directly, including `NewType` ids, `Literal` aliases, PEP 695 `type` aliases, tuples, and optional fields with defaults.
+Each report kind has one document type: `ReportDocument` in `model/documents.py` and `DeltaDocument` in `delta/document.py`, so writing a report never builds the delta's. Each is a Pydantic `BaseModel` describing the whole written JSON. Its fields are the root dataclass's fields (`ReportData`, `DeltaData`) and `$schema` by alias. The field types are the existing stdlib dataclasses. Pydantic validates those directly, including `NewType` ids, `Literal` aliases, PEP 695 `type` aliases, tuples, and optional fields with defaults.
 
 The root is a model because a model takes configuration and passes it on to the stdlib dataclasses nested in it. A `TypeAdapter` over the root dataclass refuses a `config` argument. The configuration is `extra='forbid'`: an unknown key anywhere fails with its path (`scenarios.0.stauts: Unexpected keyword argument`).
 

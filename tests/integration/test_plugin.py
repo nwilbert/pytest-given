@@ -7,7 +7,8 @@ import pytest
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import REPORT_SCHEMA_VERSION, JsonObject, report_from_dict
 from pytest_given.plugin import session
-from pytest_given.report import CoverageRecord, build_coverage_records
+from pytest_given.report import build_coverage_records
+from pytest_given.report.story_view import CoverageRecord
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
 # --- Capture to report: the basic shapes ---

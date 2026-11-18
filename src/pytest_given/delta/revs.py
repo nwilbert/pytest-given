@@ -3,7 +3,8 @@
 from pathlib import Path
 
 from ..git import commits_between, is_shallow, resolve_commits
-from ..model import Side, plural
+from ..model import plural
+from .schema import Side
 
 
 def revs_outside_range(

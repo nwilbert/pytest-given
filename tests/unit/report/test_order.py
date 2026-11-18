@@ -3,8 +3,8 @@ from pytest_given.model import (
     NodeId,
     Scenario,
     SourceLocation,
-    in_report_order,
 )
+from pytest_given.report import in_report_order
 
 
 def _scenario(

@@ -4,24 +4,28 @@ from collections.abc import Callable
 
 import pytest
 
-from pytest_given.model import (
-    DELTA_SCHEMA_VERSION,
+from pytest_given.delta import (
     CasePair,
-    CellDelta,
-    ColumnId,
-    ColumnPair,
     DeltaData,
-    DeltaMetadata,
     DeltaSide,
-    JsonObject,
-    NodeId,
     ParameterDelta,
-    PytestGivenError,
     ScenarioDelta,
     delta_from_dict,
     delta_to_dict,
-    is_delta_dict,
     other_side,
+)
+from pytest_given.delta.schema import (
+    DELTA_SCHEMA_VERSION,
+    CellDelta,
+    ColumnPair,
+    DeltaMetadata,
+)
+from pytest_given.model import (
+    ColumnId,
+    JsonObject,
+    NodeId,
+    PytestGivenError,
+    is_delta_dict,
     report_to_dict,
 )
 from tests.unit.delta.builders import (

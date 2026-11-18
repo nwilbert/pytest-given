@@ -26,15 +26,9 @@ from pytest_given.capture.steps import StepDescriptor
 from pytest_given.capture.story import (
     story as story_fn,
 )
+from pytest_given.grouping import snapshot_param_value
 from pytest_given.lint import LintConfig
-from pytest_given.model import (
-    Narration,
-    NodeId,
-    PytestGivenError,
-    Step,
-    case_id,
-    snapshot_param_value,
-)
+from pytest_given.model import Narration, NodeId, PytestGivenError, Step, case_id
 from pytest_given.plugin import case_ids, collection, fixtures, runtest, session, state
 from pytest_given.report import SinkConfig
 

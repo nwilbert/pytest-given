@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from pytest_given.cli.skills import BUNDLED_SKILLS_ROOT
-from pytest_given.lint import DEFAULTS, LintConfig
-from pytest_given.lint.catalog import RawLintFinding, RuleId
+from pytest_given.lint import LintConfig
+from pytest_given.lint.catalog import DEFAULTS, RawLintFinding, RuleId
 from pytest_given.lint.config import (
     apply_config,
     parse_ignore_entries,

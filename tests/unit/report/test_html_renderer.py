@@ -9,7 +9,7 @@ import pytest
 from pytest_given import Template, attach, given, scenario, then, when
 from pytest_given.capture.definition_refs import resolve_definition_refs
 from pytest_given.capture.template import narration_from
-from pytest_given.grouping import group_parametrized
+from pytest_given.grouping import ParamInfo, ParamSpec, group_parametrized
 from pytest_given.model import (
     REPORT_SCHEMA_VERSION,
     AttachmentRef,
@@ -30,8 +30,6 @@ from pytest_given.model import (
     ParameterCase,
     ParameterColumn,
     ParameterTable,
-    ParamInfo,
-    ParamSpec,
     Phase,
     ReportData,
     Scenario,
