@@ -4,7 +4,7 @@ A glossary declares the ubiquitous language your tests speak: actors, work objec
 
 ## Two ways to declare a glossary
 
-**A Markdown glossary over a Markdown file is the recommended default.** Humans and agents read the same `GLOSSARY.md`, and the tests load it directly. `TableGlossary` reads its GFM pipe tables:
+**A Markdown glossary is the recommended default.** Humans and agents read the same `GLOSSARY.md`, and the tests load it directly. `TableGlossary` reads its GFM pipe tables:
 
 ```python
 from pathlib import Path
@@ -19,11 +19,11 @@ By default, the first column holds the term and the second its definition. Each 
 g = TableGlossary('GLOSSARY.md', term_column='Term', definition_column='Meaning', kind_column='Kind', avoid_column='Avoid')
 ```
 
-The kind column takes `actor`, `work object` (or `object`), or `activity`. The avoid column lists avoided words, separated by commas.
+The kind column takes `actor`, `work object` (or `object`), or `activity`. The avoid column lists avoided words, separated by commas. Write term and kind cells plain: `| Guest |`.
 
 **`ParagraphGlossary` reads term paragraphs:** `**Order**:` opens a term, its definition follows on the same or the next line, and an optional `_Avoid_:` line lists its avoided words. Everything else, the `Relationships` and `Flagged ambiguities` sections included, is prose the reader ignores. The format has no kind. Loading a file with the wrong class raises an error that names the other one.
 
-Write term and kind cells plain: `| Guest |`. A definition renders `**bold**`, `*italic*` and `` `code` ``, and a `<br>` or newline as a line break; `__bold__` shows as written.
+A definition renders `**bold**`, `*italic*` and `` `code` ``, and a `<br>` or newline as a line break; `__bold__` shows as written.
 
 **In a definition, a bold span is a definition ref.** Bold another term's canonical name or S-form, in any case (`A **Booking** for one **room**`), and the report renders it as a term ref. Use italics for emphasis and a code span or quotes for an example word: a bold span that names no term is an `unresolved-definition-ref` lint finding.
 
@@ -40,7 +40,7 @@ book = g.activity('book', definition='Reserve a room for a stay.')
 
 Either way, **give the language a public home.** Define the glossary, and the stories once there are some, in one dedicated module with a public name, such as `tests/ubiquitous_language.py`. That module *is* the suite's ubiquitous language, not a private helper, so don't prefix its name with an underscore. Test modules import their handles from it. A glossary without stories is fine: you get the Glossary tab without writing any stories.
 
-**The plugin finds the glossary wherever it is constructed**, so it needs no wiring, with stories or without.
+**The plugin finds the glossary wherever it is constructed**, so it needs no wiring, with stories or without. A run that imports no module constructing it has no glossary, and its Glossary tab is empty.
 
 **One glossary per suite.** Two glossaries constructed while pytest imports the suite raise `PytestGivenError`. Keep one instance and import it everywhere. A glossary a test constructs while it runs doesn't count.
 
@@ -74,9 +74,9 @@ Every handle offers the same four forms, whether you captured it (`guest = g.act
 
 Each term is an actor, an activity or a work object. A term gets its kind in one of three ways:
 
-1. **Explicitly:** `g.actor(...)`, `g.activity(...)` or `g.work_object(...)`, or a `kind_column` in the glossary file.
+1. **Explicitly:** `g.actor(...)`, `g.activity(...)` or `g.work_object(...)`, or a `kind_column` in the glossary file. `kind_column` is opt-in: a column headed "Kind" is ignored unless you pass `kind_column=`.
 2. **Inferred from stories:** a term with no declared kind takes its kind from its positions in clauses. Position 0 makes it an actor, odd positions (the verb slots) an activity, and even positions from 2 on a work object. A term seen both as an actor and in a noun slot becomes an actor, because an actor can receive a hand-off. A term seen in a verb slot *and* in any other slot raises an error; add a kind column to settle it. A term used only in steps stays kindless (grey).
-   **A declared kind is never overridden:** putting a term in a slot its kind doesn't allow raises an error at `sentence(...)`. `kind_column` is opt-in: a column headed "Kind" is ignored unless you pass `kind_column=`.
+   **A declared kind is never overridden:** putting a term in a slot its kind doesn't allow raises an error at `sentence(...)`.
 3. **Deliberately deferred:** `g('foo')` declares a term the team hasn't classified yet. It goes into the *Uncategorized* kind group and shows an *Undefined* badge until someone writes a definition. Treat this as a place to sort terms later, not a place to leave them. This works only for code-defined glossaries. A Markdown glossary is a **closed vocabulary**: `g('foo')` and `g['foo']` both only look up, and raise on an unknown name. To add vocabulary, add it to the file.
 
 ## Keeping the glossary honest

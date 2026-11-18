@@ -11,7 +11,7 @@ pytest-given coverage report.json > coverage.json || true
 jq -r '.[] | select(.tracked | not)
        | .story_id + "#" + (.sentence_id|tostring)' coverage.json
 
-# scenarios that name a story yet cover none of its sentences
+# scenarios that name a story yet cover no sentence of any story
 jq -r --slurpfile coverage coverage.json '[$coverage[0][].scenario_ids[]] as $covering
        | .scenarios[] | select(.story_ids != [] and (.id | IN($covering[]) | not))
        | .id' report.json

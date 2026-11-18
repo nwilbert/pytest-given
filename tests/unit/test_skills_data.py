@@ -126,5 +126,5 @@ def test_the_delta_skill_unsets_every_ci_variable_a_commit_sha_is_read_from() ->
     text = (BUNDLED_SKILLS_ROOT / 'pytest-given-delta' / 'SKILL.md').read_text(
         encoding='utf-8'
     )
-    [command] = re.findall(r'env((?: -u \w+)+) ', text)
-    assert command.split(' -u ')[1:] == list(_COMMIT_ENV_VARS)
+    [variables] = re.findall(r'Unset ((?:`\w+`(?:, | and )?)+) for that run', text)
+    assert re.findall(r'`(\w+)`', variables) == list(_COMMIT_ENV_VARS)

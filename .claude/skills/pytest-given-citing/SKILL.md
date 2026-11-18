@@ -22,6 +22,8 @@ A glossary section link (`#view=glossary&section=…`) is neither: the citations
 - **recognize a report link by its URL:** the one the JSON stores (`given_report_url`), or the one `--report-url` names. A relative link counts only with `--report-path`, the HTML report's place in the repository.
 - **exit 2** when they have neither a URL nor a path, or when no document links the report: check the URL and path first.
 
+Run `pytest` and `pytest-given` through the project's own runner, such as `uv run` or tox.
+
 ## Triage
 
 | Citation finding | What to do |

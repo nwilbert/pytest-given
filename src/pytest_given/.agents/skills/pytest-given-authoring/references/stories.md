@@ -39,7 +39,7 @@ sentence(
 
 ## Binding scenarios to a story
 
-**Every declared story appears in the report**, covered or not. `@scenario(stories=...)` names the stories whose sentences the scenario's steps are matched against:
+**Every story declared in a module the run imports appears in the report**, covered or not. `@scenario(stories=...)` names the stories whose sentences the scenario's steps are matched against:
 
 ```python
 @scenario('Carol selects a suite', stories=book_a_group_trip)
@@ -48,7 +48,7 @@ def test_select_suite(carol):
         ...
 ```
 
-Name a story in `stories=` only when a step can match or pin one of its sentences; a scenario that covers nothing in it is still listed under the story. Coverage is matched **step by step**: a sentence is covered when *one step's* term refs include all of the sentence's terms. Term refs spread over several steps don't add up. The Stories tab shows a coverage chip for each sentence, with the scenarios that touch it. `pytest-given coverage` prints the same result (see below).
+Name a story in `stories=` only when a step can match one of its sentences. A pin needs no `stories=`, and a scenario that covers nothing in a story it names is still listed under it. Coverage is matched **step by step**: a sentence is covered when *one step's* term refs include all of the sentence's terms. Term refs spread over several steps don't add up. The Stories tab shows a coverage chip for each sentence, with the scenarios that touch it. `pytest-given coverage` prints the same result (see below).
 
 What this means when you write:
 

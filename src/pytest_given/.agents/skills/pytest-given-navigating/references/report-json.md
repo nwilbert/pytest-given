@@ -1,64 +1,36 @@
 # Report JSON shape
 
-`pytest <selection> --given-json=report.json` writes one file with five top-level keys:
+`pytest <selection> --given-json=report.json` writes one file with five top-level keys: `$schema`, `metadata`, `scenarios[]` (one entry per `@scenario`, parametrized cases grouped into one), `glossary` (`null` on a suite with no glossary) and `stories[]`. The JSON Schema at the `$schema` URL lists every field and its type. This page holds what the field names don't say.
 
-```
-$schema       the URL of the JSON Schema the file follows
-metadata      project, title, report_url, timestamp, pytest_version, plugin_version, commit_sha,
-              schema_version
-scenarios[]   one entry per @scenario (parametrized cases grouped into one)
-glossary      {terms: [...]} — every declared term, referenced or not; null on a suite with no glossary
-stories[]     one entry per story(...)
-```
+`metadata.schema_version` changes with every change to this shape, and `pytest-given report` refuses a report of another one. A delta JSON (`metadata.kind` is `"delta"`) is not a report: `pytest-given delta <file>` renders it.
 
-Which scenarios cover each story sentence is not in the file: `pytest-given coverage report.json` prints it as a JSON array, one `{story_id, sentence_id, tracked, scenario_ids}` per sentence, and exits 1 when a tracked sentence has no scenario.
+## Scenarios and steps
 
-`schema_version` changes with every change to this shape, and `pytest-given report` refuses a report of another one. The file at the `$schema` URL lists every field and its type. A delta JSON (`metadata.kind` is `"delta"`) is not a report: `pytest-given report` refuses it, and `pytest-given delta <file>` renders it.
+- **A scenario's `id` identifies no case.** A grouped parametrized scenario keeps the suffix of its first collected case (`tests/test_x.py::test_y[1-False]`), so match on a prefix, not on equality. Its `module`, `tags` and `source` come from that case too, but its `steps` from the first case that *passed*. Each case's node ID and status are in `parameters.cases[]`.
+- **On a parametrized scenario, `error` is always `null`**, even when it failed. Its errors are in each case's `parameters.cases[].error`. A step has no status or error of its own.
+- **`narration.text` keeps its `**`, `*` and `` ` `` markers as written**, in titles and steps alike, so strip them before you search for words. In a grouped scenario, the title and the steps hold the template (`the drink costs {price} euros`), not the first case's text.
+- **`tags[]` are report metadata, not pytest marks.**
+- **`story_ids` lists only the stories of `stories=`.** A scenario that pins a sentence of a story it doesn't name is missing from it. `pins` is `null` when nothing pins and `[]` when pinning turned matching off, on a scenario and a step alike.
+- **A parameter cell depends on its column's `kind`.** A case's `values` follow the order of `parameters.columns`. A `param` cell is the parametrize value. A `derived` cell is the string the case rendered, or a JSON Boolean for a local worded with a Boolean phrase. An `attachment` cell is a `{label, content, content_type}` object. Either is `null` for a case without a value. An attachment whose content varies between cases has no `content` in its step: its `column_id` names the column that holds it. `group_parametrized=False` gives one scenario per case, each with `parameters: null`.
 
-## Scenario
+`narration.parts[]` holds a text in structured form. Match a part by its keys, not by position:
 
-| Field | Meaning |
-|---|---|
-| `id` | The pytest node ID. A grouped parametrized scenario keeps the suffix of its **first collected case** (`tests/test_x.py::test_y[1-False]`), so match on a prefix, not on equality. Its `module`, `tags` and `source` come from that case too, but its `steps` from the first case that *passed*. Neither identifies a case: read `parameters.cases[]` for each case's node ID and status. |
-| `narration.text` | The scenario title. It keeps its `**`, `*` and `` ` `` markers as written, and so does a step's, so strip them before you search for words. For a parametrized scenario it is the grouped template. A *step* in a grouped parametrized scenario also holds the template (`the drink costs {price} euros`), not the text of the first case. |
-| `module` | The Python module the test lives in. |
-| `tags[]` | `tags=` from `@scenario`. These are report metadata, **not** pytest marks. |
-| `status` | `passed`, `failed`, `skipped` or `xfailed`. `xfailed` means it failed as expected, through an `xfail` mark or `pytest.xfail()`. |
-| `skip_reason` | `null`, or the reason a skipped scenario shows instead of a traceback. |
-| `xfail_reason` | `null`, or the reason an xfailed scenario was expected to fail. Such a scenario keeps its steps and error too. |
-| `duration_ms` | The wall-clock time of the test. |
-| `steps[]` | The tree of steps (see below). |
-| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{id, values, status, error, custom_id}]}` for a parametrized scenario. `kind` is `param`, `derived` or `attachment`. A case's `id` is its node ID, and its `values` are in the same order as `columns`. `custom_id` is `true` when the case's id is custom (`pytest.param(..., id=...)` or `ids=`, unless it only repeats the case's values); when any case's is, the report starts the table with the case IDs. A `derived` cell is the string the case rendered, a JSON Boolean for a local worded with a Boolean phrase, or `null` for a case without a value. An `attachment` cell is a `{label, content, content_type}` object, or `null` for a case without a value. A scenario that declines grouping with `group_parametrized=False` has `parameters: null`, like any scenario that isn't parametrized. |
-| `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}], causes: [{frames, error_tail, connector}]}`. `causes` holds a chained error's causes, root first, each with the sentence that leads on to the next. `is_internal` marks a frame from `pluggy`, `_pytest` or pytest-given; such frames are kept only with `--given-all-frames`. **On a parametrized scenario, `error` is always `null`**, even when it failed. Its errors are in each case's `parameters.cases[].error`, with the same shape. |
-| `source` | `{relpath, line}`: where the test function is defined. |
-| `story_ids` / `pins` | `story_ids` lists the stories `@scenario(stories=...)` matches against. `pins` lists the scenario's pins as `[{story_id, sentence_id}]`: `null` when the scenario isn't pinned, `[]` when it turned matching off. A step's `pins` works the same way. |
-
-## Step
-
-A step is `{phase, narration, children[], attachments[], pins, fixture_name}`. `phase` is `given`, `when` or `then`. `children` holds nested steps. `fixture_name` is set when the step came from a fixture decorated with `@given`. A step has no status or error of its own: a failure is recorded on the scenario, and for each case in `parameters.cases[]`. An entry in `attachments[]` is either `{label, content, content_type}` or, when the content varies between parametrize cases, `{label, content_type, column_id}`. The second form has no content; it points at the column that holds each case's content.
-
-`narration.parts[]` holds the step text in structured form. Each part is one of:
-
-- `{value: "literal text"}`: plain text.
-- `{rendered, expression, format_spec, conversion}`: a t-string interpolation whose value is the same in every case. `rendered` is the text shown, and `expression` the source code it came from. In the title of a scenario with `group_parametrized=False`, the case ID between the trailing brackets is a value too, with an empty `expression`.
+- `{value}`: plain text.
+- `{rendered, expression, format_spec, conversion}`: a t-string interpolation with the same value in every case. In a `group_parametrized=False` title, the case ID in the trailing brackets is one too, with an empty `expression`.
 - `{term_id, display, expression}`: a term ref.
-- `{name, column_id, format_spec, conversion}`: a placeholder for the column `column_id` in a grouped parametrized scenario.
-
-Match parts by their keys, not by position. A step's text is `value`, `rendered`, `display` or `{name}` of each part, joined in order. A placeholder whose `format_spec` holds Boolean phrases (`a|b`) reads `{a / b}` instead of `{name}`, and its column holds the Booleans.
+- `{name, column_id, format_spec, conversion}`: a placeholder for a parameter column. One whose `format_spec` holds Boolean phrases (`a|b`) reads `{a / b}`, and its column holds the Booleans.
 
 Term ids and story ids are slugs: the name in lowercase, with each run of non-alphanumeric characters replaced by `-` (`Late fee` becomes `late-fee`).
 
-## Glossary term
+## Glossary and stories
 
-A term is `{id, kind, canonical, definition, source, section, avoid}`. `kind` is `actor`, `activity` or `object`, or `null` for a kindless term. `definition` is `null` for an undefined term, or `{text, parts}`. `text` is the definition as written, Markdown included. `parts` split it into `{value}` literals and, for each definition ref (a bold span naming a term), a `{term_id, display, expression}` term ref whose `display` is the bold text. `section` is the term's glossary section, or `null`. `avoid` lists its avoided words as written, each with any parenthesized note.
+- A term's `kind` is `actor`, `activity`, `object` or `null`.
+- A term's `definition` is `null` or `{text, parts}`. `parts` split the text into `{value}` literals and a `{term_id, display, expression}` term ref for each definition ref.
+- A story sentence's clause part is `{term_id, display}` or `{text}`, a bare word that has no id and never counts for coverage: filter parts on `term_id`.
 
-## Story
+## Story coverage
 
-A story is `{id, title, sentences: [{id, name, clauses: [{parts: [...]}]}], source}`. The sentence ids are what `pins[].sentence_id` on scenarios and steps refers to. `name` is `null` for a sentence without a name. A clause part is either `{term_id, display}`, a glossary term, or `{text}`, a bare connective word. A bare word has no id and never counts for coverage, so filter parts on `term_id` instead of assuming every part has one.
-
-## Coverage
-
-A coverage record is `{story_id, sentence_id, tracked, scenario_ids: [...]}`. It is the same coverage per sentence that the Stories tab shows, with one record for every sentence of every story, ordered by story and then by sentence. `scenario_ids` are the node IDs of the scenarios that cover the sentence. `tracked: false` marks a sentence the report can't say anything about: it has fewer than two glossary terms, and no pin covers it. That is the Stories tab's "not coverage-tracked", and it points to a gap in the vocabulary, not in the tests. **Read coverage from here instead of recomputing it from `steps[]`.** The rule works step by step, needs at least two terms per sentence, and lets pins replace narration matching. Reimplementing it gives wrong answers.
+Which scenarios cover each story sentence is not in the file. `pytest-given coverage report.json` prints a JSON array of `{story_id, sentence_id, tracked, scenario_ids}`, one per sentence of every story, and exits 1 when a tracked sentence has no scenario. `tracked: false` marks a sentence with fewer than two glossary terms that no pin covers: a gap in the vocabulary, not in the tests. **Read coverage from here instead of recomputing it from `steps[]`.** The rule works step by step, needs two terms per sentence, and lets pins replace narration matching.
 
 ## Recipes
 
@@ -104,6 +76,10 @@ pytest-given coverage report.json |
 # Which scenarios cover one sentence
 pytest-given coverage report.json |
   jq -r '.[] | select(.story_id == "lend-and-return-a-book" and .sentence_id == 3) | .scenario_ids[]'
+
+# A story's sentences as text, one clause after another
+jq -r '.stories[] | select(.id == "cancel-a-booking") | .sentences[]
+       | (.id|tostring) + ". " + ([.clauses[] | [.parts[] | .display // .text] | join(" ")] | join(" / "))' report.json
 
 # Every term with its definition
 jq -r '.glossary.terms[] | select(.definition) | .canonical + ": " + .definition.text' report.json

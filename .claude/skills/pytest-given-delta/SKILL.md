@@ -5,7 +5,7 @@ description: Use when building a pytest-given delta report — which scenarios a
 
 # Building a pytest-given delta report
 
-A **delta report** lists the scenarios and glossary terms added, removed or changed between two JSON reports, *before* and *after*. `pytest-given delta BEFORE.json AFTER.json` writes `given-report/delta-data.json` and `given-report/delta.html`, or only what `--json PATH` and `--html PATH` name. Given one delta JSON, it re-renders its HTML. It exits 0 whether or not anything changed, and 2 when it can't build the delta.
+A **delta report** lists the scenarios and glossary terms added, removed or changed between two JSON reports, *before* and *after*. `pytest-given delta BEFORE.json AFTER.json` writes `given-report/delta-data.json` and `given-report/delta.html`, or only what `--json PATH` and `--html PATH` name. Given one delta JSON, it re-renders its HTML. It exits 0 whether or not anything changed, and 2 when it can't build the delta. Run `pytest` and `pytest-given` through the project's own runner, such as `uv run` or tox.
 
 A scenario pairs by its **scenario identity**, its node ID without the parametrize tail, and then by an equal scenario title. A rename the delta can't see reads as one scenario removed and one added. The **rename log**, `given-renames.toml` in the working directory (or `--renames PATH`), records those renames.
 
@@ -23,13 +23,13 @@ Both must come from full runs: a scenario that a partial run left out reads as r
 
     git worktree add <scratch>/before/<project> <BEFORE_SHA>
     cd <scratch>/before/<project>
-    env -u GITHUB_SHA -u CI_COMMIT_SHA -u BUILDKITE_COMMIT pytest -m pytest_given --given-json=<scratch>/before.json
+    pytest -m pytest_given --given-json=<scratch>/before.json
 
 - Name the worktree directory after the project: a report's `project` is its rootdir's name.
-- Unset the CI commit variables, as above, or a report built inside CI carries the current commit's SHA.
+- Unset `GITHUB_SHA`, `CI_COMMIT_SHA` and `BUILDKITE_COMMIT` for that run, or a report built inside CI carries the current commit's SHA.
 - Run `pytest-given delta` from the current checkout, so it reads the current rename log.
 
-**One pytest-given and one pytest version for both.** Another version can narrate a test or name its cases differently. On a schema version refusal or a version warning, regenerate the older report in its worktree, with the current versions installed in place of its lockfile's. When the older suite can't run under the current pytest-given, because the public API changed, no delta spans that change: say so.
+**One pytest-given and one pytest version for both.** Another version can narrate a test or name its cases differently. On a schema version refusal or a version warning, regenerate the older report in its worktree's own environment, with the current versions installed in place of its lockfile's. When the older suite can't run under the current pytest-given, because the public API changed, no delta spans that change: say so.
 
 ## Triage
 

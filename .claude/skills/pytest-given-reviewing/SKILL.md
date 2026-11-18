@@ -14,7 +14,7 @@ Narration can be **audited, but nothing verifies it**. No tool compares a step's
 
 Don't skip layer 1. It is cheaper and stricter than finding the same problems by reading.
 
-Run the `pytest` commands below through the project's own runner, such as `uv run pytest` or tox.
+Run `pytest` and `pytest-given` through the project's own runner, such as `uv run` or tox.
 
 ## 1. Structural gate: run the lint first
 
@@ -41,15 +41,15 @@ Judge each scenario's step texts against their bodies with the rubric below. `py
 **Step text may abstract, but it must never overstate.**
 
 - **Values:** a quantity, date or amount in the text must match the body's data, even when every assertion passes. Ask for an interpolation (`{BATCH_SIZE}`) over a literal copied from a constant.
-- **Boolean phrases:** the true phrase comes first, and nothing checks that. `{pinned:does not pin it|pins it}` over `if pinned` runs green and reports the opposite, so read the body.
+- **Boolean phrases:** the true phrase comes first, and nothing checks that. Read the first phrase against a row whose column is `True`: `{paid:stays pending|is confirmed}` over a body that confirms when `paid` runs green and reports the opposite.
 - **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario title claims every item it covers. Assertions on a sample overstate it: ask for the rest to be asserted, or for the text to be narrowed.
 - **Outcomes:** everything a `then` claims must be asserted in it, on a value the code under test produced. The lint can't tell, because the step contains an `assert`. A "never called" claim needs recorded calls asserted in the `then`, not a stub that raises, whose error the code may catch. In a parameter table, the claim must hold for every row: "the scenario errors, saying {error}" over a row that passes is false for that row. A conditional claim ("a coffee is brewed when the machine has beans") still holds on a contrast row where its condition fails, such as an empty machine that brews nothing.
-- **Strength:** an assertion must fail when its claim is false. `relpath.endswith('.py')` under "keeps its rootdir-relative source" passes on an absolute path too. Data that keeps two parts in separate fields can't show their order.
+- **Strength:** an assertion must fail when its claim is false. `total > 0` under "the total includes the late fee" passes without the fee too. Data that keeps two parts in separate fields can't show their order.
 - **Raises:** the `then` of an expected raise must not claim more than `match=` checks. When it promises that the message names the offender, offers a hint or includes a file:line, the regex must fail without that detail: `match='Gues'` matches the echoed bad input, not the did-you-mean suggestion. An alternation is only as strong as its weakest branch, so sibling scenarios that narrate *different* refusals may all pass on one generic message. Pin what tells this refusal apart from the others.
 - **Expected failures:** an `xfail` without `strict=True` (or the `xfail_strict` ini) stays quietly on working behavior and turns a later regression into an expected failure. Ask for `strict=True`.
 - **Actions:** what the `when` names must be what its body calls. Watch for a `when` whose text reads like arrangement while its body also performs the action, which then appears nowhere in the report.
 - **Attachments:** content that differs on every run, such as a timestamp, a generated ID or a default `str()` with a memory address, shows the scenario as changed in every delta report. The fixes are in the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md).
-- **Vocabulary:** each referenced term should show up in the names inside the step: in the body, and in the names of the code it calls directly. A natural-language term over its class (`Glossary section` over `GlossarySection`) is no drift. A term ref must also *mean* its term. One chosen just for its word (`Kindless` in "not kindless inference") sends the reader to the wrong row. Flag drift once per term, not once per step, and don't prescribe which side should be renamed.
+- **Vocabulary:** each referenced term should show up in the names inside the step: in the body, and in the names of the code it calls directly. A natural-language term over its class (`Room type` over `RoomType`) is no drift. A term ref must also *mean* its term. One chosen just for its word (`Guest` in "the guest Wi-Fi password", for a term defined as the person who books) sends the reader to the wrong row. Flag drift once per term, not once per step, and don't prescribe which side should be renamed.
 
 For a large suite, split layer 2 by test file. One run's Markdown splits at its scenario headings, each followed by its `file::test` line. Hand each reviewer one test file's Markdown, the rubric, and the paths of the test file, the glossary and the code under test, and have it return findings. Where the harness and the user allow subagents, a cheap, fast model is enough, because the rubric needs only that one file's context. Check a sample of their findings before you report them. Title twins, rules narrated at the wrong layer and the list of titles need the whole suite, so the coordinating reviewer does those.
 
@@ -74,6 +74,7 @@ For each finding, give the file:line, what the narration claims, what the body a
 **Report legibility can be reviewed; taste can't.** The report is documentation, so how it *reads* is in scope. Flag inconsistent casing or wording of the same concept across step texts. Read the scenario titles alone, as a list, by test file:
 
 ```bash
+pytest <selection> --given-json=report.json
 jq -r '.scenarios | group_by(.source.relpath)[]
        | .[0].source.relpath, (map(.narration.text) | unique[] | "  " + .)' report.json
 ```
