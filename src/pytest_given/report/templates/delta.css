@@ -164,6 +164,23 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-one-side { grid-template-columns: minmax(0, var(--delta-column)); }
 .delta-one-side > [data-side] { grid-column: 1; }
 .delta-side-steps .steps { padding-top: var(--space-xs); padding-left: var(--delta-gutter); }
+/* After the sides' steps the source link shares their last line when they
+   leave room, as it does after a scenario's steps; after a table it takes its
+   own line. The sides' rows end level, so the grid's last baseline, the
+   before side's, is the after side's too. The condition adds no specificity,
+   so the link's own rule below beats the one for every child. */
+.scenario-body-inner:where(:has(> .delta-sides + .scenario-source):not(:has(> .delta-sides > :is(.delta-table, .delta-shared)))) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: last baseline;
+}
+.scenario-body-inner:where(:has(> .delta-sides + .scenario-source):not(:has(> .delta-sides > :is(.delta-table, .delta-shared)))) > * { flex: 1 0 100%; }
+/* The padding is the room the last phase's hover outline reaches below it. */
+.scenario-body-inner:where(:has(> .delta-sides + .scenario-source):not(:has(> .delta-sides > :is(.delta-table, .delta-shared)))) > .delta-sides {
+  flex: 0 1 auto;
+  padding-bottom: calc(var(--space-sm) / 2);
+}
+.scenario-body-inner > .delta-sides + .scenario-source { flex: 0 0 auto; margin-left: auto; }
 
 /* A step's change, by the glyph in the margin left of its keyword, and an
    added or removed step's text on its change's tint: a modified step's
@@ -311,6 +328,19 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
   margin-top: 2px;
 }
 .delta-term-side { min-width: 0; }
+/* The source link shares the Listed scenarios line when its chips leave room,
+   and wraps under them when they don't, as after a scenario's steps: the
+   chips can run long, where the report's anchored link would cover them. */
+.delta .refs-content:has(> .refs-line + .scenario-source) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: last baseline;
+}
+.delta .refs-content > .refs-line + .scenario-source {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-block: 0;
+}
 .delta-term-more-inner {
   overflow: hidden;
   min-height: 0;

@@ -2032,6 +2032,23 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 
 
 
+.scenario-body-inner:where(:has(> .delta-sides + .scenario-source):not(:has(> .delta-sides > :is(.delta-table, .delta-shared)))) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: last baseline;
+}
+.scenario-body-inner:where(:has(> .delta-sides + .scenario-source):not(:has(> .delta-sides > :is(.delta-table, .delta-shared)))) > * { flex: 1 0 100%; }
+
+.scenario-body-inner:where(:has(> .delta-sides + .scenario-source):not(:has(> .delta-sides > :is(.delta-table, .delta-shared)))) > .delta-sides {
+  flex: 0 1 auto;
+  padding-bottom: calc(var(--space-sm) / 2);
+}
+.scenario-body-inner > .delta-sides + .scenario-source { flex: 0 0 auto; margin-left: auto; }
+
+
+
+
+
 .delta-step[data-change="modified"] { --step-glyph: '~'; }
 .delta-step[data-change="added"] { --step-glyph: '+'; }
 .delta-step[data-change="removed"] { --step-glyph: '\2212'; }
@@ -2174,6 +2191,19 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
   margin-top: 2px;
 }
 .delta-term-side { min-width: 0; }
+
+
+
+.delta .refs-content:has(> .refs-line + .scenario-source) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: last baseline;
+}
+.delta .refs-content > .refs-line + .scenario-source {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-block: 0;
+}
 .delta-term-more-inner {
   overflow: hidden;
   min-height: 0;
@@ -2213,7 +2243,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     </nav>
     
     <div class="topbar-meta">
-      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-19 09:58</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-19 09:58</span>
+      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-19 10:08</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-19 10:08</span>
       </p>
       <span class="topbar-version">pytest-given 0.5.2</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
@@ -2665,7 +2695,7 @@ Rate: unchanged</pre></div>
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
         <span class="scenario-status delta-status">⊗ expected failure → ✗ failed</span>
-        <span class="scenario-duration">46ms</span>
+        <span class="scenario-duration">49ms</span>
       </span>
     </div>
 
