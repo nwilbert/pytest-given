@@ -7,7 +7,7 @@ from pytest_given import Template, attach, given, scenario, then, when, when_the
 from pytest_given.capture.file_glossary import ParagraphGlossary, TableGlossary
 from pytest_given.capture.glossary import TermHandle
 from pytest_given.capture.story import sentence
-from pytest_given.model import ClauseTermRef, Glossary, PytestGivenError, TermId
+from pytest_given.model import Glossary, NarrationTermRef, PytestGivenError, TermId
 from tests.ubiquitous_language import pg
 
 GLOSSARY_MD = """# Glossary
@@ -99,9 +99,9 @@ def test_usable_inline_in_sentence(glossary_file):
         built = sentence(glossary['Guest'], glossary['search'], glossary['Room'])
     with then(t'each slot becomes a {pg["Term ref"].l}'):
         parts = built.clauses[0].parts
-        assert parts[0] == ClauseTermRef(term_id='guest', display='Guest')
-        assert parts[1] == ClauseTermRef(term_id='search', display='search')
-        assert parts[2] == ClauseTermRef(term_id='room', display='Room')
+        assert parts[0] == NarrationTermRef(term_id='guest', display='Guest')
+        assert parts[1] == NarrationTermRef(term_id='search', display='search')
+        assert parts[2] == NarrationTermRef(term_id='room', display='Room')
 
 
 @scenario(
@@ -118,7 +118,7 @@ def test_call_overrides_display(glossary_file):
             glossary['Room'],
         )
     with then(t'the {pg["Term ref"].l} carries the overridden display'):
-        assert built.clauses[0].parts[0] == ClauseTermRef(
+        assert built.clauses[0].parts[0] == NarrationTermRef(
             term_id='guest', display='Carol'
         )
 

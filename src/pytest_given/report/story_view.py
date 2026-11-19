@@ -7,7 +7,7 @@ from typing import TypedDict
 
 from ..model import (
     Clause,
-    ClauseTermRef,
+    NarrationTermRef,
     NodeId,
     ReportData,
     Scenario,
@@ -177,6 +177,6 @@ def _clause_text(clause: Clause) -> str:
     """One clause as plain prose. Term refs read as their surface form,
     the same word the timeline shows in a pill."""
     return ' '.join(
-        part.display if isinstance(part, ClauseTermRef) else part.text
+        part.display if isinstance(part, NarrationTermRef) else part.value
         for part in clause.parts
     )

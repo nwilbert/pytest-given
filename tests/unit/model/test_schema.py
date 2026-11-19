@@ -8,9 +8,6 @@ from pytest_given.model import (
     Attachment,
     AttachmentRef,
     Clause,
-    ClausePart,
-    ClauseTermRef,
-    ClauseWord,
     Definition,
     ErrorInfo,
     Glossary,
@@ -295,48 +292,15 @@ def test_a_definition_s_parts_join_to_its_text_each_ref_in_bold() -> None:
         Definition('Reserve a Room.', (NarrationLiteral(value='Reserve a '), _ROOM_REF))
 
 
-# --- Task 1.2: Sentence-part variants + ClausePart union ---
-
-
-def test_clause_term_ref_carries_term_id_and_display() -> None:
-    part = ClauseTermRef(term_id=TermId('guest'), display='Alice')
-    assert part.term_id == 'guest'
-    assert part.display == 'Alice'
-
-
-def test_clause_word_carries_text() -> None:
-    part = ClauseWord(text='for')
-    assert part.text == 'for'
-
-
-def test_clause_parts_are_frozen() -> None:
-    part = ClauseWord(text='for')
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        part.text = 'and'  # type: ignore[misc]
-
-
-def test_clause_part_union_accepts_all_variants() -> None:
-    parts: list[ClausePart] = [
-        ClauseTermRef(term_id=TermId('g'), display='Guest'),
-        ClauseTermRef(term_id=TermId('s'), display='searches'),
-        ClauseWord(text='for'),
-    ]
-    assert [type(p).__name__ for p in parts] == [
-        'ClauseTermRef',
-        'ClauseTermRef',
-        'ClauseWord',
-    ]
-
-
 # --- Task 1.3: Clause, Sentence, Story with _by_id index ---
 
 
 def test_clause_is_frozen_with_parts_tuple() -> None:
     path = Clause(
         parts=(
-            ClauseTermRef(term_id=TermId('guest'), display='Guest'),
-            ClauseTermRef(term_id=TermId('search'), display='searches for'),
-            ClauseTermRef(term_id=TermId('room'), display='Room'),
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+            NarrationTermRef(term_id=TermId('search'), display='searches for'),
+            NarrationTermRef(term_id=TermId('room'), display='Room'),
         )
     )
     assert len(path.parts) == 3
@@ -345,9 +309,9 @@ def test_clause_is_frozen_with_parts_tuple() -> None:
 def test_sentence_holds_id_and_clauses() -> None:
     p = Clause(
         parts=(
-            ClauseTermRef(term_id=TermId('g'), display='G'),
-            ClauseTermRef(term_id=TermId('s'), display='s'),
-            ClauseTermRef(term_id=TermId('o'), display='O'),
+            NarrationTermRef(term_id=TermId('g'), display='G'),
+            NarrationTermRef(term_id=TermId('s'), display='s'),
+            NarrationTermRef(term_id=TermId('o'), display='O'),
         )
     )
     act = Sentence(id=SentenceId(1), clauses=(p,))

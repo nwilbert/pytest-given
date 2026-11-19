@@ -23,9 +23,9 @@ from pytest_given.capture.story import (
 )
 from pytest_given.model import (
     Clause,
-    ClauseTermRef,
-    ClauseWord,
     GlossaryTerm,
+    NarrationLiteral,
+    NarrationTermRef,
     Pin,
     SentenceId,
     StoryId,
@@ -67,7 +67,7 @@ def test_clause_dispatches_actor_to_clause_term_ref(guest, search, room):
         built = clause(guest, search, room)
     with then(t'the {pg["Actor"].l} slot becomes a {pg["Term ref"].l}'):
         assert isinstance(built, Clause)
-        assert built.parts[0] == ClauseTermRef(term_id=guest.id, display='Guest')
+        assert built.parts[0] == NarrationTermRef(term_id=guest.id, display='Guest')
 
 
 def test_clause_dispatches_actor_instance_to_clause_term_ref_with_instance_display(
@@ -76,12 +76,12 @@ def test_clause_dispatches_actor_instance_to_clause_term_ref_with_instance_displ
     room,
 ):
     built = clause(guest('Alice'), search, room)
-    assert built.parts[0] == ClauseTermRef(term_id=guest.id, display='Alice')
+    assert built.parts[0] == NarrationTermRef(term_id=guest.id, display='Alice')
 
 
 def test_clause_dispatches_work_object_to_clause_term_ref(guest, search, room):
     built = clause(guest, search, room)
-    assert built.parts[2] == ClauseTermRef(term_id=room.id, display='Room')
+    assert built.parts[2] == NarrationTermRef(term_id=room.id, display='Room')
 
 
 def test_clause_dispatches_work_object_instance_to_clause_term_ref_with_display(
@@ -90,7 +90,7 @@ def test_clause_dispatches_work_object_instance_to_clause_term_ref_with_display(
     room,
 ):
     built = clause(guest, search, room('Deluxe Suite'))
-    assert built.parts[2] == ClauseTermRef(term_id=room.id, display='Deluxe Suite')
+    assert built.parts[2] == NarrationTermRef(term_id=room.id, display='Deluxe Suite')
 
 
 def test_clause_dispatches_activity_to_clause_term_ref_with_canonical_display(
@@ -99,7 +99,7 @@ def test_clause_dispatches_activity_to_clause_term_ref_with_canonical_display(
     room,
 ):
     built = clause(guest, search, room)
-    assert built.parts[1] == ClauseTermRef(term_id=search.id, display='search')
+    assert built.parts[1] == NarrationTermRef(term_id=search.id, display='search')
 
 
 @scenario(
@@ -118,7 +118,7 @@ def test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_
     with then(
         t'the {pg["Term ref"].l} shows the inflection over the same {pg["Activity"].l}'
     ):
-        assert built.parts[1] == ClauseTermRef(
+        assert built.parts[1] == NarrationTermRef(
             term_id=search.id, display='searches for'
         )
 
@@ -132,7 +132,7 @@ def test_clause_dispatches_bare_string_to_clause_word(guest, search, room):
     with then(
         t'the bare word becomes a {pg["Clause part"].l} word, not a {pg["Term ref"].l}'
     ):
-        assert built.parts[3] == ClauseWord(text='for')
+        assert built.parts[3] == NarrationLiteral(value='for')
 
 
 # --- Task 4.2: grammar validation ---
@@ -212,10 +212,10 @@ def test_a_bare_string_may_fill_any_slot(guest, search, room, position):
         parts[position] = word
         built = clause(*parts)
     with then(t'it becomes a {pg["Clause part"].l} word there'):
-        assert built.parts[position] == ClauseWord(text='plain')
+        assert built.parts[position] == NarrationLiteral(value='plain')
     with then(t'the other parts stay {pg["Term ref"].l.s}'):
         others = [part for index, part in enumerate(built.parts) if index != position]
-        assert all(isinstance(part, ClauseTermRef) for part in others)
+        assert all(isinstance(part, NarrationTermRef) for part in others)
 
 
 @scenario(
@@ -228,9 +228,9 @@ def test_clause_allows_fully_bare_words():
         built = clause(*words)
     with then(t'every part is a {pg["Clause part"].l} word'):
         assert [type(part) for part in built.parts] == [
-            ClauseWord,
-            ClauseWord,
-            ClauseWord,
+            NarrationLiteral,
+            NarrationLiteral,
+            NarrationLiteral,
         ]
 
 
@@ -254,13 +254,13 @@ def test_clause_allows_node_edge_alternation_with_connective():
         result = clause(actor, verb, booking, 'to', guest)
     with then('even positions are term-ref nodes and the connective stays a word'):
         assert [type(part) for part in result.parts] == [
-            ClauseTermRef,
-            ClauseTermRef,
-            ClauseTermRef,
-            ClauseWord,
-            ClauseTermRef,
+            NarrationTermRef,
+            NarrationTermRef,
+            NarrationTermRef,
+            NarrationLiteral,
+            NarrationTermRef,
         ]
-        assert result.parts[3].text == 'to'
+        assert result.parts[3].value == 'to'
 
 
 @scenario(
@@ -607,17 +607,17 @@ def test_story_id_collision_does_not_fire_after_registry_clear():
 
 def test_clause_allows_bare_string_in_position_1(guest, room):
     built = clause(guest, 'searches', room)
-    assert built.parts[1] == ClauseWord(text='searches')
+    assert built.parts[1] == NarrationLiteral(value='searches')
 
 
 def test_clause_allows_bare_string_in_position_2(guest, search):
     built = clause(guest, search, 'the room')
-    assert built.parts[2] == ClauseWord(text='the room')
+    assert built.parts[2] == NarrationLiteral(value='the room')
 
 
 def test_clause_accepts_actor_in_position_2(guest, search):
     built = clause(guest, search, guest('Bob'))
-    assert isinstance(built.parts[2], ClauseTermRef)
+    assert isinstance(built.parts[2], NarrationTermRef)
 
 
 def test_clause_accepts_extended_alternation(guest, search, room):
@@ -646,13 +646,13 @@ def test_clause_allows_second_verb_edge():
     ):
         result = clause(actor, confirm, booking, send, note)
     with then(t'every slot is a {pg["Term ref"].l}, with no bare words'):
-        assert [type(part) for part in result.parts] == [ClauseTermRef] * 5
+        assert [type(part) for part in result.parts] == [NarrationTermRef] * 5
 
 
 def test_clause_allows_bare_string_at_later_even_position(guest, search, room):
     # actor verb node connective bare-node — even index 4 is a bare word
     built = clause(guest, search, room, 'into', 'Inbox')
-    assert built.parts[4] == ClauseWord(text='Inbox')
+    assert built.parts[4] == NarrationLiteral(value='Inbox')
 
 
 # --- Task 4.6: top-level re-exports ---

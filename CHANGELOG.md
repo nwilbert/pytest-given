@@ -27,6 +27,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - pytest-given now depends on Pydantic 2.12 or later.
 - **Breaking.** `pytest-given report` and `pytest-given citations` refuse a JSON report of another schema version or with an unknown key, which includes every report written by 0.6.0 or earlier. Regenerate the report under the current pytest-given.
 - **Breaking.** The JSON report has no top-level `coverage` section. Read story coverage from `pytest-given coverage report.json` instead.
+- **Breaking.** A story clause's parts in the JSON report are now the narration's literal and term ref parts, so a bare word reads `.value` instead of `.text`.
 - The HTML report's browser tab and the Markdown report's heading show only the report's title, without "pytest-given".
 - The `pytest-given-authoring` skill asks for attachment content that is the same on every run.
 - `pytest-given report` now removes the previous output when its input can't be read, as it already did when rendering failed.

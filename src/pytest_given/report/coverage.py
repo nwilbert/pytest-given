@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 
 from ..model import (
-    ClauseTermRef,
     NarrationTermRef,
     NodeId,
     Pin,
@@ -88,7 +87,7 @@ def sentence_term_refs(sentence: Sentence) -> set[TermId]:
         part.term_id
         for clause in sentence.clauses
         for part in clause.parts
-        if isinstance(part, ClauseTermRef)
+        if isinstance(part, NarrationTermRef)
     }
 
 

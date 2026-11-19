@@ -14,8 +14,6 @@ from pytest_given.model import (
     REPORT_SCHEMA_VERSION,
     AttachmentRef,
     Clause,
-    ClauseTermRef,
-    ClauseWord,
     ColumnId,
     Definition,
     Glossary,
@@ -1515,7 +1513,7 @@ def test_clause_part_filter_actor_term_ref():
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
     f = make_clause_part_filter(g)
-    out = str(f(ClauseTermRef(term_id=TermId('guest'), display='Alice')))
+    out = str(f(NarrationTermRef(term_id=TermId('guest'), display='Alice')))
     assert 'term-ref-actor' in out
     assert 'Alice' in out
 
@@ -1524,13 +1522,13 @@ def test_clause_part_filter_object_term_ref():
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
     f = make_clause_part_filter(g)
-    out = str(f(ClauseTermRef(term_id=TermId('room'), display='Room')))
+    out = str(f(NarrationTermRef(term_id=TermId('room'), display='Room')))
     assert 'term-ref-object' in out
 
 
 def test_clause_part_filter_unknown_term_ref_falls_back():
     f = make_clause_part_filter(Glossary())  # empty glossary
-    out = str(f(ClauseTermRef(term_id=TermId('missing'), display='X')))
+    out = str(f(NarrationTermRef(term_id=TermId('missing'), display='X')))
     assert 'term-ref-unknown' in out
 
 
@@ -1538,14 +1536,14 @@ def test_clause_part_filter_activity_term_ref_renders_activity_class():
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('search'), kind='activity', canonical='search'))
     f = make_clause_part_filter(g)
-    out = str(f(ClauseTermRef(term_id=TermId('search'), display='searches')))
+    out = str(f(NarrationTermRef(term_id=TermId('search'), display='searches')))
     assert 'term-ref-activity' in out
     assert 'searches' in out
 
 
 def test_clause_part_filter_word_renders_clause_word_class():
     f = make_clause_part_filter(None)
-    out = str(f(ClauseWord(text='for')))
+    out = str(f(NarrationLiteral(value='for')))
     assert 'clause-word' in out
     assert 'for' in out
 
@@ -1722,9 +1720,11 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
                 clauses=(
                     Clause(
                         parts=(
-                            ClauseTermRef(term_id=TermId('guest'), display='Guest'),
-                            ClauseTermRef(term_id=TermId('search'), display='searches'),
-                            ClauseTermRef(term_id=TermId('room'), display='Room'),
+                            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                            NarrationTermRef(
+                                term_id=TermId('search'), display='searches'
+                            ),
+                            NarrationTermRef(term_id=TermId('room'), display='Room'),
                         )
                     ),
                 ),
@@ -1981,7 +1981,7 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                     'sentences': [
                         {
                             'id': 1,
-                            'clauses': [{'parts': [{'text': 'does a thing'}]}],
+                            'clauses': [{'parts': [{'value': 'does a thing'}]}],
                         }
                     ],
                 }

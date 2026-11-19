@@ -4,7 +4,6 @@ import pytest
 
 from pytest_given.model import (
     Clause,
-    ClauseTermRef,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -28,8 +27,8 @@ from pytest_given.report.glossary_view import (
 )
 
 
-def _ent(tid: str, display: str) -> ClauseTermRef:
-    return ClauseTermRef(term_id=TermId(tid), display=display)
+def _ent(tid: str, display: str) -> NarrationTermRef:
+    return NarrationTermRef(term_id=TermId(tid), display=display)
 
 
 def _g() -> Glossary:
@@ -51,7 +50,7 @@ def test_a_term_summary_counts_its_other_forms_whatever_its_kind() -> None:
             Clause(
                 parts=(
                     _ent('guest', 'Alice'),
-                    ClauseTermRef(term_id=TermId('search'), display='searches for'),
+                    NarrationTermRef(term_id=TermId('search'), display='searches for'),
                     _ent('room', 'Room'),
                 )
             ),

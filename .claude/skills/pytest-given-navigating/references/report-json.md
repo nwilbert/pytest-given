@@ -26,7 +26,7 @@ Term ids and story ids are slugs: the name in lowercase, with each run of non-al
 
 - A term's `kind` is `actor`, `activity`, `object` or `null`.
 - A term's `definition` is `null` or `{text, parts}`. `parts` split the text into `{value}` literals and a `{term_id, display, expression}` term ref for each definition ref.
-- A story sentence's clause part is `{term_id, display}` or `{text}`, a bare word that has no id and never counts for coverage: filter parts on `term_id`.
+- A story sentence's clause part is a `{term_id, display, expression}` term ref or a `{value}` literal, a bare word that has no id and never counts for coverage: filter parts on `term_id`.
 
 ## Story coverage
 
@@ -79,7 +79,7 @@ pytest-given coverage report.json |
 
 # A story's sentences as text, one clause after another
 jq -r '.stories[] | select(.id == "cancel-a-booking") | .sentences[]
-       | (.id|tostring) + ". " + ([.clauses[] | [.parts[] | .display // .text] | join(" ")] | join(" / "))' report.json
+       | (.id|tostring) + ". " + ([.clauses[] | [.parts[] | .display // .value] | join(" ")] | join(" / "))' report.json
 
 # Every term with its definition
 jq -r '.glossary.terms[] | select(.definition) | .canonical + ": " + .definition.text' report.json

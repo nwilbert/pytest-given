@@ -9,8 +9,6 @@ from ..markdown import unwrapped_text
 from ..model import (
     PHASES,
     CapturedScenario,
-    ClauseTermRef,
-    ClauseWord,
     Definition,
     Glossary,
     GlossaryTerm,
@@ -172,7 +170,7 @@ def _dead_term_findings(context: _Context) -> list[RawLintFinding]:
         for sentence in story.sentences:
             for clause in sentence.clauses:
                 for ref in clause.parts:
-                    if isinstance(ref, ClauseTermRef):
+                    if isinstance(ref, NarrationTermRef):
                         referenced.add(ref.term_id)
     return [
         RawLintFinding(
@@ -340,8 +338,8 @@ def _story_texts(story: Story) -> Iterator[_Text]:
         for clause in sentence.clauses:
             words: list[str] = []
             for part in (*clause.parts, None):
-                if isinstance(part, ClauseWord):
-                    words.append(part.text)
+                if isinstance(part, NarrationLiteral):
+                    words.append(part.value)
                 elif words:
                     yield _Text('story sentence', story.source, ' '.join(words))
                     words = []

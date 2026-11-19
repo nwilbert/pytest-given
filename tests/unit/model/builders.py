@@ -27,8 +27,6 @@ from pytest_given.model import (
     AttachmentLabel,
     AttachmentRef,
     Clause,
-    ClauseTermRef,
-    ClauseWord,
     ColumnId,
     Definition,
     ErrorCause,
@@ -89,9 +87,9 @@ def every_field_populated() -> ReportData:
                 clauses=(
                     Clause(
                         parts=(
-                            ClauseTermRef(term_id=TermId('guest'), display='Guest'),
-                            ClauseWord(text='books'),
-                            ClauseTermRef(term_id=TermId('room'), display='Room'),
+                            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                            NarrationLiteral(value='books'),
+                            NarrationTermRef(term_id=TermId('room'), display='Room'),
                         )
                     ),
                 ),

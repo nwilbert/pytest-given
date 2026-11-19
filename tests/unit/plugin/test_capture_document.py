@@ -1,12 +1,12 @@
 from pytest_given.model import (
     CapturedStep,
     Clause,
-    ClauseTermRef,
     Definition,
     Glossary,
     GlossaryTerm,
     Narration,
     NarrationLiteral,
+    NarrationTermRef,
     NodeId,
     Scenario,
     Sentence,
@@ -42,7 +42,7 @@ def _capture(glossary: Glossary | None) -> SessionCapture:
         steps=[step],
         source=SourceLocation(relpath='t.py', line=6),
     )
-    clause = Clause(parts=(ClauseTermRef(term_id=TermId('guest'), display='Guest'),))
+    clause = Clause(parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),))
     story = Story(
         id=StoryId('s'),
         title='S',

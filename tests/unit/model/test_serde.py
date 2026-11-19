@@ -7,8 +7,6 @@ from pytest_given.model import (
     AttachmentRef,
     CapturedStep,
     Clause,
-    ClauseTermRef,
-    ClauseWord,
     Definition,
     ErrorInfo,
     Glossary,
@@ -73,7 +71,9 @@ def test_clause_term_ref_round_trips():
                 id=SentenceId(1),
                 clauses=(
                     Clause(
-                        parts=(ClauseTermRef(term_id=TermId('guest'), display='Guest'),)
+                        parts=(
+                            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                        )
                     ),
                 ),
             ),
@@ -84,7 +84,7 @@ def test_clause_term_ref_round_trips():
     )
     round_tripped = report_from_dict(report_to_dict(report))
     part = round_tripped.stories[0].sentences[0].clauses[0].parts[0]
-    assert part == ClauseTermRef(term_id=TermId('guest'), display='Guest')
+    assert part == NarrationTermRef(term_id=TermId('guest'), display='Guest')
 
 
 def test_glossary_term_kind_can_be_none():
@@ -548,9 +548,9 @@ def test_a_hand_edited_string_bool_reads_by_its_meaning() -> None:
 
 def test_clause_part_variants_round_trip():
     parts = (
-        ClauseTermRef(term_id=TermId('guest'), display='Guest'),
-        ClauseTermRef(term_id=TermId('search'), display='searches'),
-        ClauseWord(text='for'),
+        NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+        NarrationTermRef(term_id=TermId('search'), display='searches'),
+        NarrationLiteral(value='for'),
     )
     path = Clause(parts=parts)
     sentence = Sentence(id=SentenceId(1), clauses=(path,))
@@ -669,9 +669,19 @@ def test_a_clause_part_of_no_known_shape_is_refused_at_its_path():
     with pytest.raises(PytestGivenError) as raised:
         report_from_dict(payload)
     assert (
-        'stories.0.sentences.0.clauses.0.parts.0.ClauseWord.text: Field required'
+        'stories.0.sentences.0.clauses.0.parts.0.NarrationLiteral.value: Field required'
         in str(raised.value)
     )
+
+
+def test_a_clause_is_written_in_narration_parts():
+    payload = report_to_dict(every_field_populated())
+    parts = payload['stories'][0]['sentences'][0]['clauses'][0]['parts']
+    assert parts == [
+        {'term_id': 'guest', 'display': 'Guest', 'expression': ''},
+        {'value': 'books'},
+        {'term_id': 'room', 'display': 'Room', 'expression': ''},
+    ]
 
 
 def test_story_source_roundtrips() -> None:
@@ -681,7 +691,7 @@ def test_story_source_roundtrips() -> None:
         sentences=(
             Sentence(
                 id=SentenceId(1),
-                clauses=(Clause(parts=(ClauseWord(text='x'),)),),
+                clauses=(Clause(parts=(NarrationLiteral(value='x'),)),),
             ),
         ),
         source=SourceLocation(relpath='conftest.py', line=4),

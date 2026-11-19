@@ -79,45 +79,12 @@
     "ClausePart": {
       "anyOf": [
         {
-          "$ref": "#/$defs/ClauseTermRef"
+          "$ref": "#/$defs/NarrationLiteral"
         },
         {
-          "$ref": "#/$defs/ClauseWord"
+          "$ref": "#/$defs/NarrationTermRef"
         }
       ]
-    },
-    "ClauseTermRef": {
-      "additionalProperties": false,
-      "properties": {
-        "term_id": {
-          "title": "Term Id",
-          "type": "string"
-        },
-        "display": {
-          "title": "Display",
-          "type": "string"
-        }
-      },
-      "required": [
-        "term_id",
-        "display"
-      ],
-      "title": "ClauseTermRef",
-      "type": "object"
-    },
-    "ClauseWord": {
-      "additionalProperties": false,
-      "properties": {
-        "text": {
-          "title": "Text",
-          "type": "string"
-        }
-      },
-      "required": [
-        "text"
-      ],
-      "title": "ClauseWord",
-      "type": "object"
     },
     "ColumnKind": {
       "enum": [

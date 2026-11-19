@@ -11,8 +11,6 @@ from pytest_given.lint.runtime_rules import _unresolved_bold_spans, run_runtime_
 from pytest_given.model import (
     CapturedStep,
     Clause,
-    ClauseTermRef,
-    ClauseWord,
     ColumnId,
     Definition,
     Glossary,
@@ -311,7 +309,7 @@ def test_dead_term_passes_term_referenced_by_a_story() -> None:
                 clauses=(
                     Clause(
                         parts=(
-                            ClauseTermRef(
+                            NarrationTermRef(
                                 term_id=id_derive('Ghost term'), display='Ghost term'
                             ),
                         )
@@ -329,7 +327,7 @@ def test_dead_term_passes_term_referenced_by_a_story() -> None:
 )
 def test_dead_term_passes_term_referenced_only_by_a_second_clause() -> None:
     def ref(name):
-        return ClauseTermRef(term_id=id_derive(name), display=name)
+        return NarrationTermRef(term_id=id_derive(name), display=name)
 
     with given(
         t'a {pg["Story"].l} whose one {pg["Sentence"].l} names the '
@@ -623,8 +621,8 @@ def _story(*clauses):
 
 def test_story_sentence_finding() -> None:
     glossary = _avoid_glossary('Customer')
-    ref = ClauseTermRef(term_id=id_derive('Guest'), display='Guest')
-    story = _story(Clause(parts=(ref, ClauseWord(text='is a Customer'))))
+    ref = NarrationTermRef(term_id=id_derive('Guest'), display='Guest')
+    story = _story(Clause(parts=(ref, NarrationLiteral(value='is a Customer'))))
     [finding] = _avoided_findings(glossary, stories=[story])
     assert finding.subject == 'booking'
     assert finding.location == SourceLocation(relpath='stories.py', line=4)
@@ -636,16 +634,24 @@ def test_story_sentence_finding() -> None:
 def test_bare_clause_words_joined() -> None:
     glossary = _avoid_glossary('payment request')
     story = _story(
-        Clause(parts=(ClauseWord(text='payment'), ClauseWord(text='request')))
+        Clause(
+            parts=(NarrationLiteral(value='payment'), NarrationLiteral(value='request'))
+        )
     )
     assert len(_avoided_findings(glossary, stories=[story])) == 1
 
 
 def test_bare_clause_words_split_by_a_term_ref_clean() -> None:
     glossary = _avoid_glossary('payment request')
-    ref = ClauseTermRef(term_id=id_derive('Guest'), display='Guest')
+    ref = NarrationTermRef(term_id=id_derive('Guest'), display='Guest')
     story = _story(
-        Clause(parts=(ClauseWord(text='payment'), ref, ClauseWord(text='request')))
+        Clause(
+            parts=(
+                NarrationLiteral(value='payment'),
+                ref,
+                NarrationLiteral(value='request'),
+            )
+        )
     )
     assert _avoided_findings(glossary, stories=[story]) == []
 

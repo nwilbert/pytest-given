@@ -8,7 +8,6 @@ from dataclasses import dataclass, field
 from typing import NewType
 
 from .schema import (
-    ClauseTermRef,
     Glossary,
     GlossaryTerm,
     Narration,
@@ -123,14 +122,14 @@ def _scenario_narrations(scenario: Scenario) -> Iterator[tuple[Narration, str | 
         yield step.narration, step.fixture_name
 
 
-def _story_term_refs(story: Story) -> Iterator[ClauseTermRef]:
+def _story_term_refs(story: Story) -> Iterator[NarrationTermRef]:
     """Every glossary reference in a story's sentence prose."""
     return (
         part
         for sentence in story.sentences
         for clause in sentence.clauses
         for part in clause.parts
-        if isinstance(part, ClauseTermRef)
+        if isinstance(part, NarrationTermRef)
     )
 
 

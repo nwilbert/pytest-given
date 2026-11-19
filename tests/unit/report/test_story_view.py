@@ -8,12 +8,11 @@ import pytest
 from pytest_given import given, scenario, then, when
 from pytest_given.model import (
     Clause,
-    ClauseTermRef,
-    ClauseWord,
     Glossary,
     GlossaryTerm,
     Metadata,
     Narration,
+    NarrationLiteral,
     NarrationTermRef,
     NodeId,
     Pin,
@@ -36,12 +35,12 @@ from pytest_given.report.story_view import (
 from tests.ubiquitous_language import pg
 
 
-def _ent(tid: str, display: str) -> ClauseTermRef:
-    return ClauseTermRef(term_id=TermId(tid), display=display)
+def _ent(tid: str, display: str) -> NarrationTermRef:
+    return NarrationTermRef(term_id=TermId(tid), display=display)
 
 
-def _activity_part(tid: str) -> ClauseTermRef:
-    return ClauseTermRef(term_id=TermId(tid), display=tid)
+def _activity_part(tid: str) -> NarrationTermRef:
+    return NarrationTermRef(term_id=TermId(tid), display=tid)
 
 
 def _g() -> Glossary:
@@ -244,8 +243,8 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
     ):
         parts = (
             _ent('guest', 'Guest'),
-            ClauseWord(text='browses'),
-            ClauseWord(text='listings'),
+            NarrationLiteral(value='browses'),
+            NarrationLiteral(value='listings'),
         )
         only = Sentence(id=SentenceId(1), clauses=(Clause(parts=parts),))
         story = Story(id=StoryId('book'), title='Book', sentences=(only,))
@@ -401,7 +400,7 @@ def test_build_sentence_labels_joins_parts_into_prose() -> None:
                     parts=(
                         _ent('guest', 'Carol'),
                         _activity_part('search'),
-                        ClauseWord(text='for'),
+                        NarrationLiteral(value='for'),
                         _ent('room', 'Room'),
                     )
                 ),

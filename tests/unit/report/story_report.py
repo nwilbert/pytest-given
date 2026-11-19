@@ -1,10 +1,9 @@
 from pytest_given.model import (
     Clause,
     ClausePart,
-    ClauseTermRef,
-    ClauseWord,
     Metadata,
     Narration,
+    NarrationLiteral,
     NarrationTermRef,
     NodeId,
     ReportData,
@@ -19,7 +18,7 @@ from pytest_given.model import (
 
 
 def _refs(*term_ids: str) -> tuple[ClausePart, ...]:
-    return tuple(ClauseTermRef(term_id=TermId(tid), display=tid) for tid in term_ids)
+    return tuple(NarrationTermRef(term_id=TermId(tid), display=tid) for tid in term_ids)
 
 
 def story_report() -> ReportData:
@@ -45,8 +44,8 @@ def story_report() -> ReportData:
                     Clause(
                         parts=(
                             *_refs('guest'),
-                            ClauseWord(text='browses'),
-                            ClauseWord(text='listings'),
+                            NarrationLiteral(value='browses'),
+                            NarrationLiteral(value='listings'),
                         )
                     ),
                 ),

@@ -3,7 +3,6 @@
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Clause,
-    ClauseTermRef,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -26,12 +25,12 @@ from pytest_given.model import (
 from tests.ubiquitous_language import pg
 
 
-def _ent(tid: str, display: str) -> ClauseTermRef:
-    return ClauseTermRef(term_id=TermId(tid), display=display)
+def _ent(tid: str, display: str) -> NarrationTermRef:
+    return NarrationTermRef(term_id=TermId(tid), display=display)
 
 
-def _activity_part(tid: str) -> ClauseTermRef:
-    return ClauseTermRef(term_id=TermId(tid), display=tid)
+def _activity_part(tid: str) -> NarrationTermRef:
+    return NarrationTermRef(term_id=TermId(tid), display=tid)
 
 
 def _g() -> Glossary:
@@ -73,7 +72,9 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
                 Clause(
                     parts=(
                         _ent('guest', 'Alice'),
-                        ClauseTermRef(term_id=TermId('search'), display='searches for'),
+                        NarrationTermRef(
+                            term_id=TermId('search'), display='searches for'
+                        ),
                         _ent('room', 'Deluxe Suite'),
                     )
                 ),
@@ -198,7 +199,7 @@ def test_repeated_references_within_one_story_are_recorded_once() -> None:
         g = _g()
         parts = (
             _ent('guest', 'Guest'),
-            ClauseTermRef(term_id=TermId('search'), display='searches for'),
+            NarrationTermRef(term_id=TermId('search'), display='searches for'),
             _ent('room', 'Room'),
         )
         story = Story(
@@ -259,7 +260,9 @@ def test_build_glossary_aggregations_canonical_ref_is_not_an_instance() -> None:
                 Clause(
                     parts=(
                         _ent('guest', 'Guest'),
-                        ClauseTermRef(term_id=TermId('search'), display='searches for'),
+                        NarrationTermRef(
+                            term_id=TermId('search'), display='searches for'
+                        ),
                         _ent('room', 'Room'),
                     )
                 ),
@@ -357,14 +360,14 @@ def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> Non
 
 
 def test_build_glossary_aggregations_skips_unknown_term_ref_in_sentence() -> None:
-    """An ClauseTermRef whose term_id isn't in the glossary is silently skipped."""
+    """A term ref whose term_id isn't in the glossary is silently skipped."""
     g = _g()
     a = Sentence(
         id=SentenceId(1),
         clauses=(
             Clause(
                 parts=(
-                    ClauseTermRef(term_id=TermId('unknown-term'), display='Unknown'),
+                    NarrationTermRef(term_id=TermId('unknown-term'), display='Unknown'),
                 )
             ),
         ),
@@ -384,7 +387,7 @@ def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> N
     ):
         g = _g()
         g.register(GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget'))
-        kindless_part = ClauseTermRef(term_id=TermId('widget'), display='My Widget')
+        kindless_part = NarrationTermRef(term_id=TermId('widget'), display='My Widget')
         a = Sentence(
             id=SentenceId(1),
             clauses=(Clause(parts=(kindless_part,)),),

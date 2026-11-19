@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from ..model import (
     Clause,
     ClausePart,
-    ClauseTermRef,
-    ClauseWord,
+    NarrationLiteral,
+    NarrationTermRef,
     Pin,
     PytestGivenError,
     PytestGivenLookupError,
@@ -151,7 +151,7 @@ def clause(*parts: _ClauseArg) -> Clause:
     nodes (actor / work object); odd positions (1, 3, ...) are edges — an
     activity handle or a bare-string connective. Position 0 is an actor,
     position 1 an activity — but any position also accepts a bare string (a
-    ClauseWord that carries no role). The clause has odd length >= 3 and ends
+    literal that carries no role). The clause has odd length >= 3 and ends
     on a node."""
     if len(parts) < 3 or len(parts) % 2 == 0:
         raise PytestGivenError(
@@ -345,5 +345,5 @@ def _suggestion_for(role: Slot) -> str:
 
 def _to_part(value: _ClauseArg) -> ClausePart:
     if isinstance(value, TermHandleBase):
-        return ClauseTermRef(term_id=value.id, display=value.display)
-    return ClauseWord(text=value)
+        return NarrationTermRef(term_id=value.id, display=value.display)
+    return NarrationLiteral(value=value)

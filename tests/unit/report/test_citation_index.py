@@ -6,7 +6,6 @@ import pytest
 
 from pytest_given.model import (
     Clause,
-    ClauseTermRef,
     GlossaryTerm,
     NarrationLiteral,
     NarrationPlaceholder,
@@ -340,7 +339,9 @@ def test_a_reference_from_a_story_sentence_alone_does_not_count() -> None:
                 id=SentenceId(1),
                 clauses=(
                     Clause(
-                        parts=(ClauseTermRef(term_id=TermId('guest'), display='guest'),)
+                        parts=(
+                            NarrationTermRef(term_id=TermId('guest'), display='guest'),
+                        )
                     ),
                 ),
             ),

@@ -4,9 +4,9 @@ from pytest_given import given, scenario, then, when, when_then
 from pytest_given.capture.kind_inference import infer_glossary_kinds, slot_for
 from pytest_given.model import (
     Clause,
-    ClauseTermRef,
     Glossary,
     GlossaryTerm,
+    NarrationTermRef,
     PytestGivenError,
     Sentence,
     SentenceId,
@@ -28,7 +28,7 @@ def _story(title, *triples):
             clauses=(
                 Clause(
                     parts=tuple(
-                        ClauseTermRef(term_id=TermId(tid), display=tid.title())
+                        NarrationTermRef(term_id=TermId(tid), display=tid.title())
                         for tid in triple
                     )
                 ),
@@ -173,7 +173,7 @@ def test_infers_kinds_from_a_second_clause():
     def clause_of(*term_ids):
         return Clause(
             parts=tuple(
-                ClauseTermRef(term_id=TermId(tid), display=tid.title())
+                NarrationTermRef(term_id=TermId(tid), display=tid.title())
                 for tid in term_ids
             )
         )

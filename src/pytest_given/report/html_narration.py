@@ -23,11 +23,10 @@ from ..markdown import (
 )
 from ..model import (
     ClausePart,
-    ClauseTermRef,
-    ClauseWord,
     Glossary,
     GlossaryTerm,
     Narration,
+    NarrationLiteral,
     NarrationPiece,
     NarrationPlaceholder,
     NarrationTermRef,
@@ -328,12 +327,12 @@ def make_clause_part_filter(
 
     def _render(part: ClausePart) -> Markup:
         match part:
-            case ClauseTermRef(term_id=term_id, display=display):
+            case NarrationTermRef(term_id=term_id, display=display):
                 term = glossary.get(term_id) if glossary is not None else None
                 if term is None:
                     return Markup(_unknown_term_span(display))
                 return Markup(_term_ref_span(term, display, _own_target(term_id)))
-            case ClauseWord(text=text):
+            case NarrationLiteral(value=text):
                 return Markup(f'<span class="clause-word">{escape(text)}</span>')
 
     return _render

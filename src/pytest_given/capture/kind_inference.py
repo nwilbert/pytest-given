@@ -10,9 +10,9 @@ from dataclasses import replace
 from typing import Literal, NoReturn
 
 from ..model import (
-    ClauseTermRef,
     Glossary,
     GlossaryTerm,
+    NarrationTermRef,
     PytestGivenError,
     Story,
     TermId,
@@ -59,7 +59,7 @@ def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
         for sentence in story.sentences:
             for clause in sentence.clauses:
                 for position, part in enumerate(clause.parts):
-                    if isinstance(part, ClauseTermRef):
+                    if isinstance(part, NarrationTermRef):
                         slot = slot_for(position)
                         sightings_by_term[part.term_id][slot].add(story.title)
     inferred_terms = [

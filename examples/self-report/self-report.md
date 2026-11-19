@@ -4316,15 +4316,18 @@
                       "parts": [
                         {
                           "term_id": "guest",
-                          "display": "Alice"
+                          "display": "Alice",
+                          "expression": ""
                         },
                         {
                           "term_id": "search",
-                          "display": "searches for"
+                          "display": "searches for",
+                          "expression": ""
                         },
                         {
                           "term_id": "room",
-                          "display": "Deluxe Suite"
+                          "display": "Deluxe Suite",
+                          "expression": ""
                         }
                       ]
                     }

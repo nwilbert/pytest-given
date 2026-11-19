@@ -228,25 +228,8 @@ class GlossaryTerm:
         return None if self.definition is None else self.definition.text
 
 
-@dataclass(frozen=True, kw_only=True)
-class ClauseTermRef:
-    """Reference to a glossary term in a clause. Kind resolved via
-    glossary[term_id].kind — mirrors NarrationTermRef. Used for both
-    code-defined handles and Markdown glossary handles (whose kind may be
-    inferred post-collection)."""
-
-    term_id: TermId
-    display: str
-
-
-@dataclass(frozen=True, kw_only=True)
-class ClauseWord:
-    """Bare-string connective (preposition, article, etc.). Carries no kind."""
-
-    text: str
-
-
-type ClausePart = ClauseTermRef | ClauseWord
+# A clause, like a definition, is words and term refs.
+type ClausePart = NarrationLiteral | NarrationTermRef
 
 
 @dataclass(frozen=True, kw_only=True)

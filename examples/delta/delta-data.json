@@ -4,7 +4,7 @@
     "before": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-19T16:14:51.437679+00:00",
+        "timestamp": "2026-11-19T16:18:53.235957+00:00",
         "pytest_version": "9.2.0",
         "plugin_version": "0.5.2",
         "commit_sha": null,
@@ -21,7 +21,7 @@
     "after": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-19T16:14:52.084643+00:00",
+        "timestamp": "2026-11-19T16:18:53.818941+00:00",
         "pytest_version": "9.2.0",
         "plugin_version": "0.5.2",
         "commit_sha": null,
@@ -36,7 +36,7 @@
       ]
     },
     "plugin_version": "0.5.2",
-    "timestamp": "2026-11-19T16:14:52.501093+00:00",
+    "timestamp": "2026-11-19T16:18:54.189885+00:00",
     "title": "Delta Example for v2",
     "kind": "delta",
     "schema_version": 1
@@ -1222,7 +1222,7 @@
           "error-handling"
         ],
         "status": "xfailed",
-        "duration_ms": 54,
+        "duration_ms": 47,
         "steps": [
           {
             "phase": "given",
@@ -1487,7 +1487,7 @@
           "error-handling"
         ],
         "status": "failed",
-        "duration_ms": 52,
+        "duration_ms": 46,
         "steps": [
           {
             "phase": "given",

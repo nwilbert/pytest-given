@@ -2,10 +2,10 @@
   "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-19T16:14:48.834564+00:00",
+    "timestamp": "2026-11-19T16:18:50.958798+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "fae67cc58042f0e7947816d5ba67d749c880bbfc",
+    "commit_sha": "12698edd2db2ec61c96fc76c004fafddeffc0e50",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html",
     "kind": "report",
@@ -511,7 +511,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 53,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1686,14 +1686,16 @@
               "parts": [
                 {
                   "term_id": "organizer",
-                  "display": "Carol"
+                  "display": "Carol",
+                  "expression": ""
                 },
                 {
-                  "text": "searches for"
+                  "value": "searches for"
                 },
                 {
                   "term_id": "room",
-                  "display": "Room"
+                  "display": "Room",
+                  "expression": ""
                 }
               ]
             }
@@ -1707,14 +1709,16 @@
               "parts": [
                 {
                   "term_id": "organizer",
-                  "display": "Carol"
+                  "display": "Carol",
+                  "expression": ""
                 },
                 {
-                  "text": "selects"
+                  "value": "selects"
                 },
                 {
                   "term_id": "room",
-                  "display": "Deluxe Suite"
+                  "display": "Deluxe Suite",
+                  "expression": ""
                 }
               ]
             }
@@ -1728,21 +1732,24 @@
               "parts": [
                 {
                   "term_id": "organizer",
-                  "display": "Carol"
+                  "display": "Carol",
+                  "expression": ""
                 },
                 {
-                  "text": "adds"
+                  "value": "adds"
                 },
                 {
                   "term_id": "guest",
-                  "display": "Alice"
+                  "display": "Alice",
+                  "expression": ""
                 },
                 {
-                  "text": "to"
+                  "value": "to"
                 },
                 {
                   "term_id": "booking",
-                  "display": "Booking"
+                  "display": "Booking",
+                  "expression": ""
                 }
               ]
             },
@@ -1750,21 +1757,24 @@
               "parts": [
                 {
                   "term_id": "organizer",
-                  "display": "Carol"
+                  "display": "Carol",
+                  "expression": ""
                 },
                 {
-                  "text": "adds"
+                  "value": "adds"
                 },
                 {
                   "term_id": "guest",
-                  "display": "Bob"
+                  "display": "Bob",
+                  "expression": ""
                 },
                 {
-                  "text": "to"
+                  "value": "to"
                 },
                 {
                   "term_id": "booking",
-                  "display": "Booking"
+                  "display": "Booking",
+                  "expression": ""
                 }
               ]
             }
@@ -1778,21 +1788,24 @@
               "parts": [
                 {
                   "term_id": "organizer",
-                  "display": "Carol"
+                  "display": "Carol",
+                  "expression": ""
                 },
                 {
-                  "text": "submits"
+                  "value": "submits"
                 },
                 {
                   "term_id": "payment",
-                  "display": "Payment"
+                  "display": "Payment",
+                  "expression": ""
                 },
                 {
-                  "text": "for"
+                  "value": "for"
                 },
                 {
                   "term_id": "booking",
-                  "display": "Booking"
+                  "display": "Booking",
+                  "expression": ""
                 }
               ]
             }
@@ -1806,15 +1819,18 @@
               "parts": [
                 {
                   "term_id": "booking-system",
-                  "display": "Booking System"
+                  "display": "Booking System",
+                  "expression": ""
                 },
                 {
                   "term_id": "confirm",
-                  "display": "confirms"
+                  "display": "confirms",
+                  "expression": ""
                 },
                 {
                   "term_id": "booking",
-                  "display": "Booking"
+                  "display": "Booking",
+                  "expression": ""
                 }
               ]
             }
@@ -1828,21 +1844,24 @@
               "parts": [
                 {
                   "term_id": "booking-system",
-                  "display": "Booking System"
+                  "display": "Booking System",
+                  "expression": ""
                 },
                 {
-                  "text": "sends"
+                  "value": "sends"
                 },
                 {
                   "term_id": "confirmation",
-                  "display": "Confirmation"
+                  "display": "Confirmation",
+                  "expression": ""
                 },
                 {
-                  "text": "to"
+                  "value": "to"
                 },
                 {
                   "term_id": "guest",
-                  "display": "Alice"
+                  "display": "Alice",
+                  "expression": ""
                 }
               ]
             },
@@ -1850,21 +1869,24 @@
               "parts": [
                 {
                   "term_id": "booking-system",
-                  "display": "Booking System"
+                  "display": "Booking System",
+                  "expression": ""
                 },
                 {
-                  "text": "sends"
+                  "value": "sends"
                 },
                 {
                   "term_id": "confirmation",
-                  "display": "Confirmation"
+                  "display": "Confirmation",
+                  "expression": ""
                 },
                 {
-                  "text": "to"
+                  "value": "to"
                 },
                 {
                   "term_id": "guest",
-                  "display": "Bob"
+                  "display": "Bob",
+                  "expression": ""
                 }
               ]
             }
@@ -1878,15 +1900,18 @@
               "parts": [
                 {
                   "term_id": "organizer",
-                  "display": "Carol"
+                  "display": "Carol",
+                  "expression": ""
                 },
                 {
                   "term_id": "redeems",
-                  "display": "redeems"
+                  "display": "redeems",
+                  "expression": ""
                 },
                 {
                   "term_id": "loyalty-points",
-                  "display": "loyalty points"
+                  "display": "loyalty points",
+                  "expression": ""
                 }
               ]
             }
@@ -1900,14 +1925,16 @@
               "parts": [
                 {
                   "term_id": "guest",
-                  "display": "Alice"
+                  "display": "Alice",
+                  "expression": ""
                 },
                 {
-                  "text": "checks in to"
+                  "value": "checks in to"
                 },
                 {
                   "term_id": "room",
-                  "display": "Deluxe Suite"
+                  "display": "Deluxe Suite",
+                  "expression": ""
                 }
               ]
             },
@@ -1915,14 +1942,16 @@
               "parts": [
                 {
                   "term_id": "guest",
-                  "display": "Bob"
+                  "display": "Bob",
+                  "expression": ""
                 },
                 {
-                  "text": "checks in to"
+                  "value": "checks in to"
                 },
                 {
                   "term_id": "room",
-                  "display": "Deluxe Suite"
+                  "display": "Deluxe Suite",
+                  "expression": ""
                 }
               ]
             }
@@ -1946,15 +1975,18 @@
               "parts": [
                 {
                   "term_id": "guest",
-                  "display": "Alice"
+                  "display": "Alice",
+                  "expression": ""
                 },
                 {
                   "term_id": "cancel",
-                  "display": "cancels"
+                  "display": "cancels",
+                  "expression": ""
                 },
                 {
                   "term_id": "booking",
-                  "display": "Booking"
+                  "display": "Booking",
+                  "expression": ""
                 }
               ]
             }
@@ -1968,22 +2000,26 @@
               "parts": [
                 {
                   "term_id": "booking-system",
-                  "display": "Booking System"
+                  "display": "Booking System",
+                  "expression": ""
                 },
                 {
                   "term_id": "refund",
-                  "display": "refunds"
+                  "display": "refunds",
+                  "expression": ""
                 },
                 {
                   "term_id": "payment",
-                  "display": "Payment"
+                  "display": "Payment",
+                  "expression": ""
                 },
                 {
-                  "text": "for"
+                  "value": "for"
                 },
                 {
                   "term_id": "booking",
-                  "display": "Booking"
+                  "display": "Booking",
+                  "expression": ""
                 }
               ]
             }
@@ -1997,21 +2033,24 @@
               "parts": [
                 {
                   "term_id": "booking-system",
-                  "display": "Booking System"
+                  "display": "Booking System",
+                  "expression": ""
                 },
                 {
-                  "text": "sends"
+                  "value": "sends"
                 },
                 {
                   "term_id": "confirmation",
-                  "display": "Confirmation"
+                  "display": "Confirmation",
+                  "expression": ""
                 },
                 {
-                  "text": "to"
+                  "value": "to"
                 },
                 {
                   "term_id": "guest",
-                  "display": "Alice"
+                  "display": "Alice",
+                  "expression": ""
                 }
               ]
             }
@@ -2025,15 +2064,18 @@
               "parts": [
                 {
                   "term_id": "guest",
-                  "display": "Alice"
+                  "display": "Alice",
+                  "expression": ""
                 },
                 {
                   "term_id": "rebook",
-                  "display": "asks to rebook"
+                  "display": "asks to rebook",
+                  "expression": ""
                 },
                 {
                   "term_id": "booking",
-                  "display": "Booking"
+                  "display": "Booking",
+                  "expression": ""
                 }
               ]
             }

@@ -14,8 +14,6 @@ from pytest_given import (
 )
 from pytest_given.model import (
     Clause,
-    ClauseTermRef,
-    ClauseWord,
     Narration,
     NarrationLiteral,
     NarrationTermRef,
@@ -40,11 +38,11 @@ from tests.ubiquitous_language import pg
 
 
 def _entity(tid, display):
-    return ClauseTermRef(term_id=TermId(tid), display=display)
+    return NarrationTermRef(term_id=TermId(tid), display=display)
 
 
 def _term_part(tid):
-    return ClauseTermRef(term_id=TermId(tid), display=tid)
+    return NarrationTermRef(term_id=TermId(tid), display=tid)
 
 
 def _clause(*parts):
@@ -66,7 +64,7 @@ def test_sentence_term_refs_collects_term_ids_whatever_the_display():
                 _clause(
                     _entity('guest', 'Alice'),
                     _entity('search', 'searches for'),
-                    ClauseWord(text='a'),
+                    NarrationLiteral(value='a'),
                     _entity('room', 'Deluxe Suite'),
                 ),
             ),
@@ -307,7 +305,7 @@ def test_compute_coverage_lost_when_sentence_gains_a_term():
             clauses=(
                 _clause(
                     _entity('guest', 'Guest'),
-                    ClauseWord(text='books'),
+                    NarrationLiteral(value='books'),
                     _entity('room', 'Room'),
                 ),
             ),
@@ -344,8 +342,8 @@ def test_compute_coverage_scenario_pin_replaces_matching():
         clauses=(
             _clause(
                 _entity('guest', 'Guest'),
-                ClauseWord(text='browses'),
-                ClauseWord(text='listings'),
+                NarrationLiteral(value='browses'),
+                NarrationLiteral(value='listings'),
             ),
         ),
     )
@@ -398,7 +396,7 @@ def _search_and_book_story():
         clauses=(
             _clause(
                 _entity('guest', 'Guest'),
-                ClauseWord(text='books'),
+                NarrationLiteral(value='books'),
                 _entity('booking', 'Booking'),
             ),
         ),
@@ -484,7 +482,10 @@ def test_a_scenario_naming_no_story_is_not_matched():
 
 def _sentence_naming(*term_ids):
     """Sentence 1 referencing these terms, padded with a bare word."""
-    parts = (*(_term_part(term_id) for term_id in term_ids), ClauseWord(text='words'))
+    parts = (
+        *(_term_part(term_id) for term_id in term_ids),
+        NarrationLiteral(value='words'),
+    )
     return Sentence(id=SentenceId(1), clauses=(_clause(*parts),))
 
 
