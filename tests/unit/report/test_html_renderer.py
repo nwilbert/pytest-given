@@ -1435,29 +1435,37 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
     assert term['definition_html'] == 'A person staying at the hotel.'
 
 
-def test_a_term_ref_names_its_tooltip_and_its_card_where_they_are_not_its_term() -> (
-    None
-):
+def test_a_term_ref_names_its_tooltip_its_card_and_its_change_where_given() -> None:
     n = Narration(
         text='Guest',
         parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
     )
 
     def elsewhere(term_id: TermId) -> TermRefTarget:
-        return TermRefTarget(tip=f'before:{term_id}', entry=f'removed:{term_id}')
+        return TermRefTarget(
+            tip=f'before:{term_id}', entry=f'removed:{term_id}', change='removed'
+        )
 
     pointed = make_narration_filter(
         param_color_map={}, glossary=_glossary(), ref_targets=elsewhere
     )
     plain = make_narration_filter(param_color_map={}, glossary=_glossary())
-    assert _term_ref_attributes(pointed(n)) == ('before:guest', 'removed:guest')
-    assert _term_ref_attributes(plain(n)) == ('guest', None)
+    assert _term_ref_attributes(pointed(n)) == (
+        'before:guest',
+        'removed:guest',
+        'removed',
+    )
+    assert _term_ref_attributes(plain(n)) == ('guest', None, None)
 
 
-def _term_ref_attributes(html: str) -> tuple[str, str | None]:
+def _term_ref_attributes(html: str) -> tuple[str, str | None, str | None]:
     [tag] = re.findall(r'<span [^>]*data-term-id=[^>]*>', html)
     attributes = dict(re.findall(r'([\w-]+)="([^"]*)"', tag))
-    return attributes['data-term-id'], attributes.get('data-term-entry')
+    return (
+        attributes['data-term-id'],
+        attributes.get('data-term-entry'),
+        attributes.get('data-change'),
+    )
 
 
 def test_a_placeholder_takes_no_colour_without_a_colour_map() -> None:

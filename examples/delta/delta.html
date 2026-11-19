@@ -1178,7 +1178,8 @@ span.param-highlight {
 .term-ref--link { cursor: pointer; }
 
 
-.term-ref--link:hover { text-decoration-color: var(--kind-ink); text-decoration-thickness: 2px; }
+
+.has-term-tip:hover { text-decoration-color: var(--kind-ink); text-decoration-thickness: 2px; }
 .clause-word {
   color: var(--text-narration);
 }
@@ -1201,7 +1202,11 @@ span.param-highlight {
   pointer-events: none;
 }
 #term-tip[hidden] { display: none; }
-.term-tip-name { display: block; font-weight: 700; }
+
+.term-tip-head { display: flex; align-items: baseline; gap: 0.25em; }
+.term-tip-name { font-weight: 700; }
+
+.term-tip-change { font-size: var(--font-size-sm); opacity: 0.82; }
 .term-tip-def { display: block; margin-top: 2px; opacity: 0.82; }
 
 
@@ -1867,6 +1872,7 @@ span.param-highlight {
 
 
 
+
 body.delta {
   --color-passed: var(--text-muted);
   --color-failed: var(--text-muted);
@@ -1885,6 +1891,9 @@ body.delta {
   --delta-hatch: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
 }
 body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
+.delta .has-term-tip[data-change="added"] { --kind-line: var(--added-line); --kind-ink: var(--added-ink); }
+.delta .has-term-tip[data-change="changed"] { --kind-line: var(--changed-line); --kind-ink: var(--changed-ink); }
+.delta .has-term-tip[data-change="removed"] { --kind-line: var(--removed-line); --kind-ink: var(--removed-ink); }
 
 .delta del { text-decoration-color: var(--removed-line); }
 
@@ -2243,7 +2252,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     </nav>
     
     <div class="topbar-meta">
-      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-19 10:08</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-19 10:08</span>
+      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-19 10:33</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-19 10:33</span>
       </p>
       <span class="topbar-version">pytest-given 0.5.2</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
@@ -2517,7 +2526,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
             </div><div class="phase-steps">
-              <div class="delta-step" data-change="removed" data-row="s1_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> receives a cancellation email with her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="before:invoice" data-term-entry="invoice">Invoice</span></div></div>
+              <div class="delta-step" data-change="removed" data-row="s1_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> receives a cancellation email with her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="before:invoice" data-term-entry="invoice" data-change="changed">Invoice</span></div></div>
             </div></div></div></div>
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
@@ -2526,7 +2535,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
             </div><div class="phase-steps">
-              <div class="delta-step" data-change="added" data-row="s1_3"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
+              <div class="delta-step" data-change="added" data-row="s1_3"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice" data-change="changed">Invoice</span></div></div>
             </div></div></div></div>
       </div>
 
@@ -2563,16 +2572,16 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body-inner">
       <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><del class="delta-words"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-entry="removed:receptionist">Dana</span></del> has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite">Room</span></div></div>
+              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><del class="delta-words"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-entry="removed:receptionist" data-change="removed">Dana</span></del> has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite" data-change="changed">Room</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite">Room</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite" data-change="changed">Room</span></div></div>
             </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s2_2" aria-hidden="true"></div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s2_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> gets <del class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite">Room 101</span></del></div></div>
+              <div class="delta-step" data-change="modified" data-row="s2_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> gets <del class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-entry="suite" data-change="changed">Room 101</span></del></div></div>
             </div></div></div></div>
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><ins class="delta-words">the front desk </ins>has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
+              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><ins class="delta-words">the front desk </ins>has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite" data-change="changed">Suite</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
+              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite" data-change="changed">Suite</span></div></div>
             </div><div class="phase-steps">
               <div class="delta-step" data-change="added" data-row="s2_2"><div class="step-text">he accepts the offer</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
@@ -2586,7 +2595,7 @@ Rate: unchanged</pre></div>
     </div>
     </div></div></div>
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified" data-row="s2_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> gets <ins class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite 101</span></ins></div></div>
+              <div class="delta-step" data-change="modified" data-row="s2_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Bob</span> gets <ins class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite" data-change="changed">Suite 101</span></ins></div></div>
             </div></div></div></div>
       </div>
 
@@ -2624,7 +2633,7 @@ Rate: unchanged</pre></div>
               <div class="step-text">the next <span class="term-ref-actor has-term-tip" data-term-id="guest">Carol</span> arrives at noon</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> asks the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-entry="removed:receptionist">Receptionist</span> for a 2 pm check-out</div>
+              <div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> asks the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-entry="removed:receptionist" data-change="removed">Receptionist</span> for a 2 pm check-out</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the request is refused</div>
@@ -2665,7 +2674,7 @@ Rate: unchanged</pre></div>
               <div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has stayed three times before</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="concierge">Concierge</span> prepares her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div>
+              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="concierge" data-change="added">Concierge</span> prepares her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice" data-change="changed">Invoice</span></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the total is reduced by 10 percent</div>
@@ -2695,7 +2704,7 @@ Rate: unchanged</pre></div>
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
         <span class="scenario-status delta-status">⊗ expected failure → ✗ failed</span>
-        <span class="scenario-duration">49ms</span>
+        <span class="scenario-duration">93ms</span>
       </span>
     </div>
 
@@ -3543,7 +3552,7 @@ Status: pending</pre></div>
 </div>
 
 <div id="term-tip" role="tooltip" hidden>
-  <span class="term-tip-name"></span>
+  <span class="term-tip-head"><span class="term-tip-name"></span><span class="term-tip-change" hidden></span></span>
   <span class="term-tip-def"></span>
 </div>
 
@@ -4815,6 +4824,7 @@ function reportApp() {
       const tip = document.getElementById('term-tip');
       if (!tip) return;
       const nameEl = tip.querySelector('.term-tip-name');
+      const changeEl = tip.querySelector('.term-tip-change');
       const defEl = tip.querySelector('.term-tip-def');
       const hide = () => { if (!tip.hidden) tip.hidden = true; };
       document.addEventListener('pointerover', (event) => {
@@ -4823,6 +4833,10 @@ function reportApp() {
         const term = termsById.get(pill.dataset.termId);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
+
+        const change = pill.dataset.change;
+        changeEl.textContent = change ? `(${change})` : '';
+        changeEl.hidden = !change;
         const def = term.definition_html || '';
 
 

@@ -45,7 +45,7 @@ from .source_link import compile_source_link
 from .step_layout import ParamColorMap, shows_repr
 
 if TYPE_CHECKING:
-    from ..delta import Side
+    from ..delta import Change, Side
 
 
 def inline_md(text: str | None) -> Markup:
@@ -133,6 +133,7 @@ class TermRefTarget:
 
     tip: str
     entry: str | None
+    change: Change | None = None  # the delta's: the change `entry` lists
 
 
 type TermRefTargets = Callable[[TermId], TermRefTarget]
@@ -264,8 +265,9 @@ def _term_ref_span(term: GlossaryTerm, display: str, target: TermRefTarget) -> s
         if target.entry in (None, target.tip)
         else f' data-term-entry="{escape(target.entry)}"'
     )
+    change = '' if target.change is None else f' data-change="{target.change}"'
     return (
-        f'<span class="{classes}" data-term-id="{escape(target.tip)}"{entry}>'
+        f'<span class="{classes}" data-term-id="{escape(target.tip)}"{entry}{change}>'
         f'{escape(display)}</span>'
     )
 

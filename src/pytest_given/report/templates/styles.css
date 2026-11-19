@@ -1145,8 +1145,9 @@ span.param-highlight {
 .term-ref-unknown { --kind-line: var(--term-kindless-line); --kind-ink: var(--term-kindless-ink); }
 .term-ref--link { cursor: pointer; }
 /* The resting underline already marks the term, so hover deepens it to the
-   kind's full ink rather than adding one. */
-.term-ref--link:hover { text-decoration-color: var(--kind-ink); text-decoration-thickness: 2px; }
+   kind's full ink rather than adding one: on every ref with a tooltip, the
+   delta's refs without a card to open too. */
+.has-term-tip:hover { text-decoration-color: var(--kind-ink); text-decoration-thickness: 2px; }
 .clause-word {
   color: var(--text-narration);
 }
@@ -1169,7 +1170,11 @@ span.param-highlight {
   pointer-events: none;
 }
 #term-tip[hidden] { display: none; }
-.term-tip-name { display: block; font-weight: 700; }
+/* A word space apart, so the name and its change read as one phrase. */
+.term-tip-head { display: flex; align-items: baseline; gap: 0.25em; }
+.term-tip-name { font-weight: 700; }
+/* The delta's: how the term of a ref that opens its card changed. */
+.term-tip-change { font-size: var(--font-size-sm); opacity: 0.82; }
 .term-tip-def { display: block; margin-top: 2px; opacity: 0.82; }
 
 /* The stale-link snackbar, top right under the top bar: an error, so it

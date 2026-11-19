@@ -3,7 +3,8 @@
    changed alone. So the status colours, parameter colours and term-kind
    colours are re-pointed at neutral ones here, rather than every rule that
    paints them being overridden: a status is its glyph and word in muted ink,
-   a placeholder plain bold, a term ref's underline the kindless grey. */
+   a placeholder plain bold, a term ref's underline the kindless grey, or its
+   term's change where a card lists one. */
 body.delta {
   --color-passed: var(--text-muted);
   --color-failed: var(--text-muted);
@@ -22,6 +23,9 @@ body.delta {
   --delta-hatch: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
 }
 body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
+.delta .has-term-tip[data-change="added"] { --kind-line: var(--added-line); --kind-ink: var(--added-ink); }
+.delta .has-term-tip[data-change="changed"] { --kind-line: var(--changed-line); --kind-ink: var(--changed-ink); }
+.delta .has-term-tip[data-change="removed"] { --kind-line: var(--removed-line); --kind-ink: var(--removed-ink); }
 /* Whatever is struck as removed is struck in the removed line's red. */
 .delta del { text-decoration-color: var(--removed-line); }
 

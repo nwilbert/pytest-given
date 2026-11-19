@@ -206,7 +206,8 @@ def test_a_before_side_ref_finds_its_term_where_the_after_one_reads_otherwise() 
 def test_a_term_ref_opens_the_card_of_the_side_it_was_read_on_if_one_is_listed() -> (
     None
 ):
-    """An unchanged term has no card to open."""
+    """And names the change its card lists. An unchanged term has no card to
+    open."""
     before = report(
         scn('t.py::test_stay', 'Stay', step('given', narr(ref('guest', 'a guest')))),
         glossary=Glossary(terms=[term('guest', 'Guest'), term('desk', 'Desk')]),
@@ -219,7 +220,12 @@ def test_a_term_ref_opens_the_card_of_the_side_it_was_read_on_if_one_is_listed()
     )
     targets = term_ref_targets(built_delta(before, after))
     assert [
-        (side, term_id, targets[side](TermId(term_id)).entry)
+        (
+            side,
+            term_id,
+            targets[side](TermId(term_id)).entry,
+            targets[side](TermId(term_id)).change,
+        )
         for side, term_id in (
             ('before', 'guest'),
             ('after', 'visitor'),
@@ -227,10 +233,10 @@ def test_a_term_ref_opens_the_card_of_the_side_it_was_read_on_if_one_is_listed()
             ('after', 'desk'),
         )
     ] == [
-        ('before', 'guest', 'removed:guest'),
-        ('after', 'visitor', 'visitor'),
-        ('before', 'desk', None),
-        ('after', 'desk', None),
+        ('before', 'guest', 'removed:guest', 'removed'),
+        ('after', 'visitor', 'visitor', 'added'),
+        ('before', 'desk', None, None),
+        ('after', 'desk', None, None),
     ]
 
 
@@ -358,12 +364,15 @@ def test_a_changed_term_reads_each_side_with_only_its_own_changes_marked():
             '2 scenarios',
         ),
     }
-    # A ref to it on either side opens its card.
+    # A ref to it on either side opens its card, which lists it changed.
     targets = term_ref_targets(delta)
-    assert (
-        targets['before'](TermId('room')).entry,
-        targets['after'](TermId('suite')).entry,
-    ) == ('suite', 'suite')
+    assert [
+        (target.entry, target.change)
+        for target in (
+            targets['before'](TermId('room')),
+            targets['after'](TermId('suite')),
+        )
+    ] == [('suite', 'changed'), ('suite', 'changed')]
 
 
 def test_a_term_whose_kind_changed_is_listed_under_each_kind() -> None:

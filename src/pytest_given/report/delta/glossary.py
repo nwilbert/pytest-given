@@ -202,28 +202,31 @@ def tip_terms(delta: DeltaData) -> dict[str, GlossaryTerm]:
 def term_ref_targets(delta: DeltaData) -> dict[Side, _SideTargets]:
     """Where a term ref read on each side points: its side's reading of the
     term, and the card listing the term's change, if one does."""
-    entries: dict[Side, dict[TermId, str]] = {'before': {}, 'after': {}}
+    cards: dict[Side, dict[TermId, TermDelta]] = {'before': {}, 'after': {}}
     for term_delta in delta.glossary.terms:
-        for side, by_id in entries.items():
+        for side, by_id in cards.items():
             if (term := term_delta.on(side)) is not None:
-                by_id[term.id] = card_key(term_delta)
+                by_id[term.id] = term_delta
     return {
         'before': _SideTargets(
-            entries['before'], frozenset(term.id for term in _read_otherwise(delta))
+            cards['before'], frozenset(term.id for term in _read_otherwise(delta))
         ),
-        'after': _SideTargets(entries['after'], frozenset()),
+        'after': _SideTargets(cards['after'], frozenset()),
     }
 
 
 @dataclass(frozen=True)
 class _SideTargets:
-    entries: dict[TermId, str]
+    cards: dict[TermId, TermDelta]
     # The terms whose tooltip is keyed `_BEFORE_TIP`.
     read_otherwise: frozenset[TermId]
 
     def __call__(self, term_id: TermId) -> TermRefTarget:
         tip = _BEFORE_TIP + term_id if term_id in self.read_otherwise else term_id
-        return TermRefTarget(tip=tip, entry=self.entries.get(term_id))
+        card = self.cards.get(term_id)
+        if card is None:
+            return TermRefTarget(tip=tip, entry=None)
+        return TermRefTarget(tip=tip, entry=card_key(card), change=card.change)
 
 
 def _referring(

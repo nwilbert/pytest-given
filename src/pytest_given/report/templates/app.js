@@ -1247,6 +1247,7 @@ function reportApp() {
       const tip = document.getElementById('term-tip');
       if (!tip) return;
       const nameEl = tip.querySelector('.term-tip-name');
+      const changeEl = tip.querySelector('.term-tip-change');
       const defEl = tip.querySelector('.term-tip-def');
       const hide = () => { if (!tip.hidden) tip.hidden = true; };
       document.addEventListener('pointerover', (event) => {
@@ -1255,6 +1256,10 @@ function reportApp() {
         const term = termsById.get(pill.dataset.termId);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
+        // On the delta page a ref that opens a card names its term's change.
+        const change = pill.dataset.change;
+        changeEl.textContent = change ? `(${change})` : '';
+        changeEl.hidden = !change;
         const def = term.definition_html || '';
         // innerHTML because a definition carries inline markup. Safe not
         // because the source is trusted, but because render_inline_markdown

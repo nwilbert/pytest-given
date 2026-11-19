@@ -561,6 +561,9 @@ scenario does in the normal report, and the column says which side a line belong
 - A changed phase shows each side's own phase, the step led by `~`.
 - Unchanged steps show on both sides, plain. Term refs keep their underlines throughout, and each
   side's term refs read from that side's glossary.
+- Hovering a term ref deepens its underline and shows its term's tooltip, as in the normal report.
+  A term ref whose term has a card on the Glossary tab is underlined in the term's change colour
+  and names that change in its tooltip, and clicking it opens the card.
 - Nested steps line up the same way, inside their parent.
 - A step's attachments show under it on each side. A changed attachment's badge is led by `~` on
   both sides, an added one's by `+` on the *after* side, and a removed one's by `−` on the
@@ -668,7 +671,8 @@ To keep those meanings unambiguous:
   highlight* does. Values in cells are plain text.
 - Term kind colours are muted. Term ref underlines and the glossary's section headings take the
   kindless grey, since an actor's orange sits near amber and a Work Object's teal near green. A
-  term's kind still reads from its section heading on the Glossary tab.
+  term's kind still reads from its section heading on the Glossary tab. A term ref whose term has a
+  card is underlined in its term's change colour instead.
 
 Most changes are also marked without colour, by a `+` / `−` / `~` glyph, strike-through or a text
 label. Added words and changed cells are marked by their tint alone. That is accepted: a reader who
