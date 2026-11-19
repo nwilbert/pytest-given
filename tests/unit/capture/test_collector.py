@@ -441,7 +441,7 @@ def test_start_scenario_with_plain_str_has_empty_parts() -> None:
 def test_finish_scenario_records_skip_reason() -> None:
     c = Collector()
     c.start_scenario(NodeId('t::x'), title='x', module='m', tags=[])
-    s = c.finish_scenario(status='skipped', skip_reason='because')
+    s = c.finish_scenario(status='skipped', reason='because')
     assert s.skip_reason == 'because'
 
 
@@ -507,10 +507,19 @@ def test_fail_keeps_an_existing_error() -> None:
 def test_fail_drops_the_xfail_reason_of_a_scenario_it_turns_failed() -> None:
     collector = Collector()
     collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
-    recorded = collector.finish_scenario(status='xfailed', xfail_reason='planned')
+    recorded = collector.finish_scenario(status='xfailed', reason='planned')
     collector.fail(NodeId('test.py::test_x'), _error('teardown boom'))
     assert recorded.status == 'failed'
-    assert recorded.xfail_reason is None
+    assert recorded.reason is None
+
+
+def test_fail_drops_the_skip_reason_of_a_scenario_it_turns_failed() -> None:
+    collector = Collector()
+    collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+    recorded = collector.finish_scenario(status='skipped', reason='no network')
+    collector.fail(NodeId('test.py::test_x'), _error('teardown boom'))
+    assert recorded.status == 'failed'
+    assert recorded.reason is None
 
 
 def test_fail_as_expected_turns_a_finished_passed_scenario_xfailed() -> None:
@@ -530,7 +539,7 @@ def test_fail_as_expected_keeps_the_first_error_and_reason() -> None:
     collector = Collector()
     collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
     collector.fail(NodeId('test.py::test_x'), _error('body boom'))
-    recorded = collector.finish_scenario(status='xfailed', xfail_reason='planned')
+    recorded = collector.finish_scenario(status='xfailed', reason='planned')
     collector.fail_as_expected(
         NodeId('test.py::test_x'), _error('teardown boom'), 'other'
     )
@@ -558,7 +567,7 @@ def test_fail_as_expected_drops_the_skip_reason_of_a_skipped_scenario() -> None:
     pytest counts it xfailed, so the skip's reason no longer applies."""
     collector = Collector()
     collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
-    recorded = collector.finish_scenario(status='skipped', skip_reason='no network')
+    recorded = collector.finish_scenario(status='skipped', reason='no network')
     collector.fail_as_expected(
         NodeId('test.py::test_x'), _error('teardown boom'), 'planned'
     )

@@ -920,7 +920,7 @@ def test_render_shows_a_skipped_scenarios_reason(tmp_path: Path) -> None:
                 'steps': [],
                 'parameters': None,
                 'error': None,
-                'skip_reason': 'awaiting fixture',
+                'reason': 'awaiting fixture',
             }
         ],
     }

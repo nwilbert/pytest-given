@@ -134,7 +134,7 @@ def test_a_search_matches_either_side_s_title_and_a_removed_tag() -> None:
 def test_a_changed_reason_keeps_the_one_it_replaced() -> None:
     def skipped(reason: str):
         return dataclasses.replace(
-            scn('t.py::test_pay', 'Pay', status='skipped'), skip_reason=reason
+            scn('t.py::test_pay', 'Pay', status='skipped'), reason=reason
         )
 
     before = report(skipped('no card reader'))
@@ -148,7 +148,7 @@ def test_a_changed_reason_keeps_the_one_it_replaced() -> None:
 def test_a_reason_the_after_side_dropped_is_kept_as_what_it_was() -> None:
     before = report(
         dataclasses.replace(
-            scn('t.py::test_pay', 'Pay', status='xfailed'), xfail_reason='bug 12'
+            scn('t.py::test_pay', 'Pay', status='xfailed'), reason='bug 12'
         )
     )
     after = report(scn('t.py::test_pay', 'Pay', status='failed'))

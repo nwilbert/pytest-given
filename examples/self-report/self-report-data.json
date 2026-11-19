@@ -2,10 +2,10 @@
   "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-19T16:19:05.667190+00:00",
+    "timestamp": "2026-11-19T16:24:21.607815+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "12698edd2db2ec61c96fc76c004fafddeffc0e50",
+    "commit_sha": "ddb77d263b933382adb3006c9bff101e7fe7fe25",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html",
     "kind": "report",
@@ -36,7 +36,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 142,
+      "duration_ms": 143,
       "steps": [
         {
           "phase": "given",
@@ -109,8 +109,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli.py",
         "line": 39
@@ -234,8 +233,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli.py",
         "line": 82
@@ -327,8 +325,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli.py",
         "line": 316
@@ -470,8 +467,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli.py",
         "line": 484
@@ -611,8 +607,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli.py",
         "line": 595
@@ -644,7 +639,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -904,8 +899,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
         "line": 83
@@ -1033,8 +1027,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
         "line": 116
@@ -1162,8 +1155,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
         "line": 141
@@ -1308,8 +1300,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
         "line": 376
@@ -1460,8 +1451,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
         "line": 413
@@ -1497,7 +1487,7 @@
         "spec/report-schema-validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -1595,8 +1585,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_coverage.py",
         "line": 14
@@ -1627,7 +1616,7 @@
         "delta"
       ],
       "status": "passed",
-      "duration_ms": 180,
+      "duration_ms": 178,
       "steps": [
         {
           "phase": "given",
@@ -1779,8 +1768,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_delta.py",
         "line": 41
@@ -1816,7 +1804,7 @@
         "delta"
       ],
       "status": "passed",
-      "duration_ms": 162,
+      "duration_ms": 185,
       "steps": [
         {
           "phase": "given",
@@ -1924,8 +1912,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_delta.py",
         "line": 493
@@ -1942,7 +1929,7 @@
       "module": "tests.integration.test_cli_skills",
       "tags": [],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -2002,8 +1989,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_skills.py",
         "line": 42
@@ -2053,7 +2039,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -2205,8 +2191,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 17
@@ -2239,7 +2224,7 @@
         "delta"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -2298,8 +2283,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 62
@@ -2322,7 +2306,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 121,
+      "duration_ms": 120,
       "steps": [
         {
           "phase": "given",
@@ -2383,8 +2367,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 198
@@ -2415,7 +2398,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -2470,8 +2453,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 269
@@ -2510,7 +2492,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -2559,8 +2541,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 307
@@ -2586,7 +2567,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -2652,8 +2633,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 399
@@ -2695,7 +2675,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -2784,8 +2764,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 468
@@ -2824,7 +2803,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 555,
+      "duration_ms": 550,
       "steps": [
         {
           "phase": "given",
@@ -2899,8 +2878,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 503
@@ -2952,7 +2930,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -3095,8 +3073,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 541
@@ -3139,7 +3116,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 102,
+      "duration_ms": 88,
       "steps": [
         {
           "phase": "given",
@@ -3293,8 +3270,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 591
@@ -3325,7 +3301,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 36,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -3363,8 +3339,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 743
@@ -3392,7 +3367,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -3470,8 +3445,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 772
@@ -3502,7 +3476,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -3612,8 +3586,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 840
@@ -3644,7 +3617,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -3682,8 +3655,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 882
@@ -3714,7 +3686,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -3807,8 +3779,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 918
@@ -3834,7 +3805,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -3921,8 +3892,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 1144
@@ -4077,8 +4047,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 1281
@@ -4097,7 +4066,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -4194,8 +4163,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 1341
@@ -4224,7 +4192,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4311,8 +4279,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
         "line": 1855
@@ -4359,7 +4326,7 @@
         "spec/definition-refs"
       ],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -4460,11 +4427,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2382
+        "line": 2381
       },
       "story_ids": [],
       "pins": null
@@ -4490,7 +4456,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 178,
+      "duration_ms": 175,
       "steps": [
         {
           "phase": "given",
@@ -4528,11 +4494,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2516
+        "line": 2515
       },
       "story_ids": [],
       "pins": null
@@ -4563,7 +4528,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -4695,11 +4660,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2684
+        "line": 2683
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -4735,7 +4699,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -4829,11 +4793,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2756
+        "line": 2755
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -4874,7 +4837,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -4971,11 +4934,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2794
+        "line": 2793
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -5019,7 +4981,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -5124,11 +5086,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2840
+        "line": 2839
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -5269,11 +5230,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2881
+        "line": 2880
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -5317,7 +5277,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -5416,11 +5376,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2943
+        "line": 2942
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -5464,7 +5423,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 168,
+      "duration_ms": 147,
       "steps": [
         {
           "phase": "given",
@@ -5659,11 +5618,10 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2983
+        "line": 2982
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -5685,7 +5643,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 523,
+      "duration_ms": 534,
       "steps": [
         {
           "phase": "given",
@@ -5769,11 +5727,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3146
+        "line": 3145
       },
       "story_ids": [],
       "pins": null
@@ -5812,7 +5769,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -5893,11 +5850,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3253
+        "line": 3252
       },
       "story_ids": [],
       "pins": null
@@ -5928,7 +5884,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -6001,11 +5957,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3284
+        "line": 3283
       },
       "story_ids": [],
       "pins": null
@@ -6030,7 +5985,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -6108,11 +6063,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3320
+        "line": 3319
       },
       "story_ids": [],
       "pins": null
@@ -6154,7 +6108,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 151,
+      "duration_ms": 144,
       "steps": [
         {
           "phase": "given",
@@ -6250,11 +6204,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3576
+        "line": 3575
       },
       "story_ids": [],
       "pins": null
@@ -6283,7 +6236,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 132,
+      "duration_ms": 101,
       "steps": [
         {
           "phase": "given",
@@ -6421,11 +6374,10 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3618
+        "line": 3617
       },
       "story_ids": [],
       "pins": null
@@ -6451,7 +6403,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -6515,11 +6467,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3736
+        "line": 3735
       },
       "story_ids": [],
       "pins": null
@@ -6545,7 +6496,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -6592,11 +6543,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3749
+        "line": 3748
       },
       "story_ids": [],
       "pins": null
@@ -6624,7 +6574,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 238,
+      "duration_ms": 211,
       "steps": [
         {
           "phase": "given",
@@ -6766,11 +6716,10 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3772
+        "line": 3771
       },
       "story_ids": [],
       "pins": null
@@ -6806,7 +6755,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -6856,11 +6805,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3844
+        "line": 3843
       },
       "story_ids": [],
       "pins": null
@@ -6896,7 +6844,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -6961,11 +6909,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3882
+        "line": 3881
       },
       "story_ids": [],
       "pins": null
@@ -6988,7 +6935,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 102,
+      "duration_ms": 94,
       "steps": [
         {
           "phase": "given",
@@ -7046,11 +6993,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3915
+        "line": 3914
       },
       "story_ids": [],
       "pins": null
@@ -7070,7 +7016,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -7132,11 +7078,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3935
+        "line": 3934
       },
       "story_ids": [],
       "pins": null
@@ -7162,7 +7107,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -7217,11 +7162,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3968
+        "line": 3967
       },
       "story_ids": [],
       "pins": null
@@ -7247,7 +7191,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -7316,11 +7260,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4000
+        "line": 3999
       },
       "story_ids": [],
       "pins": null
@@ -7354,7 +7297,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 174,
+      "duration_ms": 178,
       "steps": [
         {
           "phase": "given",
@@ -7421,11 +7364,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4139
+        "line": 4138
       },
       "story_ids": [],
       "pins": null
@@ -7451,7 +7393,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 552,
+      "duration_ms": 534,
       "steps": [
         {
           "phase": "given",
@@ -7500,11 +7442,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4187
+        "line": 4186
       },
       "story_ids": [],
       "pins": null
@@ -7593,11 +7534,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4204
+        "line": 4203
       },
       "story_ids": [],
       "pins": null
@@ -7646,7 +7586,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -7756,11 +7696,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4257
+        "line": 4256
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -7799,7 +7738,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -7843,11 +7782,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4339
+        "line": 4338
       },
       "story_ids": [],
       "pins": null
@@ -7970,11 +7908,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4389
+        "line": 4388
       },
       "story_ids": [],
       "pins": null
@@ -8015,7 +7952,7 @@
         "spec/boolean-phrases"
       ],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -8135,11 +8072,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4475
+        "line": 4474
       },
       "story_ids": [],
       "pins": null
@@ -8184,7 +8120,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 61,
       "steps": [
         {
           "phase": "given",
@@ -8294,11 +8230,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4510
+        "line": 4509
       },
       "story_ids": [],
       "pins": null
@@ -8327,7 +8262,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -8406,11 +8341,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 4567
+        "line": 4566
       },
       "story_ids": [],
       "pins": null
@@ -8460,7 +8394,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 566,
+      "duration_ms": 551,
       "steps": [
         {
           "phase": "given",
@@ -8592,8 +8526,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_file_glossary.py",
         "line": 39
@@ -8645,7 +8578,7 @@
         "spec/glossary-sections"
       ],
       "status": "passed",
-      "duration_ms": 599,
+      "duration_ms": 618,
       "steps": [
         {
           "phase": "given",
@@ -8816,8 +8749,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_file_glossary.py",
         "line": 132
@@ -8843,7 +8775,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -8907,8 +8839,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
         "line": 89
@@ -9018,8 +8949,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
         "line": 118
@@ -9052,7 +8982,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -9142,8 +9072,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
         "line": 143
@@ -9172,7 +9101,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -9268,8 +9197,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
         "line": 162
@@ -9302,7 +9230,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 141,
+      "duration_ms": 97,
       "steps": [
         {
           "phase": "given",
@@ -9502,8 +9430,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
         "line": 206
@@ -9532,7 +9459,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -9612,8 +9539,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
         "line": 242
@@ -9644,7 +9570,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -9708,8 +9634,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
         "line": 492
@@ -9789,8 +9714,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
         "line": 515
@@ -9932,8 +9856,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_xdist.py",
         "line": 40
@@ -9973,7 +9896,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -10058,8 +9981,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_xdist.py",
         "line": 69
@@ -10122,7 +10044,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 761,
+      "duration_ms": 750,
       "steps": [
         {
           "phase": "given",
@@ -10193,8 +10115,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_xdist.py",
         "line": 236
@@ -10320,8 +10241,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
         "line": 41
@@ -10452,8 +10372,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
         "line": 76
@@ -10553,8 +10472,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
         "line": 220
@@ -10672,8 +10590,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
         "line": 244
@@ -10781,8 +10698,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
         "line": 266
@@ -10897,8 +10813,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
         "line": 321
@@ -11009,8 +10924,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
         "line": 339
@@ -11091,8 +11005,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
         "line": 491
@@ -11184,11 +11097,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 570
+        "line": 579
       },
       "story_ids": [],
       "pins": null
@@ -11302,11 +11214,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 588
+        "line": 597
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -11411,11 +11322,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 610
+        "line": 619
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -11509,11 +11419,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 640
+        "line": 649
       },
       "story_ids": [],
       "pins": null
@@ -11639,8 +11548,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_definition_refs.py",
         "line": 25
@@ -11745,8 +11653,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 30
@@ -11831,8 +11738,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 44
@@ -11950,8 +11856,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 57
@@ -12051,8 +11956,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 73
@@ -12152,8 +12056,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 91
@@ -12247,8 +12150,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 107
@@ -12346,8 +12248,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 126
@@ -12420,8 +12321,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 147
@@ -12522,8 +12422,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 166
@@ -12599,8 +12498,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 181
@@ -12681,8 +12579,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 201
@@ -12782,8 +12679,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 238
@@ -12967,8 +12863,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 265
@@ -13144,8 +13039,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 300
@@ -13248,8 +13142,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 336
@@ -13363,8 +13256,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 354
@@ -13474,8 +13366,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 368
@@ -13590,8 +13481,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 410
@@ -13686,8 +13576,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 469
@@ -13846,8 +13735,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 520
@@ -14041,8 +13929,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 28
@@ -14179,8 +14066,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 52
@@ -14288,8 +14174,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 82
@@ -14405,8 +14290,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 106
@@ -14502,8 +14386,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 125
@@ -14657,8 +14540,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 160
@@ -14735,8 +14617,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 194
@@ -14835,8 +14716,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 218
@@ -14950,8 +14830,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 319
@@ -15157,8 +15036,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 373
@@ -15405,8 +15283,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 399
@@ -15508,8 +15385,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 427
@@ -15594,8 +15470,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 442
@@ -15662,8 +15537,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 455
@@ -15797,8 +15671,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
         "line": 480
@@ -16007,8 +15880,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 71
@@ -16193,8 +16065,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 103
@@ -16481,8 +16352,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 128
@@ -16652,8 +16522,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 163
@@ -16781,8 +16650,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 199
@@ -16905,8 +16773,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 227
@@ -16999,8 +16866,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 259
@@ -17094,8 +16960,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 35
@@ -17168,8 +17033,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 56
@@ -17230,8 +17094,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 78
@@ -17292,8 +17155,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 97
@@ -17486,8 +17348,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 124
@@ -17692,8 +17553,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 188
@@ -17906,8 +17766,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 220
@@ -17968,8 +17827,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
         "line": 250
@@ -18072,8 +17930,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 54
@@ -18185,8 +18042,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 154
@@ -18296,8 +18152,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 307
@@ -18392,8 +18247,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 334
@@ -18488,8 +18342,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 362
@@ -18706,8 +18559,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 404
@@ -18791,8 +18643,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 465
@@ -18932,8 +18783,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 538
@@ -19078,8 +18928,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 580
@@ -19236,8 +19085,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
         "line": 972
@@ -19368,8 +19216,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 62
@@ -19525,8 +19372,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 105
@@ -19644,8 +19490,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 126
@@ -19753,8 +19598,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 141
@@ -20081,8 +19925,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 159
@@ -20277,8 +20120,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 203
@@ -20369,8 +20211,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 221
@@ -20482,8 +20323,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 240
@@ -20580,8 +20420,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 266
@@ -20701,8 +20540,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 296
@@ -20832,8 +20670,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 312
@@ -20955,8 +20792,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 329
@@ -21078,8 +20914,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 349
@@ -21160,8 +20995,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 367
@@ -21318,8 +21152,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 404
@@ -21468,8 +21301,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 424
@@ -21594,8 +21426,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 460
@@ -21729,8 +21560,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 527
@@ -21899,8 +21729,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 545
@@ -21981,8 +21810,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 569
@@ -22101,8 +21929,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 629
@@ -22141,7 +21968,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -22200,8 +22027,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 681
@@ -22323,8 +22149,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 707
@@ -22417,8 +22242,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
         "line": 728
@@ -22487,8 +22311,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 44
@@ -22545,8 +22368,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 88
@@ -22624,8 +22446,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 137
@@ -22730,8 +22551,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 161
@@ -22798,8 +22618,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 191
@@ -22854,8 +22673,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 258
@@ -23085,8 +22903,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 298
@@ -23179,8 +22996,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 356
@@ -23278,8 +23094,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 399
@@ -23372,8 +23187,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
         "line": 437
@@ -23494,8 +23308,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 79
@@ -23516,7 +23329,7 @@
       "module": "tests.unit.citations.test_check",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -23583,8 +23396,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 105
@@ -23702,8 +23514,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 163
@@ -23867,8 +23678,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 186
@@ -24045,8 +23855,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 210
@@ -24086,7 +23895,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -24179,8 +23988,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 243
@@ -24217,7 +24025,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -24367,8 +24175,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 266
@@ -24502,8 +24309,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 622
@@ -24543,7 +24349,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -24753,8 +24559,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 892
@@ -24895,8 +24700,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1098
@@ -25040,8 +24844,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1121
@@ -25251,8 +25054,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1148
@@ -25292,7 +25094,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -25466,8 +25268,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1206
@@ -25622,8 +25423,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1243
@@ -25764,8 +25564,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1305
@@ -25797,7 +25596,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -25962,8 +25761,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1346
@@ -25995,7 +25793,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -26132,8 +25930,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1439
@@ -26300,8 +26097,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1659
@@ -26449,8 +26245,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1690
@@ -26625,8 +26420,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1712
@@ -26766,8 +26560,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1739
@@ -26930,8 +26723,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1762
@@ -27078,8 +26870,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1792
@@ -27206,8 +26997,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1828
@@ -27375,8 +27165,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1854
@@ -27491,8 +27280,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_attachments.py",
         "line": 47
@@ -27605,8 +27393,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_attachments.py",
         "line": 137
@@ -27730,8 +27517,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
         "line": 110
@@ -27845,8 +27631,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
         "line": 151
@@ -28049,8 +27834,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
         "line": 179
@@ -28180,8 +27964,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
         "line": 223
@@ -28301,8 +28084,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
         "line": 251
@@ -28400,8 +28182,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
         "line": 279
@@ -28491,8 +28272,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
         "line": 333
@@ -28630,11 +28410,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
-        "line": 397
+        "line": 401
       },
       "story_ids": [],
       "pins": null
@@ -28692,11 +28471,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_build.py",
-        "line": 494
+        "line": 498
       },
       "story_ids": [],
       "pins": null
@@ -28782,8 +28560,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
         "line": 22
@@ -28856,8 +28633,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
         "line": 38
@@ -28960,8 +28736,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
         "line": 52
@@ -29068,8 +28843,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
         "line": 71
@@ -29164,8 +28938,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_chains.py",
         "line": 93
@@ -29249,8 +29022,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
         "line": 65
@@ -29344,8 +29116,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
         "line": 99
@@ -29467,8 +29238,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
         "line": 132
@@ -29600,8 +29370,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
         "line": 166
@@ -29727,8 +29496,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_narration.py",
         "line": 205
@@ -29809,8 +29577,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_renames.py",
         "line": 54
@@ -29924,8 +29691,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_steps.py",
         "line": 32
@@ -30005,8 +29771,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_suggestions.py",
         "line": 76
@@ -30135,8 +29900,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_table.py",
         "line": 48
@@ -30218,8 +29982,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_table.py",
         "line": 95
@@ -30304,8 +30067,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_table.py",
         "line": 126
@@ -30398,8 +30160,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_table.py",
         "line": 158
@@ -30515,8 +30276,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_terms.py",
         "line": 44
@@ -30616,8 +30376,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/delta/test_terms.py",
         "line": 75
@@ -30862,11 +30621,10 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 137
+        "line": 136
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -31095,11 +30853,10 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 189
+        "line": 188
       },
       "story_ids": [],
       "pins": null
@@ -31222,11 +30979,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 291
+        "line": 290
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -31335,11 +31091,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 324
+        "line": 323
       },
       "story_ids": [],
       "pins": null
@@ -31443,11 +31198,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 497
+        "line": 496
       },
       "story_ids": [],
       "pins": null
@@ -31585,11 +31339,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 726
+        "line": 725
       },
       "story_ids": [],
       "pins": null
@@ -31715,11 +31468,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 848
+        "line": 847
       },
       "story_ids": [],
       "pins": null
@@ -31856,11 +31608,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 952
+        "line": 951
       },
       "story_ids": [],
       "pins": null
@@ -31960,11 +31711,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 971
+        "line": 970
       },
       "story_ids": [],
       "pins": null
@@ -32065,11 +31815,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 1038
+        "line": 1037
       },
       "story_ids": [],
       "pins": null
@@ -32160,11 +31909,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 1366
+        "line": 1365
       },
       "story_ids": [],
       "pins": null
@@ -32266,11 +32014,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 1382
+        "line": 1381
       },
       "story_ids": [],
       "pins": null
@@ -32372,11 +32119,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 1425
+        "line": 1424
       },
       "story_ids": [],
       "pins": null
@@ -32483,11 +32229,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 1507
+        "line": 1506
       },
       "story_ids": [],
       "pins": null
@@ -32622,11 +32367,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 1859
+        "line": 1858
       },
       "story_ids": [],
       "pins": null
@@ -32753,11 +32497,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 1915
+        "line": 1914
       },
       "story_ids": [],
       "pins": null
@@ -32892,11 +32635,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 2080
+        "line": 2079
       },
       "story_ids": [],
       "pins": null
@@ -33031,11 +32773,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 2112
+        "line": 2111
       },
       "story_ids": [],
       "pins": null
@@ -33166,11 +32907,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 2168
+        "line": 2167
       },
       "story_ids": [],
       "pins": null
@@ -33286,11 +33026,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 2714
+        "line": 2713
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -33417,11 +33156,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 2874
+        "line": 2873
       },
       "story_ids": [],
       "pins": null
@@ -33544,11 +33282,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 2991
+        "line": 2990
       },
       "story_ids": [],
       "pins": null
@@ -33727,11 +33464,10 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 3021
+        "line": 3020
       },
       "story_ids": [],
       "pins": null
@@ -33845,11 +33581,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 3140
+        "line": 3139
       },
       "story_ids": [],
       "pins": null
@@ -33977,11 +33712,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 3388
+        "line": 3387
       },
       "story_ids": [],
       "pins": null
@@ -34107,11 +33841,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 3455
+        "line": 3454
       },
       "story_ids": [],
       "pins": null
@@ -34231,11 +33964,10 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_grouping.py",
-        "line": 3479
+        "line": 3478
       },
       "story_ids": [],
       "pins": null
@@ -34361,8 +34093,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/grouping/test_percase.py",
         "line": 195
@@ -34396,7 +34127,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -34512,8 +34243,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
         "line": 101
@@ -34634,8 +34364,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
         "line": 280
@@ -34781,8 +34510,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
         "line": 370
@@ -34980,8 +34708,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
         "line": 637
@@ -35102,8 +34829,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
         "line": 785
@@ -35224,8 +34950,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
         "line": 967
@@ -35376,8 +35101,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
         "line": 69
@@ -35538,8 +35262,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
         "line": 145
@@ -35708,8 +35431,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
         "line": 253
@@ -35844,8 +35566,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
         "line": 324
@@ -35996,8 +35717,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
         "line": 369
@@ -36156,8 +35876,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
         "line": 473
@@ -36288,8 +36007,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_serde.py",
         "line": 952
@@ -36387,7 +36105,7 @@
           "attachments": [
             {
               "label": "Report data",
-              "content": "{\n  \"$schema\": \"https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json\",\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null,\n    \"report_url\": null,\n    \"kind\": \"report\",\n    \"schema_version\": 1\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\"\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"pins\": null,\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"xfail_reason\": null,\n      \"source\": null,\n      \"story_ids\": [\n        \"book\"\n      ],\n      \"pins\": null\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"activity\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"sentences\": [\n        {\n          \"id\": 1,\n          \"clauses\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\",\n                  \"expression\": \"\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\",\n                  \"expression\": \"\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\",\n                  \"expression\": \"\"\n                }\n              ]\n            }\n          ],\n          \"name\": null\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
+              "content": "{\n  \"$schema\": \"https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json\",\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null,\n    \"report_url\": null,\n    \"kind\": \"report\",\n    \"schema_version\": 1\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\"\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"pins\": null,\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"reason\": null,\n      \"source\": null,\n      \"story_ids\": [\n        \"book\"\n      ],\n      \"pins\": null\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"activity\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"sentences\": [\n        {\n          \"id\": 1,\n          \"clauses\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\",\n                  \"expression\": \"\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\",\n                  \"expression\": \"\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\",\n                  \"expression\": \"\"\n                }\n              ]\n            }\n          ],\n          \"name\": null\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
               "content_type": "json"
             }
           ],
@@ -36463,8 +36181,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_term_refs.py",
         "line": 57
@@ -36582,8 +36299,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_term_refs.py",
         "line": 161
@@ -36723,8 +36439,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_term_refs.py",
         "line": 191
@@ -36832,8 +36547,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_term_refs.py",
         "line": 246
@@ -36980,8 +36694,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_term_refs.py",
         "line": 294
@@ -37137,8 +36850,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_term_refs.py",
         "line": 381
@@ -37262,8 +36974,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_term_refs.py",
         "line": 414
@@ -37378,8 +37089,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/model/test_term_refs.py",
         "line": 503
@@ -37508,8 +37218,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 52
@@ -37627,8 +37336,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 78
@@ -37780,8 +37488,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 106
@@ -37910,8 +37617,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 162
@@ -38135,8 +37841,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 190
@@ -38361,8 +38066,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 256
@@ -38542,8 +38246,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 288
@@ -38783,8 +38486,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 408
@@ -38967,8 +38669,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 492
@@ -39122,8 +38823,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
         "line": 533
@@ -39243,8 +38943,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
         "line": 140
@@ -39272,7 +38971,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 151,
+      "duration_ms": 155,
       "steps": [
         {
           "phase": "given",
@@ -39366,8 +39065,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
         "line": 347
@@ -39411,7 +39109,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -39486,8 +39184,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
         "line": 867
@@ -39651,8 +39348,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
         "line": 1307
@@ -39777,8 +39473,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 62
@@ -39921,8 +39616,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 94
@@ -40055,8 +39749,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 194
@@ -40185,8 +39878,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 267
@@ -40423,8 +40115,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 308
@@ -40538,8 +40229,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 351
@@ -40653,8 +40343,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 422
@@ -40739,8 +40428,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 601
@@ -40850,8 +40538,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 1166
@@ -40945,8 +40632,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 1197
@@ -41067,8 +40753,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
         "line": 1268
@@ -41146,8 +40831,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_sinks.py",
         "line": 163
@@ -41317,8 +41001,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
         "line": 30
@@ -41387,8 +41070,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
         "line": 59
@@ -41454,8 +41136,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
         "line": 96
@@ -41510,8 +41191,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
         "line": 119
@@ -41579,8 +41259,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
         "line": 172
@@ -41786,8 +41465,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_story_view.py",
         "line": 232
@@ -41927,8 +41605,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_story_view.py",
         "line": 342
@@ -42049,8 +41726,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_story_view.py",
         "line": 391
@@ -42169,8 +41845,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_title_spans.py",
         "line": 32
@@ -42294,8 +41969,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "tests/unit/report/test_title_spans.py",
         "line": 53

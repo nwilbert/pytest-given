@@ -137,7 +137,7 @@ def test_scenario_with_source_and_no_steps() -> None:
                     'steps': [],
                     'parameters': None,
                     'error': None,
-                    'skip_reason': None,
+                    'reason': None,
                     'source': {'relpath': 'tests/t.py', 'line': 7},
                 }
             ],
@@ -160,7 +160,7 @@ def test_an_xfailed_scenario_round_trips_with_its_reason() -> None:
             narration=Narration(text='x'),
             module='t',
             status='xfailed',
-            xfail_reason='not implemented yet',
+            reason='not implemented yet',
         )
     )
     assert restored.status == 'xfailed'

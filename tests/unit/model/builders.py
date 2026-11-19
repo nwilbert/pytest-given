@@ -184,7 +184,7 @@ def every_field_populated() -> ReportData:
             ],
         ),
         error=ErrorInfo(message='boom', frames=[], error_tail=None),
-        skip_reason=None,
+        reason=None,
         source=SourceLocation(relpath='t.py', line=5),
         story_ids=(StoryId('booking'),),
         pins=(Pin(story_id=StoryId('booking'), sentence_id=SentenceId(1)),),

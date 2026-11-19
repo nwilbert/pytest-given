@@ -4264,8 +4264,7 @@
               ],
               "parameters": null,
               "error": null,
-              "skip_reason": null,
-              "xfail_reason": null,
+              "reason": null,
               "source": null,
               "story_ids": [
                 "book"

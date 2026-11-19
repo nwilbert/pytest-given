@@ -1777,7 +1777,7 @@ def test_skipped_scenario_captures_mark_reason(pytester, tmp_path):
     pytester.runpytest(f'--given-json={json_path}').assert_outcomes(skipped=1)
     data = json.loads(json_path.read_text())
     assert data['scenarios'][0]['status'] == 'skipped'
-    assert data['scenarios'][0]['skip_reason'] == 'awaiting fixture'
+    assert data['scenarios'][0]['reason'] == 'awaiting fixture'
     # A skip carries a structured reason, never a traceback — makereport
     # short-circuits before getrepr so no error/frames are captured.
     assert data['scenarios'][0]['error'] is None
@@ -1800,7 +1800,7 @@ def test_skipped_scenario_without_reason_has_none(pytester, tmp_path):
     json_path = tmp_path / 'report.json'
     pytester.runpytest(f'--given-json={json_path}').assert_outcomes(skipped=1)
     data = json.loads(json_path.read_text())
-    assert data['scenarios'][0]['skip_reason'] is None
+    assert data['scenarios'][0]['reason'] is None
 
 
 def test_call_time_pytest_skip_captures_reason(pytester, tmp_path):
@@ -1819,7 +1819,7 @@ def test_call_time_pytest_skip_captures_reason(pytester, tmp_path):
     json_path = tmp_path / 'report.json'
     pytester.runpytest(f'--given-json={json_path}').assert_outcomes(skipped=1)
     data = json.loads(json_path.read_text())
-    assert data['scenarios'][0]['skip_reason'] == 'missing prerequisite'
+    assert data['scenarios'][0]['reason'] == 'missing prerequisite'
 
 
 def test_parametrized_all_cases_skipped_groups_as_skipped(pytester, tmp_path):
@@ -1883,8 +1883,7 @@ def test_marked_expected_failure_is_xfailed(pytester, tmp_path):
     ):
         s = json.loads(json_path.read_text())['scenarios'][0]
         assert s['status'] == 'xfailed'
-        assert s['xfail_reason'] == 'not implemented yet'
-        assert s['skip_reason'] is None
+        assert s['reason'] == 'not implemented yet'
         assert [step['phase'] for step in s['steps']] == ['given', 'then']
         assert 'assert 1 == 2' in s['error']['message']
 
@@ -1943,7 +1942,7 @@ def test_an_expected_failure_without_a_reason_has_none(pytester, tmp_path, body)
     result, s = _run_one_scenario(pytester, tmp_path, body)
     result.assert_outcomes(xfailed=1)
     assert s['status'] == 'xfailed'
-    assert s['xfail_reason'] is None
+    assert s['reason'] is None
 
 
 def test_in_body_pytest_xfail_records_steps_and_reason_without_error(
@@ -1963,7 +1962,7 @@ def test_in_body_pytest_xfail_records_steps_and_reason_without_error(
     )
     result.assert_outcomes(xfailed=1)
     assert s['status'] == 'xfailed'
-    assert s['xfail_reason'] == 'blocked upstream'
+    assert s['reason'] == 'blocked upstream'
     assert s['error'] is None
     assert [step['phase'] for step in s['steps']] == ['given']
 
@@ -1984,7 +1983,7 @@ def test_pytest_xfail_in_a_fixture_is_xfailed(pytester, tmp_path):
     )
     result.assert_outcomes(xfailed=1)
     assert s['status'] == 'xfailed'
-    assert s['xfail_reason'] == 'fixture says so'
+    assert s['reason'] == 'fixture says so'
     assert s['error'] is None
 
 
@@ -2002,7 +2001,7 @@ def test_xfail_run_false_drops_the_notrun_prefix(pytester, tmp_path):
     )
     result.assert_outcomes(xfailed=1)
     assert s['status'] == 'xfailed'
-    assert s['xfail_reason'] == 'crashes the interpreter'
+    assert s['reason'] == 'crashes the interpreter'
     assert s['error'] is None
     assert s['steps'] == []
 
@@ -2021,7 +2020,7 @@ def test_non_strict_xpass_stays_passed(pytester, tmp_path):
     )
     result.assert_outcomes(xpassed=1)
     assert s['status'] == 'passed'
-    assert s['xfail_reason'] is None
+    assert s['reason'] is None
     assert s['error'] is None
 
 
@@ -2039,7 +2038,7 @@ def test_strict_xpass_fails_with_pytests_message(pytester, tmp_path):
     )
     result.assert_outcomes(failed=1)
     assert s['status'] == 'failed'
-    assert s['xfail_reason'] is None
+    assert s['reason'] is None
     assert s['error']['message'].startswith('[XPASS(strict)]')
 
 
@@ -2073,7 +2072,7 @@ def test_runxfail_reports_a_marked_failure_as_failed(pytester, tmp_path):
     )
     result.assert_outcomes(failed=1)
     assert s['status'] == 'failed'
-    assert s['xfail_reason'] is None
+    assert s['reason'] is None
     assert s['error'] is not None
 
 
@@ -2091,7 +2090,7 @@ def test_teardown_error_under_the_mark_stays_xfailed(pytester, tmp_path):
     )
     result.assert_outcomes(xfailed=2)
     assert s['status'] == 'xfailed'
-    assert s['xfail_reason'] == 'planned'
+    assert s['reason'] == 'planned'
     assert 'assert False' in s['error']['message']
 
 
@@ -2109,7 +2108,7 @@ def test_teardown_error_after_an_xpass_under_the_mark_is_xfailed(pytester, tmp_p
     )
     result.assert_outcomes(xpassed=1, xfailed=1)
     assert s['status'] == 'xfailed'
-    assert s['xfail_reason'] == 'planned'
+    assert s['reason'] == 'planned'
     assert 'teardown boom' in s['error']['message']
 
 
@@ -2127,7 +2126,7 @@ def test_teardown_error_after_a_strict_xpass_stays_failed(pytester, tmp_path):
     )
     result.assert_outcomes(failed=1, xfailed=1)
     assert s['status'] == 'failed'
-    assert s['xfail_reason'] is None
+    assert s['reason'] is None
     assert s['error']['message'].startswith('[XPASS(strict)]')
 
 
@@ -2144,7 +2143,7 @@ def test_teardown_error_after_an_imperative_xfail_is_failed(pytester, tmp_path):
     )
     result.assert_outcomes(xfailed=1, errors=1)
     assert s['status'] == 'failed'
-    assert s['xfail_reason'] is None
+    assert s['reason'] is None
     assert 'teardown boom' in s['error']['message']
 
 
@@ -2164,7 +2163,7 @@ def test_parametrized_group_with_one_xfailed_row_is_xfailed(pytester, tmp_path):
     )
     result.assert_outcomes(passed=1, xfailed=1)
     assert s['status'] == 'xfailed'
-    assert s['xfail_reason'] == 'two is planned'
+    assert s['reason'] == 'two is planned'
     assert s['error'] is None
     assert [case['status'] for case in s['parameters']['cases']] == [
         'passed',

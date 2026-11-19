@@ -345,7 +345,9 @@ def test_what_makes_a_scenario_changed() -> None:
             scn('t.py::step', 'Steps', step('given', 'a room')),
             scn('t.py::tag', 'Tags', tags=['a']),
             scn('t.py::status', 'Status'),
-            dataclasses.replace(scn('t.py::reason', 'Reason'), skip_reason='slow'),
+            dataclasses.replace(
+                scn('t.py::reason', 'Reason', status='skipped'), reason='slow'
+            ),
             scn('t.py::table[1]', 'Table', parameters=cases),
             scn('t.py::attach', 'Attach', _logged('a')),
         )
@@ -354,7 +356,9 @@ def test_what_makes_a_scenario_changed() -> None:
             scn('t.py::step', 'Steps', step('given', 'a suite')),
             scn('t.py::tag', 'Tags', tags=['b']),
             scn('t.py::status', 'Status', status='failed'),
-            dataclasses.replace(scn('t.py::reason', 'Reason'), skip_reason='flaky'),
+            dataclasses.replace(
+                scn('t.py::reason', 'Reason', status='skipped'), reason='flaky'
+            ),
             scn(
                 't.py::table[1]',
                 'Table',

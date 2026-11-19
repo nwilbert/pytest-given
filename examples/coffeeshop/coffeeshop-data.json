@@ -2,10 +2,10 @@
   "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-19T16:18:49.443308+00:00",
+    "timestamp": "2026-11-19T16:24:05.640261+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "12698edd2db2ec61c96fc76c004fafddeffc0e50",
+    "commit_sha": "ddb77d263b933382adb3006c9bff101e7fe7fe25",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html",
     "kind": "report",
@@ -67,8 +67,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 32
@@ -140,8 +139,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 41
@@ -196,8 +194,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 52
@@ -216,7 +213,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 84,
+      "duration_ms": 93,
       "steps": [
         {
           "phase": "given",
@@ -426,8 +423,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": "happy-hour pricing not implemented yet",
+      "reason": "happy-hour pricing not implemented yet",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 61
@@ -534,8 +530,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 90
@@ -624,8 +619,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 102
@@ -747,8 +741,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 113
@@ -854,8 +847,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 123
@@ -972,8 +964,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 123
@@ -1146,8 +1137,7 @@
         ]
       },
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 141
@@ -1272,8 +1262,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 188
@@ -1448,8 +1437,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 204
@@ -1519,8 +1507,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 241
@@ -1603,8 +1590,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 258
@@ -1621,7 +1607,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 39,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -1745,8 +1731,7 @@
         "error_tail": "E   assert 10 == 20",
         "causes": []
       },
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 274
@@ -1767,8 +1752,7 @@
       "steps": [],
       "parameters": null,
       "error": null,
-      "skip_reason": "demonstrates skipped status",
-      "xfail_reason": null,
+      "reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 280
@@ -1787,7 +1771,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 35,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -1929,8 +1913,7 @@
         "error_tail": "E   NotImplementedError: the machine does not read loyalty cards yet",
         "causes": []
       },
-      "skip_reason": null,
-      "xfail_reason": "loyalty cards not implemented yet",
+      "reason": "loyalty cards not implemented yet",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 291
@@ -1979,8 +1962,7 @@
         ]
       },
       "error": null,
-      "skip_reason": "awaiting fixture",
-      "xfail_reason": null,
+      "reason": "awaiting fixture",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 302

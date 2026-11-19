@@ -83,11 +83,8 @@ def _grouped_scenario(
         steps=template_steps,
         parameters=table,
         error=None,
-        skip_reason=_shared_reason(
-            case.skip_reason for case in group.cases if status == case.status
-        ),
-        xfail_reason=_shared_reason(
-            case.xfail_reason for case in group.cases if status == case.status
+        reason=_shared_reason(
+            case.reason for case in group.cases if status == case.status
         ),
     )
 

@@ -237,15 +237,13 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
         return
     wasxfail = _wasxfail(report)
     if report.skipped and wasxfail is not None:
-        collector.finish_scenario(
-            status='xfailed', xfail_reason=_xfail_reason(wasxfail)
-        )
+        collector.finish_scenario(status='xfailed', reason=_xfail_reason(wasxfail))
         return
     status: Status = (
         'passed' if report.passed else 'failed' if report.failed else 'skipped'
     )
     skip_reason = _extract_skip_reason(report.longrepr) if status == 'skipped' else None
-    collector.finish_scenario(status=status, skip_reason=skip_reason)
+    collector.finish_scenario(status=status, reason=skip_reason)
 
 
 def _filter_internal_frames(excinfo: pytest.ExceptionInfo[BaseException]) -> None:

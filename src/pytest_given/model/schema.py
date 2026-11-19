@@ -519,11 +519,20 @@ class Scenario[S: Step = Step]:
     steps: list[S] = field(default_factory=list)
     parameters: ParameterTable | None = None
     error: ErrorInfo | None = None
-    skip_reason: str | None = None
-    xfail_reason: str | None = None
+    # Why it was skipped or expected to fail: its status says which. A scenario
+    # of any other status has none.
+    reason: str | None = None
     source: SourceLocation | None = None
     story_ids: tuple[StoryId, ...] = ()
     pins: tuple[Pin, ...] | None = None
+
+    @property
+    def skip_reason(self) -> str | None:
+        return self.reason if self.status == 'skipped' else None
+
+    @property
+    def xfail_reason(self) -> str | None:
+        return self.reason if self.status == 'xfailed' else None
 
 
 # What capture, grouping, the lint and the plugin hold: a scenario whose steps

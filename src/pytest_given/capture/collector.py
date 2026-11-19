@@ -220,8 +220,7 @@ class Collector:
     def finish_scenario(
         self,
         status: Status,
-        skip_reason: str | None = None,
-        xfail_reason: str | None = None,
+        reason: str | None = None,
     ) -> CapturedScenario:
         """Close the active scenario and return it.
 
@@ -233,8 +232,7 @@ class Collector:
         assert self._current_scenario is not None
         self._current_scenario.status = status
         self._current_scenario.duration_ms = self._elapsed_ms()
-        self._current_scenario.skip_reason = skip_reason
-        self._current_scenario.xfail_reason = xfail_reason
+        self._current_scenario.reason = reason
         scenario = self._current_scenario
         self._scenarios[scenario.id] = scenario
         self._current_scenario = None
@@ -441,12 +439,13 @@ class Collector:
 
         The first error wins: a call-phase failure is what the reader opened
         the scenario for, and a teardown error after it is the lesser story.
-        A failed scenario was not expected to fail, so it keeps no xfail reason.
+        A failed scenario was neither skipped nor expected to fail, so it keeps
+        no reason.
         """
         scenario = self._scenario_for(node_id)
         assert scenario is not None, node_id
         scenario.status = 'failed'
-        scenario.xfail_reason = None
+        scenario.reason = None
         if scenario.error is None:
             scenario.error = error
 
@@ -467,10 +466,9 @@ class Collector:
             scenario.error = error
         if scenario.status == 'failed':
             return
-        scenario.status = 'xfailed'
-        scenario.skip_reason = None
         if scenario.xfail_reason is None:
-            scenario.xfail_reason = reason
+            scenario.reason = reason
+        scenario.status = 'xfailed'
 
     def _scenario_for(self, node_id: NodeId) -> CapturedScenario | None:
         if self._current_scenario is not None and self._current_scenario.id == node_id:

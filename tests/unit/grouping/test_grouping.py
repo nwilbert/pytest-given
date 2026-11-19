@@ -102,7 +102,7 @@ def test_group_parametrized_all_skipped_keeps_the_skip_reason() -> None:
             narration=Narration(text='x'),
             module='m',
             status='skipped',
-            skip_reason='needs a database',
+            reason='needs a database',
         )
         for nid in (nid1, nid2)
     ]
@@ -122,8 +122,7 @@ def _cases(*specs: tuple[Status, str | None]) -> tuple[list[Scenario], ParamInfo
             narration=Narration(text='x'),
             module='m',
             status=status,
-            skip_reason=reason if status == 'skipped' else None,
-            xfail_reason=reason if status == 'xfailed' else None,
+            reason=reason,
         )
         for index, (status, reason) in enumerate(specs, start=1)
     ]
@@ -226,7 +225,7 @@ def test_a_passed_group_does_not_inherit_a_skipped_anchors_reason() -> None:
             narration=Narration(text='x'),
             module='m',
             status='skipped',
-            skip_reason='needs a database',
+            reason='needs a database',
         ),
         Scenario(id=nid2, narration=Narration(text='x'), module='m', status='passed'),
     ]
@@ -247,14 +246,14 @@ def test_an_xfailed_group_does_not_inherit_a_skipped_anchors_reason() -> None:
             narration=Narration(text='x'),
             module='m',
             status='skipped',
-            skip_reason='needs a database',
+            reason='needs a database',
         ),
         Scenario(
             id=nid2,
             narration=Narration(text='x'),
             module='m',
             status='xfailed',
-            xfail_reason='planned',
+            reason='planned',
         ),
     ]
     param_info: ParamInfo = {

@@ -2,10 +2,10 @@
   "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-19T16:18:51.948114+00:00",
+    "timestamp": "2026-11-19T16:24:08.121859+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "12698edd2db2ec61c96fc76c004fafddeffc0e50",
+    "commit_sha": "ddb77d263b933382adb3006c9bff101e7fe7fe25",
     "title": "Table Glossary Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/table-glossary.html",
     "kind": "report",
@@ -138,8 +138,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/table-glossary/test_table_glossary.py",
         "line": 62
@@ -242,8 +241,7 @@
       ],
       "parameters": null,
       "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
+      "reason": null,
       "source": {
         "relpath": "examples/table-glossary/test_table_glossary.py",
         "line": 79

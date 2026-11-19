@@ -4,7 +4,7 @@
     "before": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-19T16:18:53.235957+00:00",
+        "timestamp": "2026-11-19T16:24:09.417084+00:00",
         "pytest_version": "9.2.0",
         "plugin_version": "0.5.2",
         "commit_sha": null,
@@ -21,7 +21,7 @@
     "after": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-19T16:18:53.818941+00:00",
+        "timestamp": "2026-11-19T16:24:10.001358+00:00",
         "pytest_version": "9.2.0",
         "plugin_version": "0.5.2",
         "commit_sha": null,
@@ -36,7 +36,7 @@
       ]
     },
     "plugin_version": "0.5.2",
-    "timestamp": "2026-11-19T16:18:54.189885+00:00",
+    "timestamp": "2026-11-19T16:24:10.472720+00:00",
     "title": "Delta Example for v2",
     "kind": "delta",
     "schema_version": 1
@@ -122,8 +122,7 @@
         ],
         "parameters": null,
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 39
@@ -209,8 +208,7 @@
         ],
         "parameters": null,
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 39
@@ -442,8 +440,7 @@
         ],
         "parameters": null,
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 68
@@ -564,8 +561,7 @@
         ],
         "parameters": null,
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 68
@@ -735,8 +731,7 @@
         ],
         "parameters": null,
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 82
@@ -850,8 +845,7 @@
         ],
         "parameters": null,
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 84
@@ -1104,8 +1098,7 @@
         ],
         "parameters": null,
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 92
@@ -1195,8 +1188,7 @@
         ],
         "parameters": null,
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 98
@@ -1222,7 +1214,7 @@
           "error-handling"
         ],
         "status": "xfailed",
-        "duration_ms": 47,
+        "duration_ms": 49,
         "steps": [
           {
             "phase": "given",
@@ -1467,8 +1459,7 @@
           ]
         },
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": "gift cards are not wired in yet",
+        "reason": "gift cards are not wired in yet",
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 118
@@ -1732,8 +1723,7 @@
           ]
         },
         "error": null,
-        "skip_reason": null,
-        "xfail_reason": null,
+        "reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
           "line": 124

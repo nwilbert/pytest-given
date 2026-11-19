@@ -50,7 +50,7 @@ jq -r '.scenarios[] | select(.status == "failed")
 
 # Expected failures with their reasons — planned behavior not yet working
 jq -r '.scenarios[] | select(.status == "xfailed")
-       | .narration.text + (if .xfail_reason then " — " + .xfail_reason else "" end)' report.json
+       | .narration.text + (if .reason then " — " + .reason else "" end)' report.json
 
 # Scenarios whose title or step text has some words, Markdown markers stripped
 jq -r '.scenarios[] | select([.. | .narration?.text? // empty | gsub("[*`]"; "") | ascii_downcase]

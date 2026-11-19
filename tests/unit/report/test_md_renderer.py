@@ -608,7 +608,7 @@ def test_skipped_scenario_shows_reason() -> None:
             narration=Narration(text='Later'),
             module='tests/t.py',
             status='skipped',
-            skip_reason='needs fixture data',
+            reason='needs fixture data',
             steps=[Step(phase='when', narration=Narration(text='act'))],
         )
     with when(t'the Markdown {pg["Report"].l} is rendered'):
@@ -625,7 +625,7 @@ def test_an_xfailed_scenario_heading_and_subtitle() -> None:
         narration=Narration(text='Planned'),
         module='tests/t.py',
         status='xfailed',
-        xfail_reason='not implemented yet',
+        reason='not implemented yet',
     )
     md = render_md(_report(scn))
     assert '## ⊗ Planned · expected failure' in md
@@ -969,7 +969,7 @@ def test_every_other_text_is_literal() -> None:
         module='tests/t.py',
         tags=['a*b*', 'snake_case'],
         status='skipped',
-        skip_reason='needs <b>data</b>',
+        reason='needs <b>data</b>',
         steps=[
             Step(
                 phase='given',
@@ -1234,7 +1234,7 @@ def _failed_case_scenario() -> Scenario:
         module='tests/t.py',
         status='failed',
         tags=['pricing'],
-        skip_reason='no till',
+        reason='no till',
         steps=[Step(phase='when', narration=Narration(text='insert'))],
         parameters=ParameterTable(
             columns=[

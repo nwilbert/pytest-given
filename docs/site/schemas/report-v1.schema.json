@@ -739,7 +739,7 @@
           ],
           "default": null
         },
-        "skip_reason": {
+        "reason": {
           "anyOf": [
             {
               "type": "string"
@@ -749,19 +749,7 @@
             }
           ],
           "default": null,
-          "title": "Skip Reason"
-        },
-        "xfail_reason": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Xfail Reason"
+          "title": "Reason"
         },
         "source": {
           "anyOf": [
@@ -808,8 +796,7 @@
         "steps",
         "parameters",
         "error",
-        "skip_reason",
-        "xfail_reason",
+        "reason",
         "source",
         "story_ids",
         "pins"
