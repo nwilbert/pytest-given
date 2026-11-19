@@ -1040,6 +1040,16 @@ def test_a_step_source_in_a_report_is_refused():
         report_from_dict(payload)
 
 
+def test_a_source_line_below_one_is_refused_at_its_path():
+    payload = report_to_dict(every_field_populated())
+    payload['scenarios'][0]['source'] = {'relpath': 't.py', 'line': 0}
+    with pytest.raises(
+        PytestGivenError,
+        match=r'scenarios\.0\.source\.line: Input should be greater than or equal to 1',
+    ):
+        report_from_dict(payload)
+
+
 def test_report_from_dict_refuses_a_delta_json():
     with pytest.raises(PytestGivenError, match=r'pytest-given delta d.json'):
         report_from_dict({'metadata': {'kind': 'delta'}, 'scenarios': []}, 'd.json')

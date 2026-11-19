@@ -92,7 +92,24 @@ def test_a_committed_schema_requires_every_field_and_leaves_out_skipped_ones() -
     assert definitions['Narration']['required'] == ['text', 'parts']  # type: ignore[index, call-overload]
     assert 'source' not in definitions['Step']['properties']  # type: ignore[index, call-overload, operator]
     assert list(definitions['Glossary']['properties']) == ['terms']  # type: ignore[index, call-overload, arg-type]
-    assert not [node for node in _nodes(schema) if 'description' in node]
+
+
+@pytest.mark.parametrize(
+    ('kind', 'version'),
+    [('report', REPORT_SCHEMA_VERSION), ('delta', DELTA_SCHEMA_VERSION)],
+)
+def test_a_committed_schema_describes_fields_but_no_class_and_titles_nothing(
+    kind: Literal['report', 'delta'], version: int
+) -> None:
+    """A class's docstring speaks to the code's reader, and a derived title
+    only restates a name."""
+    schema = _committed(kind, version)
+    nodes = list(_nodes(schema))
+    assert not [node for node in nodes if isinstance(node.get('title'), str)]
+    assert not [
+        node for node in nodes if 'properties' in node and 'description' in node
+    ]
+    assert [node for node in nodes if 'description' in node]
 
 
 def test_a_written_report_validates_against_the_committed_schema(

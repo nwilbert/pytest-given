@@ -1140,6 +1140,7 @@ name = "pytest-given"
 version = "0.6.0"
 source = { editable = "." }
 dependencies = [
+    { name = "annotated-types" },
     { name = "jinja2" },
     { name = "markdown-it-py" },
     { name = "markupsafe" },
@@ -1194,6 +1195,7 @@ typecheck = [
 
 [package.metadata]
 requires-dist = [
+    { name = "annotated-types", specifier = ">=0.6" },
     { name = "jinja2", specifier = ">=3.1" },
     { name = "markdown-it-py", specifier = ">=3.0" },
     { name = "markupsafe", specifier = ">=2.0" },

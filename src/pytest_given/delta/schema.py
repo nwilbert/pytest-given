@@ -3,7 +3,9 @@
 from collections import Counter
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Final, Literal
+from typing import Annotated, Final, Literal
+
+from annotated_types import Ge
 
 from ..model import (
     SCHEMAS_URL,
@@ -16,6 +18,7 @@ from ..model import (
     NodeId,
     Scenario,
     ScenarioIdentity,
+    SchemaDoc,
     StepPath,
     TermId,
     schema_file_name,
@@ -78,6 +81,11 @@ def change_counts(changes: Iterable[Change]) -> dict[Change, int]:
     return {change: counted[change] for change in CHANGES}
 
 
+_EQUAL_OR_MODIFIED: Final = SchemaDoc('Only on an equal or modified step.')
+_FIRST_LINE: Final = SchemaDoc("The first line's index on its side.")
+_ATTACHMENT_INDEX: Final = SchemaDoc("Its index among its step's attachments.")
+
+
 @dataclass(frozen=True, kw_only=True)
 class DiffSegment:
     """A run of one mark, in each side's own parts: an equal run both sides',
@@ -94,9 +102,11 @@ class StepDelta:
     change: StepChange
     before: StepPath | None = None
     after: StepPath | None = None
-    words: tuple[DiffSegment, ...] = ()  # modified only
-    children: tuple[StepDelta, ...] = ()  # equal and modified only
-    attachments: tuple[AttachmentDelta, ...] = ()  # equal and modified only
+    words: Annotated[
+        tuple[DiffSegment, ...], SchemaDoc("A modified step's word diff.")
+    ] = ()
+    children: Annotated[tuple[StepDelta, ...], _EQUAL_OR_MODIFIED] = ()
+    attachments: Annotated[tuple[AttachmentDelta, ...], _EQUAL_OR_MODIFIED] = ()
 
 
 def walk_step_deltas(deltas: Iterable[StepDelta]) -> Iterator[StepDelta]:
@@ -114,18 +124,24 @@ class TextSegment:
 @dataclass(frozen=True, kw_only=True)
 class LineDelta:
     change: LineChange
-    before: int | None = None  # the first line's index on its side
-    after: int | None = None
-    count: int = 1  # an equal run's length; 1 otherwise
-    words: tuple[TextSegment, ...] = ()  # modified only
+    before: Annotated[Annotated[int, Ge(0)] | None, _FIRST_LINE] = None
+    after: Annotated[Annotated[int, Ge(0)] | None, _FIRST_LINE] = None
+    count: Annotated[
+        int, Ge(1), SchemaDoc("An equal run's length. 1 for any other change.")
+    ] = 1
+    words: Annotated[
+        tuple[TextSegment, ...], SchemaDoc("A modified line's word diff.")
+    ] = ()
 
 
 @dataclass(frozen=True, kw_only=True)
 class AttachmentDelta:
     change: AttachmentChange
-    before: int | None = None  # its index among its step's attachments
-    after: int | None = None
-    lines: tuple[LineDelta, ...] = ()  # a changed pair of payloads only
+    before: Annotated[Annotated[int, Ge(0)] | None, _ATTACHMENT_INDEX] = None
+    after: Annotated[Annotated[int, Ge(0)] | None, _ATTACHMENT_INDEX] = None
+    lines: Annotated[
+        tuple[LineDelta, ...], SchemaDoc('The line diff of a changed pair of payloads.')
+    ] = ()
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -143,7 +159,7 @@ class ColumnPair:
 
 @dataclass(frozen=True, kw_only=True)
 class CellDelta:
-    column: ColumnId  # the after ID
+    column: Annotated[ColumnId, SchemaDoc("The after side's column ID.")]
     lines: tuple[LineDelta, ...]
 
 
@@ -152,7 +168,10 @@ class CasePair:
     before: NodeId | None = None
     after: NodeId | None = None
     paired_by: CasePairing | None = None
-    changed_cells: tuple[ColumnId, ...] = ()  # after ids of paired columns
+    changed_cells: Annotated[
+        tuple[ColumnId, ...],
+        SchemaDoc("The after side's IDs of the paired columns whose cells changed."),
+    ] = ()
     changed_attachments: tuple[CellDelta, ...] = ()
     id_changed: bool = False
     status_changed: bool = False
@@ -292,7 +311,10 @@ class Suggestion:
     of: SuggestionOf
     before: str
     after: str
-    scenario: IdentityPair[ScenarioIdentity] | None = None  # for a case
+    scenario: Annotated[
+        IdentityPair[ScenarioIdentity] | None,
+        SchemaDoc("A case suggestion's scenario."),
+    ] = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -309,7 +331,9 @@ class TermDelta(_Sided[GlossaryTerm]):
     paired_by: TermPairing | None = None
     before_facts: TermFacts | None = None
     after_facts: TermFacts | None = None
-    definition: tuple[DiffSegment, ...] = ()  # a changed definition's word diff
+    definition: Annotated[
+        tuple[DiffSegment, ...], SchemaDoc("A changed definition's word diff.")
+    ] = ()
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -332,7 +356,7 @@ class DeltaMetadata:
     before: DeltaSide
     after: DeltaSide
     plugin_version: str
-    timestamp: str
+    timestamp: Annotated[str, SchemaDoc(format='date-time')]
     title: str | None = None
     kind: Literal['delta'] = 'delta'
     schema_version: DeltaSchemaVersion = DELTA_SCHEMA_VERSION

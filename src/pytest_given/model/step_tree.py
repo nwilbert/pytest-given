@@ -7,11 +7,20 @@ addresses a position within it.
 """
 
 from collections.abc import Iterator, Sequence
+from typing import Annotated
 
-from .schema import Narration, Scenario, Step
+from annotated_types import Ge, MinLen
 
-# A position in a step tree: the child index at each level, outermost first.
-type StepPath = tuple[int, ...]
+from .schema import Narration, Scenario, SchemaDoc, Step
+
+type StepPath = Annotated[
+    tuple[Annotated[int, Ge(0)], ...],
+    MinLen(1),
+    SchemaDoc(
+        "A step's position in its scenario: the child index at each depth, "
+        'outermost first.'
+    ),
+]
 
 
 def walk_steps[T: Step](steps: Sequence[T]) -> Iterator[tuple[StepPath, T]]:

@@ -7,11 +7,17 @@ which only a session capture carries.
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
-from typing import Final, Literal, NewType, Self
+from typing import TYPE_CHECKING, Annotated, Final, Literal, NewType, Self
+
+from annotated_types import Ge
 
 from ..markdown import unwrapped_text
 from .report_url import ReportUrl
 from .text import name_key, name_keys
+
+if TYPE_CHECKING:
+    from pydantic import GetJsonSchemaHandler
+    from pydantic.json_schema import JsonSchemaValue, core_schema
 
 # Bumped with every change to the report JSON's shape; a test pins the shape.
 type ReportSchemaVersion = Literal[1]
@@ -28,6 +34,27 @@ SCHEMAS_URL: Final = 'https://nwilbert.github.io/pytest-given/latest/schemas/'
 REPORT_SCHEMA_URL: Final = SCHEMAS_URL + schema_file_name(
     'report', REPORT_SCHEMA_VERSION
 )
+
+
+@dataclass(frozen=True)
+class SchemaDoc:
+    """What the published JSON Schema says of a field beyond its type, as
+    `Annotated` metadata: Pydantic calls the hook, and this module never
+    imports Pydantic."""
+
+    description: str | None = None
+    format: str | None = None
+
+    def __get_pydantic_json_schema__(
+        self, schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
+    ) -> JsonSchemaValue:
+        generated = handler(schema)
+        if self.description is not None:
+            generated['description'] = self.description
+        if self.format is not None:
+            generated['format'] = self.format
+        return generated
+
 
 # A parameter-table column's identity — what the DOM keys on and what a
 # placeholder or attachment badge points at. Distinct from the column's display
@@ -73,7 +100,9 @@ class NarrationPlaceholder:
     """
 
     name: str
-    column_id: ColumnId
+    column_id: Annotated[
+        ColumnId, SchemaDoc('The parameter column whose cells fill it in.')
+    ]
     format_spec: str = ''
     conversion: str | None = None
 
@@ -177,7 +206,7 @@ class SourceLocation:
     """
 
     relpath: str
-    line: int
+    line: Annotated[int, Ge(1)]
 
 
 type DefinitionPart = NarrationLiteral | NarrationTermRef
@@ -216,7 +245,9 @@ class Definition:
 @dataclass(frozen=True, kw_only=True)
 class GlossaryTerm:
     id: TermId
-    kind: TermKind | None
+    kind: Annotated[
+        TermKind | None, SchemaDoc('Null when no kind was declared or inferred.')
+    ]
     canonical: str
     definition: Definition | None = None
     source: SourceLocation | None = None
@@ -305,6 +336,11 @@ class Glossary:
             self._by_name.setdefault(key, term)
 
 
+_PINS_DOC: Final = SchemaDoc(
+    'Null when nothing pins it. An empty array when pinning turned narration '
+    'matching off.'
+)
+
 # Step phase
 type Phase = Literal['given', 'when', 'then']
 
@@ -369,7 +405,12 @@ class AttachmentRef:
     # would point the reader at the wrong one.
     label: str
     content_type: ContentType
-    column_id: ColumnId
+    column_id: Annotated[
+        ColumnId,
+        SchemaDoc(
+            'The parameter column whose cells hold the content, which varies by case.'
+        ),
+    ]
 
 
 # What may sit on a grouped step: a real payload, or a pointer to a column.
@@ -431,7 +472,7 @@ class Step:
     narration: Narration
     children: list[Self] = field(default_factory=list)
     attachments: list[StepAttachment] = field(default_factory=list)
-    pins: tuple[Pin, ...] | None = None
+    pins: Annotated[tuple[Pin, ...] | None, _PINS_DOC] = None
     fixture_name: str | None = None
 
 
@@ -476,7 +517,14 @@ class ParameterCase:
     columns. `custom_id` is whether its id is custom, written by hand."""
 
     id: NodeId
-    values: list[CellValue]
+    values: Annotated[
+        list[CellValue],
+        SchemaDoc(
+            "One cell per column, in the order of the table's columns. What a "
+            "cell holds depends on its column's kind. Null is a parametrize "
+            'value in a param column and no value in any other.'
+        ),
+    ]
     status: Status = 'passed'
     error: ErrorInfo | None = None
     custom_id: bool = False
@@ -510,21 +558,36 @@ class ParameterTable:
 
 @dataclass
 class Scenario[S: Step = Step]:
-    id: NodeId
+    id: Annotated[
+        NodeId,
+        SchemaDoc(
+            'The pytest node ID. A grouped parametrized scenario keeps its first '
+            "case's."
+        ),
+    ]
     narration: Narration
     module: str
     tags: list[str] = field(default_factory=list)
     status: Status = 'passed'
-    duration_ms: int = 0
+    duration_ms: Annotated[int, Ge(0)] = 0
     steps: list[S] = field(default_factory=list)
     parameters: ParameterTable | None = None
-    error: ErrorInfo | None = None
-    # Why it was skipped or expected to fail: its status says which. A scenario
-    # of any other status has none.
-    reason: str | None = None
+    error: Annotated[
+        ErrorInfo | None,
+        SchemaDoc(
+            'Null on a grouped parametrized scenario, whose cases each hold their own.'
+        ),
+    ] = None
+    reason: Annotated[
+        str | None,
+        SchemaDoc(
+            'Why it was skipped or expected to fail, as its status says. Null for '
+            'any other status.'
+        ),
+    ] = None
     source: SourceLocation | None = None
     story_ids: tuple[StoryId, ...] = ()
-    pins: tuple[Pin, ...] | None = None
+    pins: Annotated[tuple[Pin, ...] | None, _PINS_DOC] = None
 
     @property
     def skip_reason(self) -> str | None:
@@ -543,7 +606,7 @@ type CapturedScenario = Scenario[CapturedStep]
 @dataclass(frozen=True)
 class Metadata:
     project: str
-    timestamp: str
+    timestamp: Annotated[str, SchemaDoc(format='date-time')]
     pytest_version: str
     plugin_version: str
     commit_sha: str | None = None
@@ -554,7 +617,7 @@ class Metadata:
     # The public URL the HTML report is served from: where the citations it
     # copies link, and what `pytest-given citations` reads report links
     # against. None leaves the report copying links alone.
-    report_url: ReportUrl | None = None
+    report_url: Annotated[ReportUrl, SchemaDoc(format='uri')] | None = None
     kind: Literal['report'] = 'report'
     schema_version: ReportSchemaVersion = REPORT_SCHEMA_VERSION
 

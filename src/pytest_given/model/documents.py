@@ -11,6 +11,7 @@ Its field validators check what is not shape, on read alone.
 # this module loads.
 
 import dataclasses
+import json
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Annotated, ClassVar, Final
 
@@ -153,8 +154,13 @@ def json_schema(document_type: type[Document]) -> JsonObject:
 
 
 class _SchemaGenerator(GenerateJsonSchema):
-    """The JSON as the writer emits it: every field present, and no
-    docstrings, which speak to the code's reader."""
+    """The JSON as the writer emits it: every field present, each definition
+    named by its class, and only the descriptions a `SchemaDoc` gives. Neither
+    a class's docstring, which speaks to the code's reader, nor a title
+    Pydantic derives from a name."""
+
+    def field_title_should_be_set(self, schema: object) -> bool:
+        return False
 
     def field_is_required(
         self,
@@ -170,11 +176,38 @@ class _SchemaGenerator(GenerateJsonSchema):
     def generate(
         self, schema: core_schema.CoreSchema, mode: JsonSchemaMode = 'validation'
     ) -> JsonSchemaValue:
-        generated = super().generate(schema, mode)
-        generated.pop('description', None)
-        for definition in generated.get('$defs', {}).values():
-            definition.pop('description', None)
+        generated = _named_by_title(super().generate(schema, mode))
+        for class_schema in [generated, *generated.get('$defs', {}).values()]:
+            class_schema.pop('title', None)
+            if 'properties' in class_schema:
+                class_schema.pop('description', None)
         return generated
+
+
+def _named_by_title(generated: JsonSchemaValue) -> JsonSchemaValue:
+    """Each definition under its class's name where Pydantic named it after
+    its type arguments too (`IdentityPair_NewType_`), unless two would share
+    one."""
+    definitions = generated.get('$defs', {})
+    titles = [definition.get('title') for definition in definitions.values()]
+    renamed = {
+        name: title
+        for name, definition in definitions.items()
+        if (title := definition.get('title')) not in (None, name)
+        and titles.count(title) == 1
+        and title not in definitions
+    }
+    if not renamed:
+        return generated
+    text = json.dumps(generated)
+    for name, title in renamed.items():
+        text = text.replace(f'"#/$defs/{name}"', f'"#/$defs/{title}"')
+    rewritten: JsonSchemaValue = json.loads(text)
+    rewritten['$defs'] = {
+        renamed.get(name, name): definition
+        for name, definition in rewritten['$defs'].items()
+    }
+    return rewritten
 
 
 def _problems(error: ValidationError, kind: str, source: str | None) -> str:

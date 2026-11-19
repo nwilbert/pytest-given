@@ -98,6 +98,25 @@ def test_a_report_dict_is_refused_with_a_pointer_to_the_delta_command() -> None:
     assert 'pytest-given delta BEFORE.json AFTER.json' in str(raised.value)
 
 
+def test_an_empty_step_path_is_refused() -> None:
+    delta_dict = _through_json(full_delta())
+    scenarios = delta_dict['scenarios']
+    assert isinstance(scenarios, list)
+    changed = next(
+        entry
+        for entry in scenarios
+        if isinstance(entry, dict) and entry['change'] == 'changed' and entry['steps']
+    )
+    assert isinstance(changed, dict)
+    steps = changed['steps']
+    assert isinstance(steps, list)
+    assert isinstance(steps[0], dict)
+    steps[0]['before'] = []
+
+    with pytest.raises(PytestGivenError, match='should have at least 1 item'):
+        delta_from_dict(delta_dict, 'd.json')
+
+
 def test_a_report_is_recognized_by_its_kind_alone() -> None:
     with pytest.raises(PytestGivenError, match='is a report, not a delta'):
         delta_from_dict({'metadata': {'kind': 'report'}}, 'before.json')

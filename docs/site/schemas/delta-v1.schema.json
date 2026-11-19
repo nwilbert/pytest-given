@@ -6,11 +6,9 @@
       "additionalProperties": false,
       "properties": {
         "label": {
-          "title": "Label",
           "type": "string"
         },
         "content": {
-          "title": "Content",
           "type": "string"
         },
         "content_type": {
@@ -23,7 +21,6 @@
         "content",
         "content_type"
       ],
-      "title": "Attachment",
       "type": "object"
     },
     "AttachmentChange": {
@@ -44,6 +41,7 @@
         "before": {
           "anyOf": [
             {
+              "minimum": 0,
               "type": "integer"
             },
             {
@@ -51,11 +49,12 @@
             }
           ],
           "default": null,
-          "title": "Before"
+          "description": "Its index among its step's attachments."
         },
         "after": {
           "anyOf": [
             {
+              "minimum": 0,
               "type": "integer"
             },
             {
@@ -63,14 +62,14 @@
             }
           ],
           "default": null,
-          "title": "After"
+          "description": "Its index among its step's attachments."
         },
         "lines": {
           "default": [],
+          "description": "The line diff of a changed pair of payloads.",
           "items": {
             "$ref": "#/$defs/LineDelta"
           },
-          "title": "Lines",
           "type": "array"
         }
       },
@@ -80,21 +79,19 @@
         "after",
         "lines"
       ],
-      "title": "AttachmentDelta",
       "type": "object"
     },
     "AttachmentRef": {
       "additionalProperties": false,
       "properties": {
         "label": {
-          "title": "Label",
           "type": "string"
         },
         "content_type": {
           "$ref": "#/$defs/ContentType"
         },
         "column_id": {
-          "title": "Column Id",
+          "description": "The parameter column whose cells hold the content, which varies by case.",
           "type": "string"
         }
       },
@@ -103,7 +100,6 @@
         "content_type",
         "column_id"
       ],
-      "title": "AttachmentRef",
       "type": "object"
     },
     "CasePair": {
@@ -118,8 +114,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Before"
+          "default": null
         },
         "after": {
           "anyOf": [
@@ -130,8 +125,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "After"
+          "default": null
         },
         "paired_by": {
           "anyOf": [
@@ -146,10 +140,10 @@
         },
         "changed_cells": {
           "default": [],
+          "description": "The after side's IDs of the paired columns whose cells changed.",
           "items": {
             "type": "string"
           },
-          "title": "Changed Cells",
           "type": "array"
         },
         "changed_attachments": {
@@ -157,17 +151,14 @@
           "items": {
             "$ref": "#/$defs/CellDelta"
           },
-          "title": "Changed Attachments",
           "type": "array"
         },
         "id_changed": {
           "default": false,
-          "title": "Id Changed",
           "type": "boolean"
         },
         "status_changed": {
           "default": false,
-          "title": "Status Changed",
           "type": "boolean"
         }
       },
@@ -180,7 +171,6 @@
         "id_changed",
         "status_changed"
       ],
-      "title": "CasePair",
       "type": "object"
     },
     "CasePairing": {
@@ -195,14 +185,13 @@
       "additionalProperties": false,
       "properties": {
         "column": {
-          "title": "Column",
+          "description": "The after side's column ID.",
           "type": "string"
         },
         "lines": {
           "items": {
             "$ref": "#/$defs/LineDelta"
           },
-          "title": "Lines",
           "type": "array"
         }
       },
@@ -210,7 +199,6 @@
         "column",
         "lines"
       ],
-      "title": "CellDelta",
       "type": "object"
     },
     "CellValue": {
@@ -265,8 +253,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Before"
+          "default": null
         },
         "after": {
           "anyOf": [
@@ -277,8 +264,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "After"
+          "default": null
         },
         "paired_by": {
           "anyOf": [
@@ -298,7 +284,6 @@
         "after",
         "paired_by"
       ],
-      "title": "ColumnPair",
       "type": "object"
     },
     "ColumnPairing": {
@@ -319,14 +304,12 @@
       "additionalProperties": false,
       "properties": {
         "text": {
-          "title": "Text",
           "type": "string"
         },
         "parts": {
           "items": {
             "$ref": "#/$defs/DefinitionPart"
           },
-          "title": "Parts",
           "type": "array"
         }
       },
@@ -334,7 +317,6 @@
         "text",
         "parts"
       ],
-      "title": "Definition",
       "type": "object"
     },
     "DefinitionPart": {
@@ -357,11 +339,10 @@
           "$ref": "#/$defs/DeltaSide"
         },
         "plugin_version": {
-          "title": "Plugin Version",
           "type": "string"
         },
         "timestamp": {
-          "title": "Timestamp",
+          "format": "date-time",
           "type": "string"
         },
         "title": {
@@ -373,13 +354,11 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Title"
+          "default": null
         },
         "kind": {
           "const": "delta",
           "default": "delta",
-          "title": "Kind",
           "type": "string"
         },
         "schema_version": {
@@ -396,7 +375,6 @@
         "kind",
         "schema_version"
       ],
-      "title": "DeltaMetadata",
       "type": "object"
     },
     "DeltaSchemaVersion": {
@@ -418,15 +396,13 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Label"
+          "default": null
         },
         "modules": {
           "default": [],
           "items": {
             "type": "string"
           },
-          "title": "Modules",
           "type": "array"
         }
       },
@@ -435,7 +411,6 @@
         "label",
         "modules"
       ],
-      "title": "DeltaSide",
       "type": "object"
     },
     "DiffSegment": {
@@ -449,7 +424,6 @@
           "items": {
             "$ref": "#/$defs/NarrationPart"
           },
-          "title": "Before",
           "type": "array"
         },
         "after": {
@@ -457,7 +431,6 @@
           "items": {
             "$ref": "#/$defs/NarrationPart"
           },
-          "title": "After",
           "type": "array"
         }
       },
@@ -466,7 +439,6 @@
         "before",
         "after"
       ],
-      "title": "DiffSegment",
       "type": "object"
     },
     "ErrorCause": {
@@ -476,7 +448,6 @@
           "items": {
             "$ref": "#/$defs/TracebackFrame"
           },
-          "title": "Frames",
           "type": "array"
         },
         "error_tail": {
@@ -487,11 +458,9 @@
             {
               "type": "null"
             }
-          ],
-          "title": "Error Tail"
+          ]
         },
         "connector": {
-          "title": "Connector",
           "type": "string"
         }
       },
@@ -500,21 +469,18 @@
         "error_tail",
         "connector"
       ],
-      "title": "ErrorCause",
       "type": "object"
     },
     "ErrorInfo": {
       "additionalProperties": false,
       "properties": {
         "message": {
-          "title": "Message",
           "type": "string"
         },
         "frames": {
           "items": {
             "$ref": "#/$defs/TracebackFrame"
           },
-          "title": "Frames",
           "type": "array"
         },
         "error_tail": {
@@ -526,14 +492,12 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Error Tail"
+          "default": null
         },
         "causes": {
           "items": {
             "$ref": "#/$defs/ErrorCause"
           },
-          "title": "Causes",
           "type": "array"
         }
       },
@@ -543,7 +507,6 @@
         "error_tail",
         "causes"
       ],
-      "title": "ErrorInfo",
       "type": "object"
     },
     "Glossary": {
@@ -553,14 +516,12 @@
           "items": {
             "$ref": "#/$defs/GlossaryTerm"
           },
-          "title": "Terms",
           "type": "array"
         }
       },
       "required": [
         "terms"
       ],
-      "title": "Glossary",
       "type": "object"
     },
     "GlossaryDelta": {
@@ -593,15 +554,13 @@
           "items": {
             "$ref": "#/$defs/TermDelta"
           },
-          "title": "Terms",
           "type": "array"
         },
         "unchanged": {
           "default": [],
           "items": {
-            "$ref": "#/$defs/IdentityPair_NewType_"
+            "$ref": "#/$defs/IdentityPair"
           },
-          "title": "Unchanged",
           "type": "array"
         }
       },
@@ -611,14 +570,12 @@
         "terms",
         "unchanged"
       ],
-      "title": "GlossaryDelta",
       "type": "object"
     },
     "GlossaryTerm": {
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
           "type": "string"
         },
         "kind": {
@@ -629,10 +586,10 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "Null when no kind was declared or inferred."
         },
         "canonical": {
-          "title": "Canonical",
           "type": "string"
         },
         "definition": {
@@ -666,15 +623,13 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Section"
+          "default": null
         },
         "avoid": {
           "default": [],
           "items": {
             "type": "string"
           },
-          "title": "Avoid",
           "type": "array"
         }
       },
@@ -687,18 +642,15 @@
         "section",
         "avoid"
       ],
-      "title": "GlossaryTerm",
       "type": "object"
     },
-    "IdentityPair_NewType_": {
+    "IdentityPair": {
       "additionalProperties": false,
       "properties": {
         "before": {
-          "title": "Before",
           "type": "string"
         },
         "after": {
-          "title": "After",
           "type": "string"
         }
       },
@@ -706,7 +658,6 @@
         "before",
         "after"
       ],
-      "title": "IdentityPair",
       "type": "object"
     },
     "LineChange": {
@@ -727,6 +678,7 @@
         "before": {
           "anyOf": [
             {
+              "minimum": 0,
               "type": "integer"
             },
             {
@@ -734,11 +686,12 @@
             }
           ],
           "default": null,
-          "title": "Before"
+          "description": "The first line's index on its side."
         },
         "after": {
           "anyOf": [
             {
+              "minimum": 0,
               "type": "integer"
             },
             {
@@ -746,19 +699,20 @@
             }
           ],
           "default": null,
-          "title": "After"
+          "description": "The first line's index on its side."
         },
         "count": {
           "default": 1,
-          "title": "Count",
+          "description": "An equal run's length. 1 for any other change.",
+          "minimum": 1,
           "type": "integer"
         },
         "words": {
           "default": [],
+          "description": "A modified line's word diff.",
           "items": {
             "$ref": "#/$defs/TextSegment"
           },
-          "title": "Words",
           "type": "array"
         }
       },
@@ -769,7 +723,6 @@
         "count",
         "words"
       ],
-      "title": "LineDelta",
       "type": "object"
     },
     "Mark": {
@@ -784,19 +737,16 @@
       "additionalProperties": false,
       "properties": {
         "project": {
-          "title": "Project",
           "type": "string"
         },
         "timestamp": {
-          "title": "Timestamp",
+          "format": "date-time",
           "type": "string"
         },
         "pytest_version": {
-          "title": "Pytest Version",
           "type": "string"
         },
         "plugin_version": {
-          "title": "Plugin Version",
           "type": "string"
         },
         "commit_sha": {
@@ -808,8 +758,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Commit Sha"
+          "default": null
         },
         "title": {
           "anyOf": [
@@ -820,25 +769,23 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Title"
+          "default": null
         },
         "report_url": {
           "anyOf": [
             {
+              "format": "uri",
               "type": "string"
             },
             {
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Report Url"
+          "default": null
         },
         "kind": {
           "const": "report",
           "default": "report",
-          "title": "Kind",
           "type": "string"
         },
         "schema_version": {
@@ -857,14 +804,12 @@
         "kind",
         "schema_version"
       ],
-      "title": "Metadata",
       "type": "object"
     },
     "Narration": {
       "additionalProperties": false,
       "properties": {
         "text": {
-          "title": "Text",
           "type": "string"
         },
         "parts": {
@@ -872,7 +817,6 @@
           "items": {
             "$ref": "#/$defs/NarrationPart"
           },
-          "title": "Parts",
           "type": "array"
         }
       },
@@ -880,21 +824,18 @@
         "text",
         "parts"
       ],
-      "title": "Narration",
       "type": "object"
     },
     "NarrationLiteral": {
       "additionalProperties": false,
       "properties": {
         "value": {
-          "title": "Value",
           "type": "string"
         }
       },
       "required": [
         "value"
       ],
-      "title": "NarrationLiteral",
       "type": "object"
     },
     "NarrationPart": {
@@ -917,16 +858,14 @@
       "additionalProperties": false,
       "properties": {
         "name": {
-          "title": "Name",
           "type": "string"
         },
         "column_id": {
-          "title": "Column Id",
+          "description": "The parameter column whose cells fill it in.",
           "type": "string"
         },
         "format_spec": {
           "default": "",
-          "title": "Format Spec",
           "type": "string"
         },
         "conversion": {
@@ -938,8 +877,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Conversion"
+          "default": null
         }
       },
       "required": [
@@ -948,23 +886,19 @@
         "format_spec",
         "conversion"
       ],
-      "title": "NarrationPlaceholder",
       "type": "object"
     },
     "NarrationTermRef": {
       "additionalProperties": false,
       "properties": {
         "term_id": {
-          "title": "Term Id",
           "type": "string"
         },
         "display": {
-          "title": "Display",
           "type": "string"
         },
         "expression": {
           "default": "",
-          "title": "Expression",
           "type": "string"
         }
       },
@@ -973,23 +907,19 @@
         "display",
         "expression"
       ],
-      "title": "NarrationTermRef",
       "type": "object"
     },
     "NarrationValue": {
       "additionalProperties": false,
       "properties": {
         "rendered": {
-          "title": "Rendered",
           "type": "string"
         },
         "expression": {
-          "title": "Expression",
           "type": "string"
         },
         "format_spec": {
           "default": "",
-          "title": "Format Spec",
           "type": "string"
         },
         "conversion": {
@@ -1001,8 +931,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Conversion"
+          "default": null
         }
       },
       "required": [
@@ -1011,7 +940,6 @@
         "format_spec",
         "conversion"
       ],
-      "title": "NarrationValue",
       "type": "object"
     },
     "ParamValue": {
@@ -1037,14 +965,13 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
           "type": "string"
         },
         "values": {
+          "description": "One cell per column, in the order of the table's columns. What a cell holds depends on its column's kind. Null is a parametrize value in a param column and no value in any other.",
           "items": {
             "$ref": "#/$defs/CellValue"
           },
-          "title": "Values",
           "type": "array"
         },
         "status": {
@@ -1064,7 +991,6 @@
         },
         "custom_id": {
           "default": false,
-          "title": "Custom Id",
           "type": "boolean"
         }
       },
@@ -1075,18 +1001,15 @@
         "error",
         "custom_id"
       ],
-      "title": "ParameterCase",
       "type": "object"
     },
     "ParameterColumn": {
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
           "type": "string"
         },
         "name": {
-          "title": "Name",
           "type": "string"
         },
         "kind": {
@@ -1098,7 +1021,6 @@
         "name",
         "kind"
       ],
-      "title": "ParameterColumn",
       "type": "object"
     },
     "ParameterDelta": {
@@ -1108,14 +1030,12 @@
           "items": {
             "$ref": "#/$defs/ColumnPair"
           },
-          "title": "Columns",
           "type": "array"
         },
         "cases": {
           "items": {
             "$ref": "#/$defs/CasePair"
           },
-          "title": "Cases",
           "type": "array"
         }
       },
@@ -1123,7 +1043,6 @@
         "columns",
         "cases"
       ],
-      "title": "ParameterDelta",
       "type": "object"
     },
     "ParameterTable": {
@@ -1133,14 +1052,12 @@
           "items": {
             "$ref": "#/$defs/ParameterColumn"
           },
-          "title": "Columns",
           "type": "array"
         },
         "cases": {
           "items": {
             "$ref": "#/$defs/ParameterCase"
           },
-          "title": "Cases",
           "type": "array"
         }
       },
@@ -1148,7 +1065,6 @@
         "columns",
         "cases"
       ],
-      "title": "ParameterTable",
       "type": "object"
     },
     "Phase": {
@@ -1163,11 +1079,9 @@
       "additionalProperties": false,
       "properties": {
         "story_id": {
-          "title": "Story Id",
           "type": "string"
         },
         "sentence_id": {
-          "title": "Sentence Id",
           "type": "integer"
         }
       },
@@ -1175,7 +1089,6 @@
         "story_id",
         "sentence_id"
       ],
-      "title": "Pin",
       "type": "object"
     },
     "ReportSchemaVersion": {
@@ -1186,21 +1099,19 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
+          "description": "The pytest node ID. A grouped parametrized scenario keeps its first case's.",
           "type": "string"
         },
         "narration": {
           "$ref": "#/$defs/Narration"
         },
         "module": {
-          "title": "Module",
           "type": "string"
         },
         "tags": {
           "items": {
             "type": "string"
           },
-          "title": "Tags",
           "type": "array"
         },
         "status": {
@@ -1209,14 +1120,13 @@
         },
         "duration_ms": {
           "default": 0,
-          "title": "Duration Ms",
+          "minimum": 0,
           "type": "integer"
         },
         "steps": {
           "items": {
             "$ref": "#/$defs/Step"
           },
-          "title": "Steps",
           "type": "array"
         },
         "parameters": {
@@ -1239,7 +1149,8 @@
               "type": "null"
             }
           ],
-          "default": null
+          "default": null,
+          "description": "Null on a grouped parametrized scenario, whose cases each hold their own."
         },
         "reason": {
           "anyOf": [
@@ -1251,7 +1162,7 @@
             }
           ],
           "default": null,
-          "title": "Reason"
+          "description": "Why it was skipped or expected to fail, as its status says. Null for any other status."
         },
         "source": {
           "anyOf": [
@@ -1269,7 +1180,6 @@
           "items": {
             "type": "string"
           },
-          "title": "Story Ids",
           "type": "array"
         },
         "pins": {
@@ -1285,7 +1195,7 @@
             }
           ],
           "default": null,
-          "title": "Pins"
+          "description": "Null when nothing pins it. An empty array when pinning turned narration matching off."
         }
       },
       "required": [
@@ -1303,7 +1213,6 @@
         "story_ids",
         "pins"
       ],
-      "title": "Scenario",
       "type": "object"
     },
     "ScenarioDelta": {
@@ -1350,7 +1259,6 @@
           "items": {
             "$ref": "#/$defs/ChangedPart"
           },
-          "title": "Changed In",
           "type": "array"
         },
         "steps": {
@@ -1358,7 +1266,6 @@
           "items": {
             "$ref": "#/$defs/StepDelta"
           },
-          "title": "Steps",
           "type": "array"
         },
         "parameters": {
@@ -1382,7 +1289,6 @@
         "steps",
         "parameters"
       ],
-      "title": "ScenarioDelta",
       "type": "object"
     },
     "ScenarioPairing": {
@@ -1397,11 +1303,10 @@
       "additionalProperties": false,
       "properties": {
         "relpath": {
-          "title": "Relpath",
           "type": "string"
         },
         "line": {
-          "title": "Line",
+          "minimum": 1,
           "type": "integer"
         }
       },
@@ -1409,7 +1314,6 @@
         "relpath",
         "line"
       ],
-      "title": "SourceLocation",
       "type": "object"
     },
     "Status": {
@@ -1434,14 +1338,12 @@
           "items": {
             "$ref": "#/$defs/Step"
           },
-          "title": "Children",
           "type": "array"
         },
         "attachments": {
           "items": {
             "$ref": "#/$defs/StepAttachment"
           },
-          "title": "Attachments",
           "type": "array"
         },
         "pins": {
@@ -1457,7 +1359,7 @@
             }
           ],
           "default": null,
-          "title": "Pins"
+          "description": "Null when nothing pins it. An empty array when pinning turned narration matching off."
         },
         "fixture_name": {
           "anyOf": [
@@ -1468,8 +1370,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Fixture Name"
+          "default": null
         }
       },
       "required": [
@@ -1480,7 +1381,6 @@
         "pins",
         "fixture_name"
       ],
-      "title": "Step",
       "type": "object"
     },
     "StepAttachment": {
@@ -1532,26 +1432,26 @@
         },
         "words": {
           "default": [],
+          "description": "A modified step's word diff.",
           "items": {
             "$ref": "#/$defs/DiffSegment"
           },
-          "title": "Words",
           "type": "array"
         },
         "children": {
           "default": [],
+          "description": "Only on an equal or modified step.",
           "items": {
             "$ref": "#/$defs/StepDelta"
           },
-          "title": "Children",
           "type": "array"
         },
         "attachments": {
           "default": [],
+          "description": "Only on an equal or modified step.",
           "items": {
             "$ref": "#/$defs/AttachmentDelta"
           },
-          "title": "Attachments",
           "type": "array"
         }
       },
@@ -1563,13 +1463,15 @@
         "children",
         "attachments"
       ],
-      "title": "StepDelta",
       "type": "object"
     },
     "StepPath": {
+      "description": "A step's position in its scenario: the child index at each depth, outermost first.",
       "items": {
+        "minimum": 0,
         "type": "integer"
       },
+      "minItems": 1,
       "type": "array"
     },
     "Suggestion": {
@@ -1579,23 +1481,22 @@
           "$ref": "#/$defs/SuggestionOf"
         },
         "before": {
-          "title": "Before",
           "type": "string"
         },
         "after": {
-          "title": "After",
           "type": "string"
         },
         "scenario": {
           "anyOf": [
             {
-              "$ref": "#/$defs/IdentityPair_NewType_"
+              "$ref": "#/$defs/IdentityPair"
             },
             {
               "type": "null"
             }
           ],
-          "default": null
+          "default": null,
+          "description": "A case suggestion's scenario."
         }
       },
       "required": [
@@ -1604,7 +1505,6 @@
         "after",
         "scenario"
       ],
-      "title": "Suggestion",
       "type": "object"
     },
     "SuggestionOf": {
@@ -1678,10 +1578,10 @@
         },
         "definition": {
           "default": [],
+          "description": "A changed definition's word diff.",
           "items": {
             "$ref": "#/$defs/DiffSegment"
           },
-          "title": "Definition",
           "type": "array"
         }
       },
@@ -1694,7 +1594,6 @@
         "after_facts",
         "definition"
       ],
-      "title": "TermDelta",
       "type": "object"
     },
     "TermFacts": {
@@ -1705,12 +1604,10 @@
           "items": {
             "type": "string"
           },
-          "title": "Other Forms",
           "type": "array"
         },
         "scenario_count": {
           "default": 0,
-          "title": "Scenario Count",
           "type": "integer"
         }
       },
@@ -1718,7 +1615,6 @@
         "other_forms",
         "scenario_count"
       ],
-      "title": "TermFacts",
       "type": "object"
     },
     "TermKind": {
@@ -1743,7 +1639,6 @@
           "$ref": "#/$defs/Mark"
         },
         "text": {
-          "title": "Text",
           "type": "string"
         }
       },
@@ -1751,30 +1646,24 @@
         "mark",
         "text"
       ],
-      "title": "TextSegment",
       "type": "object"
     },
     "TracebackFrame": {
       "additionalProperties": false,
       "properties": {
         "path": {
-          "title": "Path",
           "type": "string"
         },
         "lineno": {
-          "title": "Lineno",
           "type": "integer"
         },
         "func": {
-          "title": "Func",
           "type": "string"
         },
         "code": {
-          "title": "Code",
           "type": "string"
         },
         "is_internal": {
-          "title": "Is Internal",
           "type": "boolean"
         }
       },
@@ -1785,7 +1674,6 @@
         "code",
         "is_internal"
       ],
-      "title": "TracebackFrame",
       "type": "object"
     }
   },
@@ -1793,7 +1681,6 @@
   "properties": {
     "$schema": {
       "default": "https://nwilbert.github.io/pytest-given/latest/schemas/delta-v1.schema.json",
-      "title": "$Schema",
       "type": "string"
     },
     "metadata": {
@@ -1804,15 +1691,13 @@
       "items": {
         "$ref": "#/$defs/ScenarioDelta"
       },
-      "title": "Scenarios",
       "type": "array"
     },
     "unchanged": {
       "default": [],
       "items": {
-        "$ref": "#/$defs/IdentityPair_NewType_"
+        "$ref": "#/$defs/IdentityPair"
       },
-      "title": "Unchanged",
       "type": "array"
     },
     "suggestions": {
@@ -1820,7 +1705,6 @@
       "items": {
         "$ref": "#/$defs/Suggestion"
       },
-      "title": "Suggestions",
       "type": "array"
     },
     "glossary": {
@@ -1841,6 +1725,5 @@
     "suggestions",
     "glossary"
   ],
-  "title": "DeltaDocument",
   "type": "object"
 }

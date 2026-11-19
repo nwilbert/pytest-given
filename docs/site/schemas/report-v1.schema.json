@@ -6,11 +6,9 @@
       "additionalProperties": false,
       "properties": {
         "label": {
-          "title": "Label",
           "type": "string"
         },
         "content": {
-          "title": "Content",
           "type": "string"
         },
         "content_type": {
@@ -23,21 +21,19 @@
         "content",
         "content_type"
       ],
-      "title": "Attachment",
       "type": "object"
     },
     "AttachmentRef": {
       "additionalProperties": false,
       "properties": {
         "label": {
-          "title": "Label",
           "type": "string"
         },
         "content_type": {
           "$ref": "#/$defs/ContentType"
         },
         "column_id": {
-          "title": "Column Id",
+          "description": "The parameter column whose cells hold the content, which varies by case.",
           "type": "string"
         }
       },
@@ -46,7 +42,6 @@
         "content_type",
         "column_id"
       ],
-      "title": "AttachmentRef",
       "type": "object"
     },
     "CellValue": {
@@ -66,14 +61,12 @@
           "items": {
             "$ref": "#/$defs/ClausePart"
           },
-          "title": "Parts",
           "type": "array"
         }
       },
       "required": [
         "parts"
       ],
-      "title": "Clause",
       "type": "object"
     },
     "ClausePart": {
@@ -105,14 +98,12 @@
       "additionalProperties": false,
       "properties": {
         "text": {
-          "title": "Text",
           "type": "string"
         },
         "parts": {
           "items": {
             "$ref": "#/$defs/DefinitionPart"
           },
-          "title": "Parts",
           "type": "array"
         }
       },
@@ -120,7 +111,6 @@
         "text",
         "parts"
       ],
-      "title": "Definition",
       "type": "object"
     },
     "DefinitionPart": {
@@ -140,7 +130,6 @@
           "items": {
             "$ref": "#/$defs/TracebackFrame"
           },
-          "title": "Frames",
           "type": "array"
         },
         "error_tail": {
@@ -151,11 +140,9 @@
             {
               "type": "null"
             }
-          ],
-          "title": "Error Tail"
+          ]
         },
         "connector": {
-          "title": "Connector",
           "type": "string"
         }
       },
@@ -164,21 +151,18 @@
         "error_tail",
         "connector"
       ],
-      "title": "ErrorCause",
       "type": "object"
     },
     "ErrorInfo": {
       "additionalProperties": false,
       "properties": {
         "message": {
-          "title": "Message",
           "type": "string"
         },
         "frames": {
           "items": {
             "$ref": "#/$defs/TracebackFrame"
           },
-          "title": "Frames",
           "type": "array"
         },
         "error_tail": {
@@ -190,14 +174,12 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Error Tail"
+          "default": null
         },
         "causes": {
           "items": {
             "$ref": "#/$defs/ErrorCause"
           },
-          "title": "Causes",
           "type": "array"
         }
       },
@@ -207,7 +189,6 @@
         "error_tail",
         "causes"
       ],
-      "title": "ErrorInfo",
       "type": "object"
     },
     "Glossary": {
@@ -217,21 +198,18 @@
           "items": {
             "$ref": "#/$defs/GlossaryTerm"
           },
-          "title": "Terms",
           "type": "array"
         }
       },
       "required": [
         "terms"
       ],
-      "title": "Glossary",
       "type": "object"
     },
     "GlossaryTerm": {
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
           "type": "string"
         },
         "kind": {
@@ -242,10 +220,10 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "Null when no kind was declared or inferred."
         },
         "canonical": {
-          "title": "Canonical",
           "type": "string"
         },
         "definition": {
@@ -279,15 +257,13 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Section"
+          "default": null
         },
         "avoid": {
           "default": [],
           "items": {
             "type": "string"
           },
-          "title": "Avoid",
           "type": "array"
         }
       },
@@ -300,26 +276,22 @@
         "section",
         "avoid"
       ],
-      "title": "GlossaryTerm",
       "type": "object"
     },
     "Metadata": {
       "additionalProperties": false,
       "properties": {
         "project": {
-          "title": "Project",
           "type": "string"
         },
         "timestamp": {
-          "title": "Timestamp",
+          "format": "date-time",
           "type": "string"
         },
         "pytest_version": {
-          "title": "Pytest Version",
           "type": "string"
         },
         "plugin_version": {
-          "title": "Plugin Version",
           "type": "string"
         },
         "commit_sha": {
@@ -331,8 +303,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Commit Sha"
+          "default": null
         },
         "title": {
           "anyOf": [
@@ -343,25 +314,23 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Title"
+          "default": null
         },
         "report_url": {
           "anyOf": [
             {
+              "format": "uri",
               "type": "string"
             },
             {
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Report Url"
+          "default": null
         },
         "kind": {
           "const": "report",
           "default": "report",
-          "title": "Kind",
           "type": "string"
         },
         "schema_version": {
@@ -380,14 +349,12 @@
         "kind",
         "schema_version"
       ],
-      "title": "Metadata",
       "type": "object"
     },
     "Narration": {
       "additionalProperties": false,
       "properties": {
         "text": {
-          "title": "Text",
           "type": "string"
         },
         "parts": {
@@ -395,7 +362,6 @@
           "items": {
             "$ref": "#/$defs/NarrationPart"
           },
-          "title": "Parts",
           "type": "array"
         }
       },
@@ -403,21 +369,18 @@
         "text",
         "parts"
       ],
-      "title": "Narration",
       "type": "object"
     },
     "NarrationLiteral": {
       "additionalProperties": false,
       "properties": {
         "value": {
-          "title": "Value",
           "type": "string"
         }
       },
       "required": [
         "value"
       ],
-      "title": "NarrationLiteral",
       "type": "object"
     },
     "NarrationPart": {
@@ -440,16 +403,14 @@
       "additionalProperties": false,
       "properties": {
         "name": {
-          "title": "Name",
           "type": "string"
         },
         "column_id": {
-          "title": "Column Id",
+          "description": "The parameter column whose cells fill it in.",
           "type": "string"
         },
         "format_spec": {
           "default": "",
-          "title": "Format Spec",
           "type": "string"
         },
         "conversion": {
@@ -461,8 +422,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Conversion"
+          "default": null
         }
       },
       "required": [
@@ -471,23 +431,19 @@
         "format_spec",
         "conversion"
       ],
-      "title": "NarrationPlaceholder",
       "type": "object"
     },
     "NarrationTermRef": {
       "additionalProperties": false,
       "properties": {
         "term_id": {
-          "title": "Term Id",
           "type": "string"
         },
         "display": {
-          "title": "Display",
           "type": "string"
         },
         "expression": {
           "default": "",
-          "title": "Expression",
           "type": "string"
         }
       },
@@ -496,23 +452,19 @@
         "display",
         "expression"
       ],
-      "title": "NarrationTermRef",
       "type": "object"
     },
     "NarrationValue": {
       "additionalProperties": false,
       "properties": {
         "rendered": {
-          "title": "Rendered",
           "type": "string"
         },
         "expression": {
-          "title": "Expression",
           "type": "string"
         },
         "format_spec": {
           "default": "",
-          "title": "Format Spec",
           "type": "string"
         },
         "conversion": {
@@ -524,8 +476,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Conversion"
+          "default": null
         }
       },
       "required": [
@@ -534,7 +485,6 @@
         "format_spec",
         "conversion"
       ],
-      "title": "NarrationValue",
       "type": "object"
     },
     "ParamValue": {
@@ -560,14 +510,13 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
           "type": "string"
         },
         "values": {
+          "description": "One cell per column, in the order of the table's columns. What a cell holds depends on its column's kind. Null is a parametrize value in a param column and no value in any other.",
           "items": {
             "$ref": "#/$defs/CellValue"
           },
-          "title": "Values",
           "type": "array"
         },
         "status": {
@@ -587,7 +536,6 @@
         },
         "custom_id": {
           "default": false,
-          "title": "Custom Id",
           "type": "boolean"
         }
       },
@@ -598,18 +546,15 @@
         "error",
         "custom_id"
       ],
-      "title": "ParameterCase",
       "type": "object"
     },
     "ParameterColumn": {
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
           "type": "string"
         },
         "name": {
-          "title": "Name",
           "type": "string"
         },
         "kind": {
@@ -621,7 +566,6 @@
         "name",
         "kind"
       ],
-      "title": "ParameterColumn",
       "type": "object"
     },
     "ParameterTable": {
@@ -631,14 +575,12 @@
           "items": {
             "$ref": "#/$defs/ParameterColumn"
           },
-          "title": "Columns",
           "type": "array"
         },
         "cases": {
           "items": {
             "$ref": "#/$defs/ParameterCase"
           },
-          "title": "Cases",
           "type": "array"
         }
       },
@@ -646,7 +588,6 @@
         "columns",
         "cases"
       ],
-      "title": "ParameterTable",
       "type": "object"
     },
     "Phase": {
@@ -661,11 +602,9 @@
       "additionalProperties": false,
       "properties": {
         "story_id": {
-          "title": "Story Id",
           "type": "string"
         },
         "sentence_id": {
-          "title": "Sentence Id",
           "type": "integer"
         }
       },
@@ -673,7 +612,6 @@
         "story_id",
         "sentence_id"
       ],
-      "title": "Pin",
       "type": "object"
     },
     "ReportSchemaVersion": {
@@ -684,21 +622,19 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
+          "description": "The pytest node ID. A grouped parametrized scenario keeps its first case's.",
           "type": "string"
         },
         "narration": {
           "$ref": "#/$defs/Narration"
         },
         "module": {
-          "title": "Module",
           "type": "string"
         },
         "tags": {
           "items": {
             "type": "string"
           },
-          "title": "Tags",
           "type": "array"
         },
         "status": {
@@ -707,14 +643,13 @@
         },
         "duration_ms": {
           "default": 0,
-          "title": "Duration Ms",
+          "minimum": 0,
           "type": "integer"
         },
         "steps": {
           "items": {
             "$ref": "#/$defs/Step"
           },
-          "title": "Steps",
           "type": "array"
         },
         "parameters": {
@@ -737,7 +672,8 @@
               "type": "null"
             }
           ],
-          "default": null
+          "default": null,
+          "description": "Null on a grouped parametrized scenario, whose cases each hold their own."
         },
         "reason": {
           "anyOf": [
@@ -749,7 +685,7 @@
             }
           ],
           "default": null,
-          "title": "Reason"
+          "description": "Why it was skipped or expected to fail, as its status says. Null for any other status."
         },
         "source": {
           "anyOf": [
@@ -767,7 +703,6 @@
           "items": {
             "type": "string"
           },
-          "title": "Story Ids",
           "type": "array"
         },
         "pins": {
@@ -783,7 +718,7 @@
             }
           ],
           "default": null,
-          "title": "Pins"
+          "description": "Null when nothing pins it. An empty array when pinning turned narration matching off."
         }
       },
       "required": [
@@ -801,21 +736,18 @@
         "story_ids",
         "pins"
       ],
-      "title": "Scenario",
       "type": "object"
     },
     "Sentence": {
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
           "type": "integer"
         },
         "clauses": {
           "items": {
             "$ref": "#/$defs/Clause"
           },
-          "title": "Clauses",
           "type": "array"
         },
         "name": {
@@ -827,8 +759,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Name"
+          "default": null
         }
       },
       "required": [
@@ -836,18 +767,16 @@
         "clauses",
         "name"
       ],
-      "title": "Sentence",
       "type": "object"
     },
     "SourceLocation": {
       "additionalProperties": false,
       "properties": {
         "relpath": {
-          "title": "Relpath",
           "type": "string"
         },
         "line": {
-          "title": "Line",
+          "minimum": 1,
           "type": "integer"
         }
       },
@@ -855,7 +784,6 @@
         "relpath",
         "line"
       ],
-      "title": "SourceLocation",
       "type": "object"
     },
     "Status": {
@@ -880,14 +808,12 @@
           "items": {
             "$ref": "#/$defs/Step"
           },
-          "title": "Children",
           "type": "array"
         },
         "attachments": {
           "items": {
             "$ref": "#/$defs/StepAttachment"
           },
-          "title": "Attachments",
           "type": "array"
         },
         "pins": {
@@ -903,7 +829,7 @@
             }
           ],
           "default": null,
-          "title": "Pins"
+          "description": "Null when nothing pins it. An empty array when pinning turned narration matching off."
         },
         "fixture_name": {
           "anyOf": [
@@ -914,8 +840,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Fixture Name"
+          "default": null
         }
       },
       "required": [
@@ -926,7 +851,6 @@
         "pins",
         "fixture_name"
       ],
-      "title": "Step",
       "type": "object"
     },
     "StepAttachment": {
@@ -943,18 +867,15 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "title": "Id",
           "type": "string"
         },
         "title": {
-          "title": "Title",
           "type": "string"
         },
         "sentences": {
           "items": {
             "$ref": "#/$defs/Sentence"
           },
-          "title": "Sentences",
           "type": "array"
         },
         "source": {
@@ -975,7 +896,6 @@
         "sentences",
         "source"
       ],
-      "title": "Story",
       "type": "object"
     },
     "TermKind": {
@@ -990,23 +910,18 @@
       "additionalProperties": false,
       "properties": {
         "path": {
-          "title": "Path",
           "type": "string"
         },
         "lineno": {
-          "title": "Lineno",
           "type": "integer"
         },
         "func": {
-          "title": "Func",
           "type": "string"
         },
         "code": {
-          "title": "Code",
           "type": "string"
         },
         "is_internal": {
-          "title": "Is Internal",
           "type": "boolean"
         }
       },
@@ -1017,7 +932,6 @@
         "code",
         "is_internal"
       ],
-      "title": "TracebackFrame",
       "type": "object"
     }
   },
@@ -1025,7 +939,6 @@
   "properties": {
     "$schema": {
       "default": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
-      "title": "$Schema",
       "type": "string"
     },
     "metadata": {
@@ -1035,7 +948,6 @@
       "items": {
         "$ref": "#/$defs/Scenario"
       },
-      "title": "Scenarios",
       "type": "array"
     },
     "glossary": {
@@ -1054,7 +966,6 @@
       "items": {
         "$ref": "#/$defs/Story"
       },
-      "title": "Stories",
       "type": "array"
     }
   },
@@ -1065,6 +976,5 @@
     "glossary",
     "stories"
   ],
-  "title": "ReportDocument",
   "type": "object"
 }
