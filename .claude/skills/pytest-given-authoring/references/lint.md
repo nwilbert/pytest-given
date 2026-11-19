@@ -1,6 +1,6 @@
 # The narration lint
 
-The narration lint enforces the structural part of the rules in [scenarios.md](scenarios.md). Turn it on with `pytest --given-lint` or `given_lint = true` in `[tool.pytest]`; `--no-given-lint` turns an ini-enabled lint off for one run. A *warn* lint finding prints in the terminal summary. Only an *error* lint finding fails the run. A run with no lint findings says so.
+The narration lint enforces the structural part of the rules in [scenarios.md](scenarios.md). Turn it on with `pytest --given-lint` or `given_lint = true` in `[tool.pytest]`; `--no-given-lint` turns a lint enabled in the config file off for one run. A *warn* lint finding prints in the terminal summary. Only an *error* lint finding fails the run. A run with no lint findings says so.
 
 | Rule | Default | Catches |
 |---|---|---|
@@ -16,7 +16,7 @@ The narration lint enforces the structural part of the rules in [scenarios.md](s
 | `unresolved-definition-ref` | warn | A bold span in a glossary definition that names no term. Fix the name if the term was renamed. Put an example word in a code span or quotes, and use italics for emphasis. Ignore one with `unresolved-definition-ref: <term-id glob>`. Linting part of a suite can flag a ref to a term that another test module declares in code. |
 | `avoided-word` | warn | A glossary term's avoided word, or its S-form, as a whole word in any case, with a hyphen or a space between its words, in the plain text of a scenario title, a step or a story sentence. Term refs, values, code spans and definitions are not checked, but both phrases of a Boolean phrase spec are. Use a term ref to the preferred term (the fitting one when the message names several), or reword. If the word is right after all, remove it from the term's avoided words. Ignore one with `avoided-word: <node-id glob>`, or the story id for a story sentence. |
 
-You can override each rule's severity with the `given_lint_rules` ini. That and the rest of the setup are in the project documentation at <https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/>.
+You can override each rule's severity with the `given_lint_rules` setting. That and the rest of the setup are in the project documentation at <https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/>.
 
 **A `then-without-check` lint finding on a step that does check is usually a naming problem.** The rule only recognizes an assertion helper by its `assert` prefix. So rename `check_totals` to `assert_totals` before you reach for the ignore list. A third-party matcher with another name (`result.stdout.fnmatch_lines(...)`) needs a real `assert` next to it, or an ignore entry.
 

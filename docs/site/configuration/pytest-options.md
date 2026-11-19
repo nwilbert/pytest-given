@@ -8,17 +8,48 @@ The checks, however, always run. Every run builds the report, even if it doesn't
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--given-json[=PATH]` | off | Write the JSON report data. Without a path: `given-report/report-data.json`. |
+| `--given-json[=PATH]` | off | Write the JSON report data. Without a path: `given-report/report-data.json`. The [standalone CLI](../cli.md) renders HTML or Markdown from it later, without running the tests. |
 | `--given-html[=PATH]` | off | Write the HTML report. Without a path: `given-report/report.html`. |
 | `--given-md[=PATH]` | off | Write the [Markdown report](../markdown-report.md). **Without a path, it prints to stdout**, between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers. |
-| `--given-md-lines` / `--no-given-md-lines` | `true` | Show the line in the `file.py:line::test_name` anchor under each Markdown heading. Off, the anchor is the node ID, so a Markdown diff doesn't show every anchor below an inserted test. Ini setting: `given_md_lines`; both flags override it. |
-| `--given-md-source` | off | End each Markdown scenario with its test function, decorators included, each line under its number in the file, for reviewing step text against step body. Only the test function is shown, not the step fixtures or helpers it uses. No ini setting. |
-| `--given-title=TEXT` | rootdir name | The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. Ini setting: `given_title`. |
-| `--given-report-url=URL` | unset | The public URL the HTML report will be served from, such as its page on your docs site. The report then shows copy buttons that put a Markdown [citation](../guide/citations.md) linking there on the clipboard, and `pytest-given citations` checks links to it. Ini setting: `given_report_url`. |
-| `--given-source-link=PRESET` | `none` | An editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or a URL template. **HTML only.** Adds a clickable file:line link to each scenario card, story panel, and expanded glossary term. Ini setting: `given_source_link`. See [Source links](source-links.md). |
+| `--given-md-lines` / `--no-given-md-lines` | `true` | Show the line in the `file.py:line::test_name` anchor under each Markdown heading. Off, the anchor is the node ID, so a Markdown diff doesn't show every anchor below an inserted test. |
+| `--given-md-source` | off | End each Markdown scenario with its test function, decorators included, each line under its number in the file, for reviewing step text against step body. Only the test function is shown, not the step fixtures or helpers it uses. |
+| `--given-title=TEXT` | rootdir name | The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. |
+| `--given-report-url=URL` | unset | The public URL the HTML report will be served from, such as its page on your docs site. The report then shows copy buttons that put a Markdown [citation](../guide/citations.md) linking there on the clipboard, and `pytest-given citations` checks links to it. |
+| `--given-source-link=PRESET` | `none` | An editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or a URL template. **HTML only.** Adds a clickable file:line link to each scenario card, story panel, and expanded glossary term. See [Source links](source-links.md). |
 | `--given-all-frames` | off | Keep pytest's and pytest-given's internal frames (`pluggy`, `_pytest`, pytest-given) in failure tracebacks. See [Traceback frames](source-links.md#traceback-frames). |
-| `--given-lint` / `--no-given-lint` | `false` | Turn the narration lint on or off. A lint finding with severity `error` fails the run. Ini setting: `given_lint`; both flags override it. See [Narration lint](narration-lint.md). |
-| `--given-theme=light\|dark\|auto` | `auto` | The theme the HTML report opens in. `auto` follows the viewer's system setting. The report's own Light / Dark / System switch overrides it in each browser. Ini setting: `given_theme`. |
+| `--given-lint` / `--no-given-lint` | `false` | Turn the narration lint on or off. A lint finding with severity `error` fails the run. See [Narration lint](narration-lint.md). |
+| `--given-theme=light\|dark\|auto` | `auto` | The theme the HTML report opens in. `auto` follows the viewer's system setting. The report's own Light / Dark / System switch overrides it in each browser. |
+
+## Configuration file
+
+Put settings in `[tool.pytest]` in `pyproject.toml` (pytest 9's native TOML table). pytest still reads the older `[tool.pytest.ini_options]`, but you can't use both: pytest raises `UsageError` if both are present.
+
+| Setting | Type | Flag |
+|---------|------|------|
+| `given_title` | string | `--given-title` |
+| `given_report_url` | string | `--given-report-url` |
+| `given_source_link` | string | `--given-source-link` |
+| `given_theme` | string | `--given-theme` |
+| `given_md_lines` | boolean | `--given-md-lines` / `--no-given-md-lines` |
+| `given_lint` | boolean | `--given-lint` / `--no-given-lint` |
+| `given_lint_rules` | array of strings | none, see [Narration lint](narration-lint.md#configuration) |
+| `given_lint_ignore` | array of strings | none, see [Narration lint](narration-lint.md#configuration) |
+
+Each setting takes the values its flag does and has the same default. A flag overrides its setting for one run.
+
+```toml
+[tool.pytest]
+given_title = "Coffeeshop"
+given_source_link = "vscode"
+given_lint = true
+```
+
+The other flags have no setting. To pass one on every run, add it to pytest's `addopts` setting, which adds its flags to every run's command line:
+
+```toml
+[tool.pytest]
+addopts = ["--given-html"]
+```
 
 ## Flag order
 
@@ -48,7 +79,3 @@ Mind `-k`: it matches any part of a test's keywords, and a scenario's include `p
 ## JSON schema
 
 The JSON report follows a published [JSON Schema](../schemas/report-v1.schema.json). Every report names it under a top-level `$schema` key, so an editor can validate and complete the file. `metadata.schema_version` holds the report's version. pytest-given reads only reports of its own version. `pytest-given report`, `citations`, `coverage` and `delta` refuse any other with one line saying to regenerate it.
-
-## Ini settings
-
-Put ini settings in `[tool.pytest]` in `pyproject.toml` (pytest 9's native TOML table). pytest still reads the older `[tool.pytest.ini_options]`, but you can't use both: pytest raises `UsageError` if both are present.

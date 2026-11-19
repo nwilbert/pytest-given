@@ -1,31 +1,34 @@
 # Standalone CLI
 
-Regenerate the HTML from a saved JSON file at any time:
+## Report
+
+`pytest-given report` renders the HTML or Markdown report from a saved JSON file at any time:
 
 ```bash
 pytest-given report path/to/report-data.json -o path/to/report.html \
     --source-link=vscode
 ```
 
-Without a JSON file it reads `given-report/report-data.json`, where a bare `--given-json` writes it.
+The CLI takes its settings from flags only, never from your pytest config, and imports none of your code. So it also runs without installing: `uvx pytest-given@<version> report …`, pinned to the version that wrote the JSON file.
 
-The CLI takes its settings from flags only, never from your pytest config, and imports none of your code, so it also runs without installing: `uvx pytest-given@<version> report …`, pinned to the version that wrote the JSON file.
+| Option | Default | Description |
+|--------|---------|-------------|
+| `JSON_FILE` | `given-report/report-data.json` | The JSON report to render. The default is where a bare `--given-json` writes it. |
+| `-o PATH` | `given-report/report.html`, stdout for Markdown | The output file. A `.md` or `.markdown` name implies `--format md`. |
+| `--format html\|md` | `html` | The output format. Markdown printed to stdout has no `<!-- pytest-given:md:start -->` markers. The plugin adds them only to separate the report from pytest's own output. |
+| `--source-link=PRESET` | `none` | The same presets and URL templates as `--given-source-link` (see [Source links](configuration/source-links.md)). With `none`, file:line is shown as plain text. With `--format md`, the option is checked but has no effect. |
+| `--theme=light\|dark\|auto` | `auto` | The theme the report opens in, like `--given-theme`. |
+| `--report-url=URL` | the URL in the JSON file | The URL the citations copied from the report link to, like `--given-report-url`. Render a report this way for each place it is served from. |
+| `--no-lines` | off | Leave the line out of each Markdown scenario anchor, like `--no-given-md-lines`. Render both sides of a diff this way. |
+| `--glossary-only` | off | Render an HTML report with only the Glossary tab, for readers who need the vocabulary and not the tests. Scenarios, stories, each term's *Other forms* list and the citation copy menus are left out. The JSON file is not changed. |
 
-`--source-link` takes the same presets and URL templates as `--given-source-link` (see [Source links](configuration/source-links.md)). Without it (or with `--source-link=none`), file:line is shown as plain text, without a link. With `--format md`, the option is checked but has no effect.
+`pytest-given report` exits 2 when:
 
-`--theme=light|dark|auto` sets the theme the report opens in, like `--given-theme`. The default is `auto`.
-
-`--report-url` sets the URL the citations copied from the report link to, like `--given-report-url`, in place of the one stored in the JSON file: render a report this way for each place it is served from.
-
-`--glossary-only` renders an HTML report with only the Glossary tab, for readers who need the vocabulary and not the tests. Scenarios and stories are left out, and so is each term's *Other forms* list, since it comes from them. The citation copy menus are left out too, since a term citation counts the term's scenarios. The JSON file is not changed.
-
-Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md` or `.markdown` file name: `-o report.md` needs no `--format`.
-
-`--no-lines` leaves the line out of each Markdown scenario anchor, like `--no-given-md-lines`. Render both sides of a diff this way.
-
-With `--format md` and no `-o`, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no `<!-- pytest-given:md:start -->` markers; the plugin only adds them to separate the report from pytest's own output.
-
-`pytest-given report` exits 2 when it cannot read the JSON file, or cannot render or write the report. It also exits 2 when an option value is invalid, such as an unknown `--theme` or `--source-link` preset, or a `--report-url` that is not an absolute http(s) URL. With `--glossary-only`, it exits 2 for Markdown output, for a `--report-url`, and for a report without glossary terms. A malformed report exits 2 with the path and reason of each problem. A report of another schema version exits 2 with one line saying to regenerate it. That includes every report written by pytest-given 0.6.0 or earlier.
+- it cannot read the JSON file, or cannot render or write the report.
+- an option value is invalid, such as an unknown `--theme` or `--source-link` preset, or a `--report-url` that is not an absolute http(s) URL.
+- `--glossary-only` comes with Markdown output or a `--report-url`, or the report has no glossary terms.
+- the report is malformed. The message names the path and reason of each problem.
+- the report is of another schema version. One line says to regenerate it. That includes every report written by pytest-given 0.6.0 or earlier.
 
 ## Citations
 
@@ -45,8 +48,6 @@ A directory is searched recursively for `*.md`. Neither command runs tests: both
 
 - `--list` prints every report link on a line of its own, `path:line: glyph kind key` (`link` in place of the glyph for a plain report link), with its citation findings indented under it.
 - `--covering NODE_ID` narrows that list to the links that [may cite the scenario](guide/citations.md#finding-the-citations-of-a-scenario), and implies `--list`. Repeat it for several scenarios. A test function's node ID covers each of its scenarios, one per case under `group_parametrized=False`. It exits 2 when the report holds no scenario of that node ID.
-
-The same command also installs the agent skills with `pytest-given skills install`; see [Agent skills](ai-agents.md#agent-skills).
 
 ## Delta
 
@@ -86,6 +87,10 @@ pytest-given coverage [path/to/report-data.json]
 It prints a JSON array to stdout, one record per sentence in story then sentence order: `story_id`, `sentence_id`, `tracked` (false for a sentence narration matching never reaches) and `scenario_ids`. The report defaults to `given-report/report-data.json`, where a bare `--given-json` writes it.
 
 It exits 1 when a tracked sentence has no scenario, and says on stderr how many. It exits 2 when it cannot read the report, under the same rules as `report`.
+
+## Skills
+
+`pytest-given skills install` installs the bundled agent skills. See [Agent skills](ai-agents.md#agent-skills) for its options.
 
 ## Exit status
 

@@ -44,6 +44,6 @@ Each section header in the Glossary view has a link button, which copies a link 
 
 ## Publishing
 
-Copy buttons put a citation on the clipboard only when the report knows its public URL. Set it with `--given-report-url` (ini setting `given_report_url`). A report served from several places can be rendered once per place from the same JSON with the [standalone CLI](cli.md), each with its own `--report-url`. This site does that for its [example reports](examples.md).
+Copy buttons put a citation on the clipboard only when the report knows its public URL. Set it with `--given-report-url` (setting `given_report_url`). A report served from several places can be rendered once per place from the same JSON with the [standalone CLI](cli.md), each with its own `--report-url`. This site does that for its [example reports](examples.md).
 
 For a text version of the same run, see the [Markdown report](markdown-report.md).
