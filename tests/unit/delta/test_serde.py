@@ -98,6 +98,11 @@ def test_a_report_dict_is_refused_with_a_pointer_to_the_delta_command() -> None:
     assert 'pytest-given delta BEFORE.json AFTER.json' in str(raised.value)
 
 
+def test_a_report_is_recognized_by_its_kind_alone() -> None:
+    with pytest.raises(PytestGivenError, match='is a report, not a delta'):
+        delta_from_dict({'metadata': {'kind': 'report'}}, 'before.json')
+
+
 def test_a_dict_that_is_neither_a_delta_nor_a_report_is_not_called_a_report() -> None:
     with pytest.raises(PytestGivenError) as raised:
         delta_from_dict({'name': 'x'}, 'other.json')

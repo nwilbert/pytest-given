@@ -2,12 +2,13 @@
   "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-18T07:59:55.018060+00:00",
+    "timestamp": "2026-11-19T16:14:47.001605+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "a5c07f741927e394d30f7b3eb33ef117ebba90ad",
+    "commit_sha": "fae67cc58042f0e7947816d5ba67d749c880bbfc",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html",
+    "kind": "report",
     "schema_version": 1
   },
   "scenarios": [
@@ -215,7 +216,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 89,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -1620,7 +1621,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 37,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -1786,7 +1787,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 50,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",

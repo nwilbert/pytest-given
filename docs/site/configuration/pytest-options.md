@@ -87,4 +87,4 @@ Without a report or the lint, `--dist` is left alone.
 
 ## JSON schema
 
-The JSON report follows a published [JSON Schema](../schemas/report-v1.schema.json). Every report names it under a top-level `$schema` key, so an editor can validate and complete the file. `metadata.schema_version` holds the report's version. pytest-given reads only reports of its own version. `pytest-given report`, `citations`, `coverage` and `delta` refuse any other with one line saying to regenerate it.
+The JSON report follows a published [JSON Schema](../schemas/report-v1.schema.json). Every report names it under a top-level `$schema` key, so an editor can validate and complete the file. `metadata.kind` is `report`, where a delta's is `delta`. `metadata.schema_version` holds the report's version. pytest-given reads only reports of its own version. `pytest-given report`, `citations`, `coverage` and `delta` refuse any other with one line saying to regenerate it.

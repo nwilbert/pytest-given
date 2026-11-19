@@ -236,12 +236,12 @@
 - **then** the «scenario» carries its title, its «tag» and its three «steps»
 - **then** the given «step» holds a «term ref» to the term
 
-## ✓ A JSON «report» records the schema version of its shape
-`tests/integration/test_plugin.py::test_the_json_report_records_its_schema_version` · delta
+## ✓ A JSON «report» records its kind and the schema version of its shape
+`tests/integration/test_plugin.py::test_the_json_report_records_its_kind_and_schema_version` · delta
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-json
-- **then** the «report»'s `metadata.schema_version` is this pytest-given's `REPORT_SCHEMA_VERSION`
+- **then** the «report»'s `metadata.kind` is `report` and its `metadata.schema_version` is this pytest-given's `REPORT_SCHEMA_VERSION`
 
 ## ✓ A chained failure reports the frames of its own error, and its cause apart
 `tests/integration/test_plugin.py::test_chained_failure_keeps_the_frames_of_its_own_error` · validation
@@ -4219,6 +4219,7 @@
             "commit_sha": null,
             "title": null,
             "report_url": null,
+            "kind": "report",
             "schema_version": 1
           },
           "scenarios": [

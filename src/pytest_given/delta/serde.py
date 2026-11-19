@@ -8,6 +8,7 @@ from ..model import (
     PytestGivenError,
     dump_document,
     is_delta_dict,
+    is_report_dict,
     load_document,
 )
 from .document import DeltaDocument
@@ -27,7 +28,7 @@ def delta_from_dict(d: JsonObject, source: str | None = None) -> DeltaData:
     still reads can break an invariant the renderer relies on.
     """
     if not is_delta_dict(d):
-        if isinstance(d.get('metadata'), dict) and 'scenarios' in d:
+        if is_report_dict(d):
             raise PytestGivenError(
                 f'{source or "input"} is a report, not a delta; compare it with '
                 'a second report: `pytest-given delta BEFORE.json AFTER.json`.'

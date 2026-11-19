@@ -21,8 +21,11 @@ def report_to_dict[S: Step](report: ReportData[S]) -> JsonObject:
 
 
 def is_delta_dict(d: JsonObject) -> bool:
-    metadata = d.get('metadata')
-    return isinstance(metadata, dict) and metadata.get('kind') == 'delta'
+    return _metadata_kind(d) == 'delta'
+
+
+def is_report_dict(d: JsonObject) -> bool:
+    return _metadata_kind(d) == 'report'
 
 
 def report_from_dict(d: JsonObject, source: str | None = None) -> ReportData:
@@ -40,6 +43,11 @@ def report_from_dict(d: JsonObject, source: str | None = None) -> ReportData:
 def schema_version(d: JsonObject) -> JsonValue:
     metadata = d.get('metadata')
     return metadata.get('schema_version') if isinstance(metadata, dict) else None
+
+
+def _metadata_kind(d: JsonObject) -> JsonValue:
+    metadata = d.get('metadata')
+    return metadata.get('kind') if isinstance(metadata, dict) else None
 
 
 type JsonValue = (

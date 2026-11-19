@@ -391,6 +391,12 @@
           "default": null,
           "title": "Report Url"
         },
+        "kind": {
+          "const": "report",
+          "default": "report",
+          "title": "Kind",
+          "type": "string"
+        },
         "schema_version": {
           "$ref": "#/$defs/ReportSchemaVersion",
           "default": 1
@@ -404,6 +410,7 @@
         "commit_sha",
         "title",
         "report_url",
+        "kind",
         "schema_version"
       ],
       "title": "Metadata",

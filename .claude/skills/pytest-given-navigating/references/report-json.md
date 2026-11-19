@@ -2,7 +2,7 @@
 
 `pytest <selection> --given-json=report.json` writes one file with five top-level keys: `$schema`, `metadata`, `scenarios[]` (one entry per `@scenario`, parametrized cases grouped into one), `glossary` (`null` on a suite with no glossary) and `stories[]`. The JSON Schema at the `$schema` URL lists every field and its type. This page holds what the field names don't say.
 
-`metadata.schema_version` changes with every change to this shape, and `pytest-given report` refuses a report of another one. A delta JSON (`metadata.kind` is `"delta"`) is not a report: `pytest-given delta <file>` renders it.
+`metadata.kind` is `"report"`. `metadata.schema_version` changes with every change to this shape, and `pytest-given report` refuses a report of another one. A delta JSON (`metadata.kind` is `"delta"`) is not a report: `pytest-given delta <file>` renders it.
 
 ## Scenarios and steps
 

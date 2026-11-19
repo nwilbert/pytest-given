@@ -15,7 +15,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
-- `metadata.schema_version` in the JSON report, bumped with every change to the report's shape.
+- `metadata.kind` (`report`) and `metadata.schema_version` in the JSON report, the version bumped with every change to the report's shape.
 - `pytest-given delta BEFORE.json AFTER.json` writes a delta report — the added, removed and changed scenarios and glossary terms between two JSON reports — with a `given-renames.toml` rename log for renamed tests and terms.
 - The `pytest-given-delta` agent skill: building a delta between two commits and recording renames in `given-renames.toml`.
 - A malformed JSON report or delta is refused with the path and reason of each problem.

@@ -563,6 +563,7 @@ class Metadata:
     # copies link, and what `pytest-given citations` reads report links
     # against. None leaves the report copying links alone.
     report_url: ReportUrl | None = None
+    kind: Literal['report'] = 'report'
     schema_version: ReportSchemaVersion = REPORT_SCHEMA_VERSION
 
 

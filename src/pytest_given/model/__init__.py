@@ -108,6 +108,7 @@ from .schema import (
 from .serde import (
     JsonObject,
     is_delta_dict,
+    is_report_dict,
     read_report,
     read_report_json,
     report_from_dict,
@@ -214,6 +215,7 @@ __all__ = [
     'dump_document',
     'id_derive',
     'is_delta_dict',
+    'is_report_dict',
     'is_schema_version',
     'iter_narrations',
     'iter_steps',
