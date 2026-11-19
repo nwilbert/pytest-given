@@ -103,7 +103,7 @@
 
   --added-ink: #17693f;   --added-line: #3f9e6b;   --added-tint: #e3f3e8;   --added-tint-strong: #bfe4cb;
   --removed-ink: #a8231c; --removed-line: #d0584f; --removed-tint: #fcebe9; --removed-tint-strong: #f5c6c1;
-  --changed-ink: #855000; --changed-line: #d49a2a; --changed-tint: #fbf1dc; --changed-tint-strong: #f2d89e;
+  --changed-ink: #855000; --changed-line: #d49a2a; --changed-tint: #fbf1dc;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   
@@ -153,7 +153,7 @@
 
   --added-ink: #7ad7a0;   --added-line: #4fae7c;   --added-tint: #1f3329;   --added-tint-strong: #2d5641;
   --removed-ink: #f4968d; --removed-line: #d8675d; --removed-tint: #3b2228; --removed-tint-strong: #66303a;
-  --changed-ink: #f0c070; --changed-line: #d1a046; --changed-tint: #372d1f; --changed-tint-strong: #5c4826;
+  --changed-ink: #f0c070; --changed-line: #d1a046; --changed-tint: #372d1f;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
@@ -2125,14 +2125,41 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-step[data-change="removed"] :is(.step-text, .step-toggle) { text-decoration: line-through; }
 
 
+
+
+.delta-step[data-change="added"] .step-text { --words-tint: var(--added-tint-strong); }
+.delta-step[data-change="removed"] .step-text { --words-tint: var(--removed-tint-strong); }
 .delta-step:is([data-change="added"], [data-change="removed"]) .step-text {
-  border-radius: 2px;
-  background: var(--change-tint);
-  box-shadow: 0 0 0 2px var(--change-tint);
+  width: fit-content;
+  margin-inline: -2px;
+  padding-inline: 2px;
+  background: linear-gradient(
+      transparent calc((1lh - var(--words-band)) / 2),
+      var(--words-tint) 0,
+      var(--words-tint) calc((1lh + var(--words-band)) / 2),
+      transparent 0
+    ) 0 0 / 100% 1lh repeat-y;
 }
-.delta-words { border-radius: 2px; padding: 0 1px; }
-del.delta-words { background: var(--removed-tint-strong); text-decoration-color: currentColor; }
-ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
+
+
+
+.delta { --words-band: 1em; }
+.delta-words {
+  padding: 0 1px;
+  background: linear-gradient(var(--words-tint), var(--words-tint)) center / 100% var(--words-band) no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+del.delta-words { --words-tint: var(--removed-tint-strong); --words-line: var(--removed-line); text-decoration-color: currentColor; }
+ins.delta-words { --words-tint: var(--added-tint-strong); --words-line: var(--added-line); text-decoration: none; }
+
+
+
+.delta-words code {
+  --code-tint: color-mix(in srgb, var(--words-line) 28%, var(--words-tint));
+  padding-block: 0;
+  background: linear-gradient(var(--code-tint), var(--code-tint)) center / 100% calc(var(--words-band) / 0.9) no-repeat;
+}
 
 
 .delta .step-children { position: relative; }
@@ -2214,7 +2241,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-table .param-table th .delta-was { display: block; }
 
 
-.delta-table .param-table tr[data-change] { background: var(--change-tint); }
 .delta-row-lead {
   display: inline-block;
   width: 1ch;
@@ -2225,10 +2251,20 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
 
 
-.delta-table .param-table td[data-change="added"]:not(.param-highlight),
-.delta-table .param-table th[data-change="added"]:not(.param-highlight) { background: var(--added-tint); }
-.delta-table .param-table td[data-change="removed"]:not(.param-highlight),
-.delta-table .param-table th[data-change="removed"]:not(.param-highlight) { background: var(--removed-tint); }
+
+
+
+.delta-table .param-table [data-change="added"] { --cell-tint: var(--added-tint-strong); --cell-hover-tint: var(--added-tint); }
+.delta-table .param-table [data-change="removed"] { --cell-tint: var(--removed-tint-strong); --cell-hover-tint: var(--removed-tint); }
+.delta-table .param-table tr[data-change] > *,
+.delta-table .param-table :is(td, th)[data-change] {
+  background: var(--cell-tint);
+  color: var(--text-narration);
+}
+
+
+.delta-table .param-table tbody tr:hover > :is([data-change], tr[data-change] > *),
+.delta-table .param-table :is([data-change], tr[data-change] > *).param-highlight { background: var(--cell-hover-tint); }
 .delta-table .param-table thead th[data-change="added"] { color: var(--added-ink); }
 .delta-table .param-table thead th[data-change="removed"] { color: var(--removed-ink); }
 
@@ -2302,8 +2338,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     
     <div class="topbar-meta">
       <p class="delta-range"><span class="delta-range-side" tabindex="0" aria-describedby="range-tip-before"><span class="delta-range-name">v1</span>
-          <span class="delta-range-tip" id="range-tip-before" role="tooltip"><span class="delta-range-tip-head"><span class="delta-range-tip-name">v1</span> <span>before</span></span><span class="delta-range-row"> <span>Commit</span> <span class="delta-range-sha">e13e037f15df9e15ad79727d874f8457819b872c</span></span><span class="delta-range-row"> <span>Run</span> <span>2026-11-19 18:20 UTC</span></span><span class="delta-range-row"> <span>File</span> <span>before.json</span></span><span class="delta-range-row"> <span>Report</span> <span>Delta Example, 6 scenarios</span></span><span class="delta-range-row"> <span>Tools</span> <span>pytest 9.2.0, pytest-given 0.5.2</span></span></span></span><span class="delta-range-to"> to </span><span class="delta-range-side" tabindex="0" aria-describedby="range-tip-after"><span class="delta-range-name">v2</span>
-          <span class="delta-range-tip" id="range-tip-after" role="tooltip"><span class="delta-range-tip-head"><span class="delta-range-tip-name">v2</span> <span>after</span></span><span class="delta-range-row"> <span>Commit</span> <span class="delta-range-sha">f801e68a529717ed6f9f00492be6753acc62e9c0</span></span><span class="delta-range-row"> <span>Run</span> <span>2026-11-19 18:20 UTC</span></span><span class="delta-range-row"> <span>File</span> <span>after.json</span></span><span class="delta-range-row"> <span>Report</span> <span>Delta Example, 6 scenarios</span></span><span class="delta-range-row"> <span>Tools</span> <span>pytest 9.2.0, pytest-given 0.5.2</span></span></span></span>
+          <span class="delta-range-tip" id="range-tip-before" role="tooltip"><span class="delta-range-tip-head"><span class="delta-range-tip-name">v1</span> <span>before</span></span><span class="delta-range-row"> <span>Commit</span> <span class="delta-range-sha">e13e037f15df9e15ad79727d874f8457819b872c</span></span><span class="delta-range-row"> <span>Run</span> <span>2026-11-19 20:06 UTC</span></span><span class="delta-range-row"> <span>File</span> <span>before.json</span></span><span class="delta-range-row"> <span>Report</span> <span>Delta Example, 6 scenarios</span></span><span class="delta-range-row"> <span>Tools</span> <span>pytest 9.2.0, pytest-given 0.5.2</span></span></span></span><span class="delta-range-to"> to </span><span class="delta-range-side" tabindex="0" aria-describedby="range-tip-after"><span class="delta-range-name">v2</span>
+          <span class="delta-range-tip" id="range-tip-after" role="tooltip"><span class="delta-range-tip-head"><span class="delta-range-tip-name">v2</span> <span>after</span></span><span class="delta-range-row"> <span>Commit</span> <span class="delta-range-sha">f801e68a529717ed6f9f00492be6753acc62e9c0</span></span><span class="delta-range-row"> <span>Run</span> <span>2026-11-19 20:06 UTC</span></span><span class="delta-range-row"> <span>File</span> <span>after.json</span></span><span class="delta-range-row"> <span>Report</span> <span>Delta Example, 6 scenarios</span></span><span class="delta-range-row"> <span>Tools</span> <span>pytest 9.2.0, pytest-given 0.5.2</span></span></span></span>
       </p>
       <span class="topbar-version">pytest-given 0.5.2</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
@@ -2755,7 +2791,7 @@ Rate: unchanged</pre></div>
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
         <span class="scenario-status delta-status">⊗ expected failure → ✗ failed</span>
-        <span class="scenario-duration">49ms</span>
+        <span class="scenario-duration">70ms</span>
       </span>
     </div>
 
@@ -2815,7 +2851,7 @@ Rate: unchanged</pre></div>
               
             </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">credit card</td>
-                <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">60</td>
+                <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0" data-change="removed">60</td>
                 <td data-param="reason" data-block="2" data-subst="reason">insufficient funds</td>
                 <td data-param="amount" data-block="2" data-subst="amount">120</td>
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
@@ -2860,7 +2896,7 @@ Status: pending</pre></div>
               
             </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">debit card</td>
-                <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">40</td>
+                <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0" data-change="removed">40</td>
                 <td data-param="reason" data-block="2" data-subst="reason">expired card</td>
                 <td data-param="amount" data-block="2" data-subst="amount" data-change="removed">80</td>
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
@@ -2897,7 +2933,7 @@ Status: pending</pre></div>
               
             </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">bank transfer</td>
-                <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">150</td>
+                <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0" data-change="removed">150</td>
                 <td data-param="reason" data-block="2" data-subst="reason">fraud check failed</td>
                 <td data-param="amount" data-block="2" data-subst="amount">300</td>
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
@@ -2937,7 +2973,7 @@ Status: pending</pre></div>
               
             </td>
                 <td data-param="payment_method" data-block="1" data-subst="payment_method">gift card</td>
-                <td data-param="before:derived:0" data-block="1"></td>
+                <td data-param="before:derived:0" data-block="1" data-change="removed"></td>
                 <td data-param="reason" data-block="2" data-subst="reason">partial balance</td>
                 <td data-param="amount" data-block="2" data-subst="amount">50</td>
                 <td class="param-status" data-block="frame" data-change="removed"><span class="dot-xfailed">⊗</span></td>

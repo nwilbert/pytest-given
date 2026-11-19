@@ -935,6 +935,34 @@ def test_a_changed_attachment_cell_marks_its_cell_and_carries_its_line_diff():
     assert marks == [[None, 'removed'], [None, 'added']]
 
 
+def test_a_removed_column_marks_its_cells_as_an_added_column_marks_its_own():
+    before = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            parameters=table([('amount', 'param')], ('t.py::test_pay[a]', [1])),
+        )
+    )
+    after = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            parameters=table([('method', 'param')], ('t.py::test_pay[a]', ['card'])),
+        )
+    )
+    [item] = _listed(built_delta(before, after))
+    assert item.table is not None
+    [row] = item.table.rows
+    marks = [
+        [mark for _, _, _, mark in side.cells(case, row.pair)]
+        for side, case in zip(
+            item.table.sides, (row.before_case, row.after_case), strict=True
+        )
+        if case is not None
+    ]
+    assert marks == [['removed'], ['added']]
+
+
 def test_a_removed_attachment_column_leaves_the_diff_on_the_paired_column_s_content():
     log = Attachment(label='log', content='log')
     before = report(

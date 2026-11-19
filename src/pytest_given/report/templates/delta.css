@@ -255,16 +255,43 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
    would not. The toggle of a step with sub-steps is inline-flex, which a
    strike-through doesn't reach into. */
 .delta-step[data-change="removed"] :is(.step-text, .step-toggle) { text-decoration: line-through; }
-/* Its sub-steps' text too. The tint spreads as a shadow, so the text and its
-   glyph stay where an unmarked step's do. */
+/* Its sub-steps' text too, in the changed word run's band, one per line: the
+   band repeats down the text at its line height, as wide as the text.
+   Widened by a margin its padding takes back, so the text and its glyph stay
+   where an unmarked step's do. */
+.delta-step[data-change="added"] .step-text { --words-tint: var(--added-tint-strong); }
+.delta-step[data-change="removed"] .step-text { --words-tint: var(--removed-tint-strong); }
 .delta-step:is([data-change="added"], [data-change="removed"]) .step-text {
-  border-radius: 2px;
-  background: var(--change-tint);
-  box-shadow: 0 0 0 2px var(--change-tint);
+  width: fit-content;
+  margin-inline: -2px;
+  padding-inline: 2px;
+  background: linear-gradient(
+      transparent calc((1lh - var(--words-band)) / 2),
+      var(--words-tint) 0,
+      var(--words-tint) calc((1lh + var(--words-band)) / 2),
+      transparent 0
+    ) 0 0 / 100% 1lh repeat-y;
 }
-.delta-words { border-radius: 2px; padding: 0 1px; }
-del.delta-words { background: var(--removed-tint-strong); text-decoration-color: currentColor; }
-ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
+/* A changed word run's tint: a band the font's size high, centred on the
+   line, so it stays clear of the lines above and below and of their term-ref
+   underlines. Repeated on each line the run wraps onto. */
+.delta { --words-band: 1em; }
+.delta-words {
+  padding: 0 1px;
+  background: linear-gradient(var(--words-tint), var(--words-tint)) center / 100% var(--words-band) no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+del.delta-words { --words-tint: var(--removed-tint-strong); --words-line: var(--removed-line); text-decoration-color: currentColor; }
+ins.delta-words { --words-tint: var(--added-tint-strong); --words-line: var(--added-line); text-decoration: none; }
+/* Inline code in a run: the run's band in a deeper shade, rather than the
+   page-grey chip, which would cut a hole in it. The same height as the run's,
+   since code is set at 0.9em. */
+.delta-words code {
+  --code-tint: color-mix(in srgb, var(--words-line) 28%, var(--words-tint));
+  padding-block: 0;
+  background: linear-gradient(var(--code-tint), var(--code-tint)) center / 100% calc(var(--words-band) / 0.9) no-repeat;
+}
 /* A collapsed parent clips its children, so a nested glyph sits inside the
    children's indent rather than out in the margin, where it would escape. */
 .delta .step-children { position: relative; }
@@ -344,9 +371,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-table .param-table th,
 .delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
 .delta-table .param-table th .delta-was { display: block; }
-/* An added or removed case's row in its change's tint; every case's ID is led
-   by its change's glyph, a changed one's in the card's amber. */
-.delta-table .param-table tr[data-change] { background: var(--change-tint); }
+/* Every case's ID is led by its change's glyph, a changed one's in the card's
+   amber. */
 .delta-row-lead {
   display: inline-block;
   width: 1ch;
@@ -355,12 +381,22 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
   color: var(--change-ink);
 }
 /* A changed cell, ID or status, red on the before side and green on the
-   after, so the old and new values face each other; an added column's
-   cells green throughout. A hovered column's highlight still shows. */
-.delta-table .param-table td[data-change="added"]:not(.param-highlight),
-.delta-table .param-table th[data-change="added"]:not(.param-highlight) { background: var(--added-tint); }
-.delta-table .param-table td[data-change="removed"]:not(.param-highlight),
-.delta-table .param-table th[data-change="removed"]:not(.param-highlight) { background: var(--removed-tint); }
+   after, so the old and new values face each other; an added or removed
+   column's cells and case's row in its change throughout. In a changed word
+   run's tint and ink, as a changed value in the narration is: the cells'
+   secondary ink is too faint on that tint. Painted on the cells, a row's cells
+   taking its change, so a hovered row's tint never covers it. */
+.delta-table .param-table [data-change="added"] { --cell-tint: var(--added-tint-strong); --cell-hover-tint: var(--added-tint); }
+.delta-table .param-table [data-change="removed"] { --cell-tint: var(--removed-tint-strong); --cell-hover-tint: var(--removed-tint); }
+.delta-table .param-table tr[data-change] > *,
+.delta-table .param-table :is(td, th)[data-change] {
+  background: var(--cell-tint);
+  color: var(--text-narration);
+}
+/* Hovered, by its row or its column, a changed cell lightens to its change's
+   faint tint where an unchanged one takes the hover's. */
+.delta-table .param-table tbody tr:hover > :is([data-change], tr[data-change] > *),
+.delta-table .param-table :is([data-change], tr[data-change] > *).param-highlight { background: var(--cell-hover-tint); }
 .delta-table .param-table thead th[data-change="added"] { color: var(--added-ink); }
 .delta-table .param-table thead th[data-change="removed"] { color: var(--removed-ink); }
 /* A case the side lacks, hatched; opaque, so a hovered row's tint stays off. */

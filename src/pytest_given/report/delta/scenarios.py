@@ -93,7 +93,7 @@ class TableSide:
             self.parameters.cells(case), self.columns, strict=True
         ):
             changed = (
-                shown.change == 'added'
+                shown.change is not None
                 or column.id in pair.changed_cells
                 or column.id in changed_attachments
             )

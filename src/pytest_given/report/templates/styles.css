@@ -67,11 +67,11 @@
 
   /* The delta page's changes: added green, removed red, changed amber. The
      ink is text, the line a row's bar, the tint a marked row's ground and the
-     strong tint a marked word's. On that page status, parameter and term-kind
+     strong tint the band behind a marked step or word. On that page status, parameter and term-kind
      colours are off (see `body.delta`), so these mean nothing else there. */
   --added-ink: #17693f;   --added-line: #3f9e6b;   --added-tint: #e3f3e8;   --added-tint-strong: #bfe4cb;
   --removed-ink: #a8231c; --removed-line: #d0584f; --removed-tint: #fcebe9; --removed-tint-strong: #f5c6c1;
-  --changed-ink: #855000; --changed-line: #d49a2a; --changed-tint: #fbf1dc; --changed-tint-strong: #f2d89e;
+  --changed-ink: #855000; --changed-line: #d49a2a; --changed-tint: #fbf1dc;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   /* Inline code inside the tooltip, which is inverted (ink on bg). */
@@ -121,7 +121,7 @@
 
   --added-ink: #7ad7a0;   --added-line: #4fae7c;   --added-tint: #1f3329;   --added-tint-strong: #2d5641;
   --removed-ink: #f4968d; --removed-line: #d8675d; --removed-tint: #3b2228; --removed-tint-strong: #66303a;
-  --changed-ink: #f0c070; --changed-line: #d1a046; --changed-tint: #372d1f; --changed-tint-strong: #5c4826;
+  --changed-ink: #f0c070; --changed-line: #d1a046; --changed-tint: #372d1f;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
