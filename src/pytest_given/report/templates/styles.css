@@ -850,9 +850,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   padding: var(--space-sm) var(--space-md);
   color: var(--text-muted);
   font-weight: 600;
-  background: var(--bg-surface);
-  border-bottom: 2px solid var(--border);
 }
+/* Wider than a row's rule, so it wins the collapsed border under the header. */
+.param-table thead th { border-bottom: 2px solid var(--border); }
 .param-table td {
   padding: var(--space-sm) var(--space-md);
   color: var(--text-secondary);
@@ -880,8 +880,6 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .param-table tbody th.param-id {
   font-weight: normal;
   color: var(--text-secondary);
-  background: none;
-  border-bottom: none;
   border-top: 1px solid var(--border);
 }
 .param-table tr.failed-row { background: var(--color-failed-tint); }
@@ -1012,6 +1010,9 @@ span.param-highlight {
   border-radius: var(--radius-sm);
   margin-top: var(--space-xs);
 }
+/* In a parameter table cell, its label level with the row's other values:
+   no gap above, and its own top padding pulled into the cell's. */
+.param-table td .attachment-badge { margin-top: -2px; }
 .attachment-badge:hover { background: var(--border); }
 /* A promoted attachment names its column and expands nothing. */
 .attachment-badge--static { cursor: default; }

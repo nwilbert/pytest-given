@@ -882,9 +882,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   padding: var(--space-sm) var(--space-md);
   color: var(--text-muted);
   font-weight: 600;
-  background: var(--bg-surface);
-  border-bottom: 2px solid var(--border);
 }
+
+.param-table thead th { border-bottom: 2px solid var(--border); }
 .param-table td {
   padding: var(--space-sm) var(--space-md);
   color: var(--text-secondary);
@@ -912,8 +912,6 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .param-table tbody th.param-id {
   font-weight: normal;
   color: var(--text-secondary);
-  background: none;
-  border-bottom: none;
   border-top: 1px solid var(--border);
 }
 .param-table tr.failed-row { background: var(--color-failed-tint); }
@@ -1044,6 +1042,9 @@ span.param-highlight {
   border-radius: var(--radius-sm);
   margin-top: var(--space-xs);
 }
+
+
+.param-table td .attachment-badge { margin-top: -2px; }
 .attachment-badge:hover { background: var(--border); }
 
 .attachment-badge--static { cursor: default; }
@@ -2338,8 +2339,8 @@ ins.delta-words { --words-tint: var(--added-tint-strong); --words-line: var(--ad
     
     <div class="topbar-meta">
       <p class="delta-range"><span class="delta-range-side" tabindex="0" aria-describedby="range-tip-before"><span class="delta-range-name">v1</span>
-          <span class="delta-range-tip" id="range-tip-before" role="tooltip"><span class="delta-range-tip-head"><span class="delta-range-tip-name">v1</span> <span>before</span></span><span class="delta-range-row"> <span>Commit</span> <span class="delta-range-sha">e13e037f15df9e15ad79727d874f8457819b872c</span></span><span class="delta-range-row"> <span>Run</span> <span>2026-11-19 20:06 UTC</span></span><span class="delta-range-row"> <span>File</span> <span>before.json</span></span><span class="delta-range-row"> <span>Report</span> <span>Delta Example, 6 scenarios</span></span><span class="delta-range-row"> <span>Tools</span> <span>pytest 9.2.0, pytest-given 0.5.2</span></span></span></span><span class="delta-range-to"> to </span><span class="delta-range-side" tabindex="0" aria-describedby="range-tip-after"><span class="delta-range-name">v2</span>
-          <span class="delta-range-tip" id="range-tip-after" role="tooltip"><span class="delta-range-tip-head"><span class="delta-range-tip-name">v2</span> <span>after</span></span><span class="delta-range-row"> <span>Commit</span> <span class="delta-range-sha">f801e68a529717ed6f9f00492be6753acc62e9c0</span></span><span class="delta-range-row"> <span>Run</span> <span>2026-11-19 20:06 UTC</span></span><span class="delta-range-row"> <span>File</span> <span>after.json</span></span><span class="delta-range-row"> <span>Report</span> <span>Delta Example, 6 scenarios</span></span><span class="delta-range-row"> <span>Tools</span> <span>pytest 9.2.0, pytest-given 0.5.2</span></span></span></span>
+          <span class="delta-range-tip" id="range-tip-before" role="tooltip"><span class="delta-range-tip-head"><span class="delta-range-tip-name">v1</span> <span>before</span></span><span class="delta-range-row"> <span>Commit</span> <span class="delta-range-sha">e13e037f15df9e15ad79727d874f8457819b872c</span></span><span class="delta-range-row"> <span>Run</span> <span>2026-11-19 20:07 UTC</span></span><span class="delta-range-row"> <span>File</span> <span>before.json</span></span><span class="delta-range-row"> <span>Report</span> <span>Delta Example, 6 scenarios</span></span><span class="delta-range-row"> <span>Tools</span> <span>pytest 9.2.0, pytest-given 0.5.2</span></span></span></span><span class="delta-range-to"> to </span><span class="delta-range-side" tabindex="0" aria-describedby="range-tip-after"><span class="delta-range-name">v2</span>
+          <span class="delta-range-tip" id="range-tip-after" role="tooltip"><span class="delta-range-tip-head"><span class="delta-range-tip-name">v2</span> <span>after</span></span><span class="delta-range-row"> <span>Commit</span> <span class="delta-range-sha">f801e68a529717ed6f9f00492be6753acc62e9c0</span></span><span class="delta-range-row"> <span>Run</span> <span>2026-11-19 20:07 UTC</span></span><span class="delta-range-row"> <span>File</span> <span>after.json</span></span><span class="delta-range-row"> <span>Report</span> <span>Delta Example, 6 scenarios</span></span><span class="delta-range-row"> <span>Tools</span> <span>pytest 9.2.0, pytest-given 0.5.2</span></span></span></span>
       </p>
       <span class="topbar-version">pytest-given 0.5.2</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
@@ -2791,7 +2792,7 @@ Rate: unchanged</pre></div>
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
         <span class="scenario-status delta-status">⊗ expected failure → ✗ failed</span>
-        <span class="scenario-duration">70ms</span>
+        <span class="scenario-duration">57ms</span>
       </span>
     </div>
 
