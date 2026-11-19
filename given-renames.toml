@@ -1,0 +1,6 @@
+# Identity changes pytest-given can't detect by itself, read by `pytest-given delta`.
+
+[[term]]
+old = "file-glossary"
+new = "markdown-glossary"
+rev = "93a7e9f87825ee9fbbaa526d92b64da4263b604e"
