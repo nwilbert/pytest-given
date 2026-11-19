@@ -9,11 +9,13 @@ A **delta report** lists the scenarios and glossary terms added, removed or chan
 
 A scenario pairs by its **scenario identity**, its node ID without the parametrize tail, and then by an equal scenario title. A rename the delta can't see reads as one scenario removed and one added. The **rename log**, `given-renames.toml` in the working directory (or `--renames PATH`), records those renames.
 
-## Picking the range
+## Choosing the two commits
 
-- A project that keeps its deltas starts each one where the last kept one ended, at its *after* SHA (`.metadata.after.metadata.commit_sha` in its JSON).
-- Keep a delta only when it lists a change. A release that changed no scenario adds none, and the next delta starts at the same commit.
-- Without a kept delta, start at the previous release tag.
+To publish a delta with each release:
+
+- Start the first delta at the previous release tag.
+- Start each later delta at the commit the last published one ended at, its *after* commit (`.metadata.after.metadata.commit_sha` in its JSON).
+- Skip a release whose delta lists no change. The next delta then starts at the last published one.
 - For a release not tagged yet, pass `--after-label v<version>`.
 - Pass `--title` naming the product and the release, in words its stakeholders know: `--title "Hotel booking changes for v2.4"`. It defaults to the after report's title.
 

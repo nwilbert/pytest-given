@@ -24,52 +24,40 @@ Each report carries the commit SHA it ran at. The delta header shows the SHAs an
 
 The delta's title is the after report's title. Pass `--title` to name what the delta covers in words its readers know, such as `--title "Hotel booking changes for v2.4"`.
 
-### Picking the range
+### Choosing the two commits
 
-A project that keeps its deltas starts each one where the last kept one ended. That is the *after* SHA in `.metadata.after.metadata.commit_sha` of its JSON. Without a kept delta, start at the previous release tag.
+The command compares the two reports you give it. Which commits they come from is up to you. To publish a delta with each release:
 
-Keep a delta only when it lists a change.
+- Start the first delta at the previous release tag.
+- Start each later delta at the commit the last published one ended at, its *after* commit, so together they cover every commit once. Its SHA is in `.metadata.after.metadata.commit_sha` of that delta's JSON.
+- Skip a release whose delta lists no change. The next delta then starts at the last published one and covers the skipped release too.
 
 ## What counts as a change
 
-A scenario found on both sides is *changed* when any of these parts differ. The parts that differ are its *changed parts*, listed in `changed_in` in the delta JSON.
+A scenario found on both sides is *changed* when one of these parts differs. The delta JSON lists them in `changed_in`.
 
-- **Title**: its title
-- **Steps**: its steps, with their phase, narration and nesting
-- **Tags**: its tags
-- **Status**: its status, or its skip or xfail reason
-- **Parameters**: its parameter table, meaning its columns, cases, cell values and case statuses, apart from `attachment` columns
-- **Attachments**: its attachments. An attachment was added or removed, or its content or content type changed. An `attachment` column was added or removed. Or a paired case's attachment cell changed. The attachment cells of an added or removed case count under Parameters, with their case.
+- **Title**
+- **Steps**: their phase, narration and nesting.
+- **Tags**
+- **Status**, including a skip or xfail reason.
+- **Parameters**: the parameter table's columns, cases, cell values and case statuses.
+- **Attachments**: an attachment's content or content type, or an `attachment` column or cell.
 
-A case ID that pytest generates from the values does not count on its own, only the values do. A custom case ID counts.
-
-Steps compare by their text, with each value as the report shows it. A term ref compares by its term, so renaming a term alone does not make a scenario changed.
-
-Nothing else counts. That includes the node ID, the module, the source location, the duration, the error, the fixtures, the stories and the pins.
+Steps compare by their text, with each value as the report shows it. A term ref compares by its term, so renaming a term does not change the scenarios that use it. A case ID that pytest generates from the values does not count, only the values do. A custom case ID counts. Nothing else counts, such as the node ID, the source location, the duration, the error or the stories.
 
 A term is *changed* when its name or definition differs.
 
-A value that differs on every run makes its scenario changed in every delta. Examples are a timestamp, a generated ID, or an object's default `str()` with its memory address. Attachments hold such values most often, since an attachment is often a whole dumped object. Fix the value at its source, with a fixed clock, a seeded ID generator or a stable `__str__`. For a value the test cannot control, replace the varying part with a fixed placeholder before attaching. Until then, unchecking Attachments in the *Changed in* filter hides a scenario whose only changed part is attachments.
-
-The delta HTML's sidebar has a Change filter for added, changed and removed scenarios. Under it, a *Changed in* filter holds a checkbox per changed part, each with the number of changed scenarios that changed in it. A changed scenario shows while at least one of its changed parts is checked. So unchecking Attachments hides the scenarios that changed only in their attachments. Added and removed scenarios have no changed parts, and the filter never hides them. Once a part is unchecked, the address bar holds the checked parts.
-
-A changed attachment, or a changed attachment cell, opens on both sides as a diff. The before side marks the removed lines and words, and the after side the added ones. A long run of unchanged lines folds to a line such as `… 40 unchanged lines`, which opens on click.
+A value that differs on every run makes its scenario changed in every delta. Examples are a timestamp, a generated ID, or a default `str()` with a memory address. Fix it at its source, with a fixed clock, a seeded ID generator or a stable `__str__`, or replace it with a fixed placeholder before attaching. Until then, the HTML's *Changed in* filter can hide the scenarios that changed only in their attachments.
 
 ## How scenarios pair
 
-A scenario pairs by its **scenario identity**. That is its node ID without the parametrize tail, so a case added to a parametrized scenario does not change it. With `group_parametrized=False`, each case is a *per-case scenario*, and its identity is the full node ID.
+A scenario pairs by its **scenario identity**: its node ID without the parametrize tail, so adding a case does not change it. With `group_parametrized=False`, each case is a *per-case scenario* and pairs by its full node ID. A scenario still unpaired then pairs by title, if exactly one unpaired scenario on each side has it. That covers a test moved to another file.
 
-A scenario still unpaired then pairs by title, if exactly one unpaired scenario on each side has it. That covers a test moved to another file.
+Anything still unpaired is listed as removed and added, such as a test renamed along with its title. Record such a rename in the [rename log](#the-rename-log). The delta JSON's `suggestions` lists the removed and added pairs that look like one rename, but never applies them.
 
-Whatever stays unpaired is removed on the before side and added on the after side. A test renamed with a new title is therefore listed as one scenario removed and one added.
+Inside a paired scenario, a case whose values changed under a generated case ID, such as `2-True` to `3-True`, is likewise one case removed and one added. So is an attachment whose label changed.
 
-Inside a paired parametrized scenario, columns pair by name first. Cases then pair by custom case ID, then by their values, then by generated case ID. A case whose value changed under a generated ID, such as `2-True` to `3-True`, is listed as one case removed and one added.
-
-Inside a paired step, attachments pair by label. When a label repeats on the step, its unchanged attachments pair first, and the rest pair in order between them. An attachment whose label changed is listed as one attachment removed and one added.
-
-Glossary terms pair by term ID. A term whose kind changed is listed as removed under its old kind and added under its new one. A term that gains or loses a kind still pairs.
-
-The delta JSON lists a `suggestions` entry for each removed and added pair that looks like one rename. A suggestion is never applied. To accept one, add it to the rename log.
+Glossary terms pair by term ID. A term whose kind changed is listed as removed and added. A term that only gains or loses a kind still pairs.
 
 ## The rename log
 
