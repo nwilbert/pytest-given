@@ -41,8 +41,12 @@ mistake shipped to PyPI is permanent.
       `--after-label v<version>`, since the tag doesn't exist yet.
       Write the result to `docs/deltas/<version>.json` and `.html`. The
       `.json` is written once. The `self_report` session re-renders the `.html`
-      from it. A `schema_version` bump inside the range makes the delta
-      impossible, so such a release keeps none, and the next range starts at it.
+      from it. A `schema_version` change inside the range leaves the *before*
+      report unreadable, and 0.6.0's has none. Convert that report by hand with
+      a scratch script, following the CHANGELOG's **Breaking** entries on the
+      JSON report, until `pytest-given delta` reads it. Don't commit the script.
+      A report no script can convert keeps no delta, and the next range starts
+      at its release.
       Add a line to the release's `CHANGELOG.md` section that links
       `https://nwilbert.github.io/pytest-given/latest/deltas/<version>.html`.
 - [ ] Mark the `given-renames.toml` entries added since the last release. An
