@@ -189,12 +189,14 @@
     <div class="delta-gap" data-row="{{ step_id }}" aria-hidden="true"></div>
   {%- endmacro -%}
 
-  {#- An added or removed row is its step's whole subtree, rendered as one. -#}
+  {#- An added, removed or replaced row is its step's whole subtree on each
+      side, rendered as one. -#}
   {%- macro render_step_row(row, side, scenario_idx) -%}
     {%- set line = row.line(side) -%}
     {%- set step_id = row.row_id(scenario_idx) -%}
-    <div class="delta-step" data-change="{{ row.change }}" data-row="{{ step_id }}">
-    {%- if row.change in ('added', 'removed') -%}
+    {%- set change = row.change_on(side) -%}
+    <div class="delta-step" data-change="{{ change }}" data-row="{{ step_id }}">
+    {%- if change in ('added', 'removed') -%}
       {{ render_step(line.step, step_id, side) }}
     {%- else -%}
       {{ step_text(line.step, step_id, line.words | narration_diff(side) if line.words else line.step.narration | narration(side)) }}

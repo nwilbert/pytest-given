@@ -2031,6 +2031,7 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 
 
 
+
 .delta-step[data-change="modified"] { --step-glyph: '~'; }
 .delta-step[data-change="added"] { --step-glyph: '+'; }
 .delta-step[data-change="removed"] { --step-glyph: '\2212'; }
@@ -2047,6 +2048,13 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 
 
 .delta-step[data-change="removed"] :is(.step-text, .step-toggle) { text-decoration: line-through; }
+
+
+.delta-step:is([data-change="added"], [data-change="removed"]) .step-text {
+  border-radius: 2px;
+  background: var(--change-tint);
+  box-shadow: 0 0 0 2px var(--change-tint);
+}
 .delta-words { border-radius: 2px; padding: 0 1px; }
 del.delta-words { background: var(--removed-tint-strong); text-decoration-color: currentColor; }
 ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
@@ -2059,11 +2067,17 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
 
 
+
 .delta-gaps + .phase-block:not(.delta-continued) { margin-top: var(--space-sm); }
 .delta-gap {
+  --gap-indent: 0px;
   height: 1lh;
-  background: var(--delta-hatch) content-box;
+  background: repeating-linear-gradient(90deg, var(--border) 0 4px, transparent 4px 8px)
+    var(--gap-indent) 0.5lh / calc(100% - var(--gap-indent)) 1px no-repeat content-box;
 }
+
+
+.delta-gaps > .delta-gap { --gap-indent: calc(3em + var(--space-sm)); }
 
 
 
@@ -2199,7 +2213,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     </nav>
     
     <div class="topbar-meta">
-      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-17 19:48</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-17 19:48</span>
+      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-19 09:58</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-19 09:58</span>
       </p>
       <span class="topbar-version">pytest-given 0.5.2</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
@@ -2474,15 +2488,15 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
               <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
             </div><div class="phase-steps">
               <div class="delta-step" data-change="removed" data-row="s1_3"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> receives a cancellation email with her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="before:invoice" data-term-entry="invoice">Invoice</span></div></div>
-            </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s1_4" aria-hidden="true"></div></div></div></div>
+            </div></div></div></div>
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s1_1"><div class="step-text"><span class="term-ref-actor has-term-tip" data-term-id="guest">Alice</span> cancels the <span class="term-ref-object has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
-            </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s1_3" aria-hidden="true"></div></div><div class="phase-block delta-continued" data-block="2"><div class="phase-steps">
-              <div class="delta-step" data-change="added" data-row="s1_4"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
+            </div><div class="phase-steps">
+              <div class="delta-step" data-change="added" data-row="s1_3"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
             </div></div></div></div>
       </div>
 
@@ -2651,7 +2665,7 @@ Rate: unchanged</pre></div>
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
         <span class="scenario-status delta-status">⊗ expected failure → ✗ failed</span>
-        <span class="scenario-duration">45ms</span>
+        <span class="scenario-duration">46ms</span>
       </span>
     </div>
 

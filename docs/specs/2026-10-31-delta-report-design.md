@@ -542,19 +542,22 @@ scenario does in the normal report, and the column says which side a line belong
     Given  our guest Alice                       Given  our guest Alice
   ~ When   Alice checks in to the             ~ When   Alice checks in to the
            [Deluxe Suite]                               [Garden Suite]
-  − Then   the later booking is cancelled     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    + Then   the later Booking is cancelled and
-                                                    refunded in full
+  − Then   the later booking is cancelled     + Then   the later Booking is cancelled and
+                                                       refunded in full
+           - - - - - - - - - - - - - -        +        the porter carries her bags up
     When   she tries to cancel the stay…         When   she tries to cancel the stay…
 ```
 
 - Steps line up by the step alignment, one row per aligned pair, so a step and its counterpart sit
-  level however each wraps. A hatched row marks a step missing on that side, as a missing case is
-  marked in the tables.
+  level however each wraps. In a run of removed and added steps, the removed ones face the added
+  ones in order, a row each, as a split diff pairs lines. A step left over in the run faces a
+  dashed rule across the text column, level with its first line.
 - A modified step is led by `~`. Its removed words are marked on the *before* side, struck through
-  on red, and its added words on the *after* side, on green. Rows are not tinted: the marked words
-  and the glyph carry the change. The strike-through takes the ink colour, so it reads on the red.
-- A removed step is led by `−` and its text is struck through. An added step is led by `+`.
+  on red, and its added words on the *after* side, on green. Its row is not tinted: the marked
+  words and the glyph carry the change. The strike-through takes the ink colour, so it reads on the
+  red.
+- A removed step is led by `−`, its text struck through on red. An added step is led by `+`, its
+  text on green.
 - A changed phase shows each side's own phase, the step led by `~`.
 - Unchanged steps show on both sides, plain. Term refs keep their underlines throughout, and each
   side's term refs read from that side's glossary.

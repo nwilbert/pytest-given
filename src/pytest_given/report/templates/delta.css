@@ -18,7 +18,7 @@ body.delta {
   --term-actor-ink: var(--term-kindless-ink);       --term-actor-line: var(--term-kindless-line);
   --term-object-ink: var(--term-kindless-ink);      --term-object-line: var(--term-kindless-line);
   --term-activity-ink: var(--term-kindless-ink);    --term-activity-line: var(--term-kindless-line);
-  /* What a side lacks: a step or a case. */
+  /* What a side lacks: a case or a payload line. */
   --delta-hatch: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
 }
 body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
@@ -165,7 +165,8 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-one-side > [data-side] { grid-column: 1; }
 .delta-side-steps .steps { padding-top: var(--space-xs); padding-left: var(--delta-gutter); }
 
-/* A step's change, by the glyph in the margin left of its keyword: the
+/* A step's change, by the glyph in the margin left of its keyword, and an
+   added or removed step's text on its change's tint: a modified step's
    marked words carry the rest. The glyph is positioned against the phase
    block, so a nested step's sits in the same margin. */
 .delta-step[data-change="modified"] { --step-glyph: '~'; }
@@ -184,6 +185,13 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
    would not. The toggle of a step with sub-steps is inline-flex, which a
    strike-through doesn't reach into. */
 .delta-step[data-change="removed"] :is(.step-text, .step-toggle) { text-decoration: line-through; }
+/* Its sub-steps' text too. The tint spreads as a shadow, so the text and its
+   glyph stay where an unmarked step's do. */
+.delta-step:is([data-change="added"], [data-change="removed"]) .step-text {
+  border-radius: 2px;
+  background: var(--change-tint);
+  box-shadow: 0 0 0 2px var(--change-tint);
+}
 .delta-words { border-radius: 2px; padding: 0 1px; }
 del.delta-words { background: var(--removed-tint-strong); text-decoration-color: currentColor; }
 ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
@@ -191,16 +199,22 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
    children's indent rather than out in the margin, where it would escape. */
 .delta .step-children { position: relative; }
 .delta .step-children .delta-step:not([data-change="equal"]) > .step-text::before { left: 2px; }
-/* A step the side lacks, hatched across the keyword's gutter too and outside
-   any phase, so a phase's outline never takes in a step of the other side;
-   a line high until `delta.js` sizes it to the step it stands in for.
-   Content-box clipped, since the push that lines it up is padding. A phase
-   it interrupts goes on below it without its keyword. */
+/* A step the side lacks: a dashed rule across the text column, level with
+   the first line of the step it stands in for. Outside any phase, so a phase's
+   outline never takes in a step of the other side; a line high until
+   `delta.js` sizes it to that step. Drawn in the content box, since the push
+   that lines it up is padding. A phase it interrupts goes on below it
+   without its keyword. */
 .delta-gaps + .phase-block:not(.delta-continued) { margin-top: var(--space-sm); }
 .delta-gap {
+  --gap-indent: 0px;
   height: 1lh;
-  background: var(--delta-hatch) content-box;
+  background: repeating-linear-gradient(90deg, var(--border) 0 4px, transparent 4px 8px)
+    var(--gap-indent) 0.5lh / calc(100% - var(--gap-indent)) 1px no-repeat content-box;
 }
+/* A top-level one starts past the keyword column (`.phase-block`'s), where
+   a step's text does. */
+.delta-gaps > .delta-gap { --gap-indent: calc(3em + var(--space-sm)); }
 
 /* A step's attachment's change, by the glyph leading its badge, a removed
    one's label struck. */

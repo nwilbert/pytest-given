@@ -4,9 +4,9 @@ and a side's runs of a word diff serve the tables and the Glossary tab too."""
 
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
-from itertools import groupby
+from itertools import groupby, zip_longest
 from operator import itemgetter
-from typing import Protocol
+from typing import Literal, Protocol
 
 from ...delta import (
     SIDE_MARK,
@@ -38,6 +38,9 @@ type BlockKey = str
 # Prefixes a before block none of whose steps the after side still has.
 _BEFORE_ONLY_BLOCK = 'before:'
 
+# A step's change, or a removed step facing the added one in its place.
+type RowChange = Literal['equal', 'modified', 'added', 'removed', 'replaced']
+
 
 @dataclass(frozen=True)
 class MarkedRun:
@@ -60,10 +63,10 @@ class StepLine:
 @dataclass(frozen=True)
 class StepRow:
     """An aligned pair of steps, a line on each side that has its step. An
-    added or removed step stands for its whole subtree, so it has no rows
-    below it."""
+    added, removed or replaced step stands for its whole subtree, so it has
+    no rows below it."""
 
-    change: StepChange
+    change: RowChange
     # Its place among the rows, which keys it alike on both sides.
     path: StepPath
     before: StepLine | None
@@ -73,6 +76,11 @@ class StepRow:
 
     def line(self, side: Side) -> StepLine | None:
         return on_side(side, self.before, self.after)
+
+    def change_on(self, side: Side) -> StepChange:
+        if self.change == 'replaced':
+            return on_side(side, 'removed', 'added')
+        return self.change
 
     def row_id(self, scenario_idx: int) -> str:
         return f's{scenario_idx}_' + '_'.join(map(str, self.path))
@@ -111,10 +119,7 @@ def steps_view(
             'after': dict(walk_steps(after.steps)),
         }
     )
-    top = [
-        rows.row(step_delta, (index,))
-        for index, step_delta in enumerate(scenario_delta.steps)
-    ]
+    top = rows.rows(scenario_delta.steps, ())
     return StepsView(
         before=_side_blocks(top, 'before', keys['before']),
         after=_side_blocks(top, 'after', keys['after']),
@@ -186,7 +191,28 @@ class _Marked(Protocol):
 class _Rows:
     steps: dict[Side, dict[StepPath, Step]]
 
-    def row(self, step_delta: StepDelta, path: StepPath) -> StepRow:
+    def rows(
+        self, step_deltas: Sequence[StepDelta], path: StepPath
+    ) -> tuple[StepRow, ...]:
+        return tuple(
+            self._row(facing, (*path, index))
+            for index, facing in enumerate(_facing(step_deltas))
+        )
+
+    def _row(self, facing: _Facing, path: StepPath) -> StepRow:
+        match facing:
+            case (removed, added):
+                return StepRow(
+                    change='replaced',
+                    path=path,
+                    before=self._line(removed, 'before'),
+                    after=self._line(added, 'after'),
+                    children=(),
+                )
+            case (step_delta,):
+                return self._step_row(step_delta, path)
+
+    def _step_row(self, step_delta: StepDelta, path: StepPath) -> StepRow:
         attachments: tuple[AttachmentRow, ...] = ()
         if step_delta.attachments:
             assert step_delta.before is not None
@@ -201,10 +227,7 @@ class _Rows:
             path=path,
             before=self._line(step_delta, 'before'),
             after=self._line(step_delta, 'after'),
-            children=tuple(
-                self.row(child, (*path, index))
-                for index, child in enumerate(step_delta.children)
-            ),
+            children=self.rows(step_delta.children, path),
             attachments=attachments,
         )
 
@@ -218,13 +241,36 @@ class _Rows:
         return StepLine(step, side_runs(step_delta.words, side))
 
 
+# A step delta alone, or a removed one with the added one in its place.
+type _Facing = tuple[StepDelta] | tuple[StepDelta, StepDelta]
+
+
+def _facing(step_deltas: Sequence[StepDelta]) -> Iterator[_Facing]:
+    """Each run of added and removed steps' removed ones paired with its added
+    ones in order, as a split diff pairs lines; the rest one by one."""
+    for one_sided, group in groupby(
+        step_deltas, key=lambda step_delta: step_delta.change in ('added', 'removed')
+    ):
+        run = list(group)
+        if not one_sided:
+            yield from ((step_delta,) for step_delta in run)
+            continue
+        removed = [step_delta for step_delta in run if step_delta.change == 'removed']
+        added = [step_delta for step_delta in run if step_delta.change == 'added']
+        for before, after in zip_longest(removed, added):
+            if before is None or after is None:
+                yield (before or after,)
+            else:
+                yield (before, after)
+
+
 def _block_of(blocks: list[list[Step]]) -> list[int]:
     """Each top-level step's phase block."""
     return [index for index, block in enumerate(blocks) for _ in block]
 
 
 def _side_blocks(
-    rows: list[StepRow], side: Side, keys: list[BlockKey]
+    rows: Sequence[StepRow], side: Side, keys: list[BlockKey]
 ) -> list[SideBlock]:
     blocks: list[SideBlock] = []
     opened: SideBlock | None = None  # the phase block last opened

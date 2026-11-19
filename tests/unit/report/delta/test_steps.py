@@ -62,16 +62,20 @@ def test_steps_pair_up_in_rows_each_side_under_its_own_phases() -> None:
             't.py::test_stay',
             'Stay',
             step('given', 'a guest', step('given', 'with her passport')),
+            step('when', 'she arrives'),
             step('when', 'she phones the desk'),
             step('when', 'she checks in'),
+            step('when', 'she pays'),
             step('then', 'she gets a key card'),
         ),
         scn(
             't.py::test_stay',
             'Stay',
             step('given', 'a guest', step('given', 'with her passport and visa')),
-            step('given', 'a free room'),
+            step('when', 'she arrives'),
             step('when', 'she checks in'),
+            step('when', 'she orders a taxi'),
+            step('when', 'she pays'),
             step('when', 'she gets a key card'),
             step('then', 'her phone opens the door'),
         ),
@@ -79,27 +83,38 @@ def test_steps_pair_up_in_rows_each_side_under_its_own_phases() -> None:
     view = steps_view(scenario_delta, block_keys(scenario_delta))
     assert _side(view, 'before') == [
         ('given', '0', False, [((0,), 'equal', 'a guest')]),
-        ('when', '1', False, [((1,), 'removed', 'she phones the desk')]),
-        (None, None, False, [((2,), 'added', None)]),
-        ('when', '1', True, [((3,), 'equal', 'she checks in')]),
-        # Its step went to the after side's When, so it keys as that block.
-        ('then', '1', False, [((4,), 'modified', 'she gets a key card')]),
-        (None, None, False, [((5,), 'added', None)]),
-    ]
-    assert _side(view, 'after') == [
-        ('given', '0', False, [((0,), 'equal', 'a guest')]),
-        (None, None, False, [((1,), 'removed', None)]),
-        ('given', '0', True, [((2,), 'added', 'a free room')]),
         (
             'when',
             '1',
             False,
             [
+                ((1,), 'equal', 'she arrives'),
+                ((2,), 'removed', 'she phones the desk'),
                 ((3,), 'equal', 'she checks in'),
-                ((4,), 'modified', 'she gets a key card'),
             ],
         ),
-        ('then', '2', False, [((5,), 'added', 'her phone opens the door')]),
+        (None, None, False, [((4,), 'added', None)]),
+        ('when', '1', True, [((5,), 'equal', 'she pays')]),
+        # Its step went to the after side's When, so it keys as that block.
+        ('then', '1', False, [((6,), 'modified', 'she gets a key card')]),
+        (None, None, False, [((7,), 'added', None)]),
+    ]
+    assert _side(view, 'after') == [
+        ('given', '0', False, [((0,), 'equal', 'a guest')]),
+        ('when', '1', False, [((1,), 'equal', 'she arrives')]),
+        (None, None, False, [((2,), 'removed', None)]),
+        (
+            'when',
+            '1',
+            True,
+            [
+                ((3,), 'equal', 'she checks in'),
+                ((4,), 'added', 'she orders a taxi'),
+                ((5,), 'equal', 'she pays'),
+                ((6,), 'modified', 'she gets a key card'),
+            ],
+        ),
+        ('then', '2', False, [((7,), 'added', 'her phone opens the door')]),
     ]
     [guest] = view.before[0].rows
     assert [
@@ -109,6 +124,54 @@ def test_steps_pair_up_in_rows_each_side_under_its_own_phases() -> None:
             ((0, 0), 'modified', 'with her passport'),
             ((0, 0), 'modified', 'with her passport and visa'),
         )
+    ]
+
+
+def test_a_removed_step_faces_the_added_one_in_its_place() -> None:
+    """The removed and added steps of one run share rows in order, removed on
+    the before side and added on the after; the steps left over keep a row of
+    their own."""
+    scenario_delta = _scenario_delta(
+        scn(
+            't.py::test_stay',
+            'Stay',
+            step('given', 'a guest'),
+            step('when', 'she phones the desk'),
+            step('when', 'she writes a letter'),
+            step('then', 'she gets a key card'),
+        ),
+        scn(
+            't.py::test_stay',
+            'Stay',
+            step('given', 'a guest'),
+            step('when', 'the lobby kiosk prints a receipt'),
+            step('then', 'she gets a key card'),
+        ),
+    )
+    view = steps_view(scenario_delta, block_keys(scenario_delta))
+    assert _side(view, 'before') == [
+        ('given', '0', False, [((0,), 'equal', 'a guest')]),
+        (
+            'when',
+            'before:1',
+            False,
+            [
+                ((1,), 'replaced', 'she phones the desk'),
+                ((2,), 'removed', 'she writes a letter'),
+            ],
+        ),
+        ('then', '2', False, [((3,), 'equal', 'she gets a key card')]),
+    ]
+    assert _side(view, 'after') == [
+        ('given', '0', False, [((0,), 'equal', 'a guest')]),
+        ('when', '1', False, [((1,), 'replaced', 'the lobby kiosk prints a receipt')]),
+        (None, None, False, [((2,), 'removed', None)]),
+        ('then', '2', False, [((3,), 'equal', 'she gets a key card')]),
+    ]
+    replaced = view.before[1].rows[0]
+    assert [replaced.change_on(side) for side in ('before', 'after')] == [
+        'removed',
+        'added',
     ]
 
 

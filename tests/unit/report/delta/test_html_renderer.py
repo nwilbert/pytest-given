@@ -442,8 +442,7 @@ def test_a_removed_step_renders_a_placeholder_whose_column_only_the_before_side_
     [item] = _listed(delta)
     assert item.steps is not None
     assert [row.change for block in item.steps.before for row in block.rows] == [
-        'removed',
-        'added',
+        'replaced',
         'modified',
     ]
     render_delta_html(delta, source_link_template=None)
