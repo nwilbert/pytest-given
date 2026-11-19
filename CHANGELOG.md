@@ -39,6 +39,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A `str` or `int` enum parametrize value shows in the parameter table, the JSON report and a re-rendered report as the narration renders it, not as its plain value.
 - A test session writing a report no longer crashes on a git remote URL that the system's locale encoding can't decode.
 - `pytest-given report` refuses an `-o` path that is its input file, which a failed render could delete.
+- A `#scenario=` link to one of the HTML report's last scenarios now scrolls it to the top instead of stopping short.
 
 ## [0.6.0] - 2026-11-21
 

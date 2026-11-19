@@ -2,10 +2,10 @@
   "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-19T18:44:02.951395+00:00",
+    "timestamp": "2026-11-19T19:25:31.857846+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "1187dbde9b2d5d5e559991a0ac9be60123458c2f",
+    "commit_sha": "8fe8f2b1ad2934799cdcb9c640f2b32825fc322d",
     "title": "Paragraph Glossary Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html",
     "kind": "report",

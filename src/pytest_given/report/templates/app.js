@@ -722,13 +722,29 @@ function reportApp() {
     isVisible(index) {
       return this._visible().has(index);
     },
+    // Scrolled once the body has opened: near the list's end a closed body
+    // leaves too little below the card to bring it to the top, and the
+    // browser stops the scroll short.
     scrollToAndExpand(id) {
       const index = data.scenarios.findIndex(s => s.id === id);
       if (index === -1) return;
+      const wasOpen = !!this.expandedScenarios[index];
       this.expandedScenarios[index] = true;
       this.$nextTick(() => {
         const el = document.getElementById('scenario-' + index);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!el) return;
+        const scroll = () => el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const body = document.getElementById('scenario-body-' + index);
+        if (wasOpen || !body || parseFloat(getComputedStyle(body).transitionDuration) === 0) {
+          scroll();
+          return;
+        }
+        const opened = (event) => {
+          if (event.target !== body || event.propertyName !== 'grid-template-rows') return;
+          body.removeEventListener('transitionend', opened);
+          scroll();
+        };
+        body.addEventListener('transitionend', opened);
       });
     },
     goToScenario(nodeId) {
