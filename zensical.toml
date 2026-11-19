@@ -11,7 +11,8 @@ extra_css = ["stylesheets/extra.css"]
 nav = [
   { "Home" = "index.md" },
   { "Getting started" = "getting-started.md" },
-  { "Guide" = [
+  { "AI agents" = "ai-agents.md" },
+  { "Narration" = [
     { "Scenarios & steps" = "guide/scenarios.md" },
     { "Step text & placeholders" = "guide/step-text.md" },
     { "Parametrized scenarios" = "guide/parametrized.md" },
@@ -19,19 +20,20 @@ nav = [
     { "Glossary" = "guide/glossary.md" },
     { "Domain Storytelling" = "guide/domain-storytelling.md" },
     { "Narration lint" = "configuration/narration-lint.md" },
-    { "Citations" = "guide/citations.md" },
-    { "Working with AI agents" = "ai-agents.md" },
   ] },
   { "Reports" = [
     { "HTML report" = "html-report.md" },
     { "Markdown report" = "markdown-report.md" },
     { "Delta report" = "delta-report.md" },
-    { "pytest options" = "configuration/pytest-options.md" },
+    { "Citations" = "guide/citations.md" },
     { "Source links & tracebacks" = "configuration/source-links.md" },
-    { "Standalone CLI" = "cli.md" },
+    { "Example reports" = "examples.md" },
   ] },
-  { "Examples" = "examples.md" },
-  { "BDD" = "bdd.md" },
+  { "Reference" = [
+    { "pytest options" = "configuration/pytest-options.md" },
+    { "Standalone CLI" = "cli.md" },
+    { "Compared with BDD" = "bdd.md" },
+  ] },
   { "Changelog" = "changelog.md" },
 ]
 
