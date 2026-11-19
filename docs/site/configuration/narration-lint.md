@@ -2,7 +2,7 @@
 
 `--given-lint` checks the scenarios of a test run for steps whose text doesn't match their code. It checks the steps that actually ran, so steps from decorated helpers, fixtures, and `when_then` are all handled correctly.
 
-When the lint is off, it costs nothing: pytest-given records nothing extra, and the reports are exactly the same as with the lint on.
+When the lint is off, it costs nothing, and the lint never changes the reports.
 
 ## Rules
 
@@ -20,7 +20,7 @@ Each rule has a default severity. A `warn` lint finding is printed in the termin
 | `tag-shadows-term` | `warn` | A scenario tag that matches a glossary term, so the same concept has two names. |
 | `dead-term` | `off` | A glossary term that no step, scenario title, or story sentence uses. Turn this on if every glossary term should be used. |
 | `unresolved-definition-ref` | `warn` | A bold span in a glossary definition that names no term of the glossary, often left behind when a term is renamed. Fix the name, or use italics for emphasis. An entry for this rule names the term's id instead of a test: `unresolved-definition-ref: handle`. |
-| `avoided-word` | `warn` | An [avoided word](../guide/glossary.md#avoided-words) of a glossary term, or its S-form, as a whole word in any case, with a hyphen or a space between its words, in the plain text of a scenario title, a step or a story sentence. Term refs, values, code spans and glossary definitions are not checked, but both phrases of a [Boolean phrase](../guide/step-text.md#boolean-phrases) are. Each scenario or story gets one lint finding per avoided word. Use a term ref to the preferred term, the fitting one when the message names several, or reword. If the word is right after all, remove it from the term's avoided words. An entry for this rule names the scenario's node ID or the story's id: `avoided-word: *::test_booking`. |
+| `avoided-word` | `warn` | An [avoided word](../guide/glossary.md#avoided-words) of a glossary term, or its S-form, in the text of a scenario title, a step or a story sentence, in any case. Term refs, values and code spans are not checked, but [Boolean phrases](../guide/step-text.md#boolean-phrases) are. Use a term ref to the preferred term, or reword. If the word is right after all, remove it from the term's avoided words. An entry for this rule names the scenario's node ID or the story's id: `avoided-word: *::test_booking`. |
 
 ## Configuration
 

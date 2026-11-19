@@ -18,7 +18,12 @@ Only tests with `@scenario` appear in the report. The decorator returns your fun
 
 `given(text, *, pins=None)`, `when(text, *, pins=None)`, `then(text, *, pins=None)`
 
-You can use a step in four places: as a **context manager** in a test body, as a **decorator** on a fixture or a helper function, or as a **given annotation** (`Annotated[..., given(...)]`) on a test parameter.
+You can use a step in four places:
+
+- as a **context manager** in a test body
+- as a **decorator** on a fixture
+- as a **decorator** on a helper function
+- as a **given annotation** (`Annotated[..., given(...)]`) on a test parameter
 
 `pins=` links the step to specific story sentences; see [Pins](domain-storytelling.md#pins).
 
@@ -60,7 +65,7 @@ def machine():
     return {'coffees': 10, 'price': 2}
 ```
 
-Generator fixtures work too, but only the part before `yield` is narrated. The teardown after `yield` isn't recorded, and a step or `attach` there raises `PytestGivenError`.
+Generator fixtures work too, async ones included, but only the part before `yield` is narrated. The teardown after `yield` isn't recorded, and a step or `attach` there raises `PytestGivenError`.
 
 A fixture's label must be a plain string; `@given(Template(...))` on a fixture raises an error. If the label needs to change, move the step into a helper function.
 
@@ -76,6 +81,7 @@ Only `given` is allowed here:
 
 ```python
 from typing import Annotated
+from pytest_given import Template, given, scenario, when_then
 
 @scenario('Underpayment is rejected')
 @pytest.mark.parametrize('cents', [0, 50, 199])
@@ -99,6 +105,8 @@ The annotation takes `pins=` like any step. On a fixture with its own `@given(..
 `given`, `when` and `then` can all decorate a helper function. The helper then records a step each time it's called. To put argument values into the step text, use `pytest_given.Template` with the helper's parameter names:
 
 ```python
+from pytest_given import Template, when
+
 @when('inserting money')
 def insert(amount):
     ...
@@ -108,7 +116,7 @@ def insert(amount):
     ...
 ```
 
-This works the same for `async def` helpers and async generator fixtures.
+This works the same for `async def` helpers.
 
 ### Nesting steps
 
@@ -123,21 +131,6 @@ with when('I place a large order'):
 ```
 
 Nesting a different phase raises `PytestGivenError`, for example a `then` inside a `when`. This includes decorated helpers: calling a `@when` helper inside a `given` block raises too. So if you call a helper from more than one phase, don't decorate it; narrate it where you call it instead.
-
-## Expected failures
-
-A scenario that fails as expected gets the status `xfailed`. That covers `@pytest.mark.xfail`, a `pytest.param(..., marks=pytest.mark.xfail)` row of a parametrized test, and `pytest.xfail()` in the body. The report keeps its steps up to where it broke, the error that broke it and the reason, and does not count it as failing.
-
-The main use is test-first development at the scenario level: a scenario written ahead of its implementation, as an executable statement of planned behavior. The report lists it under *Expected failure* with its reason, so planned behavior reads alongside working behavior until the implementation lands.
-
-```python
-@scenario('Loyalty card earns a free coffee')
-@pytest.mark.xfail(strict=True, reason='loyalty cards not implemented yet')
-def test_loyalty_card_free_coffee(machine):
-    ...
-```
-
-Mark it `strict=True`, or set the `xfail_strict` ini option, so the run fails once the scenario starts passing and the mark comes off. A non-strict mark passes quietly and stays, so a later regression reports as an expected failure instead of failing the run.
 
 ## `when_then`
 
@@ -161,4 +154,19 @@ def test_sold_out(machine):
 ```
 
 The body runs as the `when` step. The `then` step is recorded after the body finishes without an error (here: after `pytest.raises` catches the exception). If an exception escapes the body, only the `when` is recorded, and the exception propagates as usual.
+
+## Expected failures
+
+A scenario that fails as expected gets the status `xfailed`. That covers `@pytest.mark.xfail`, a `pytest.param(..., marks=pytest.mark.xfail)` row of a parametrized test, and `pytest.xfail()` in the body. The report keeps its steps up to where it broke, the error that broke it and the reason, and does not count it as failing.
+
+The main use is test-first development at the scenario level: a scenario written ahead of its implementation, as an executable statement of planned behavior. The report lists it under *Expected failure* with its reason, so planned behavior reads alongside working behavior until the implementation lands.
+
+```python
+@scenario('Loyalty card earns a free coffee')
+@pytest.mark.xfail(strict=True, reason='loyalty cards not implemented yet')
+def test_loyalty_card_free_coffee(machine):
+    ...
+```
+
+Mark it `strict=True`, or set pytest's `xfail_strict` setting, so the run fails once the scenario starts passing and the mark comes off. A non-strict mark passes quietly and stays, so a later regression reports as an expected failure instead of failing the run.
 

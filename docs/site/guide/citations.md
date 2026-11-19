@@ -156,7 +156,7 @@ A plain report link takes the same URL, with no glyph and your own link text:
 Rejecting [divergent cases](https://docs.example.org/report.html#scenario=tests/test_grouping.py::test_divergent_cases) keeps the tree honest.
 ```
 
-A link into the report can outlive what it names. When the report no longer has a scenario, tag, story, term or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.
+A report opened at a link whose target it no longer has names what is missing and opens without it (see [Links](../html-report.md#links)).
 
 ## Narrated citations
 
@@ -196,27 +196,21 @@ Someone staying at the hotel.
 
 The block follows a [narrated citation](#narrated-citations)'s rules, with the term's summary after `</a>`, inside the `<summary>`.
 
-The body is the definition on one line, showing what the report's Glossary view shows. Its code and emphasis stay Markdown and everything else is escaped, so a link or an HTML tag in a definition stays literal text. A line break becomes `<br>`.
+The body is the definition on one line, as the report's Glossary view shows it.
 
-To add one, choose **Copy defining citation** in the report's copy menu on a Glossary term row, paste it into your document, and run `pytest-given citations update`, which fills the empty body. From then on `update` rewrites the body to match the report, and `pytest-given citations check` fails when it differs.
+To add one, choose **Copy defining citation** in the copy menu of a Glossary term row, and go on as for a [narrated citation](#narrated-citations).
 
 The body belongs to the citation, so write your own words outside the block. A term with no definition has no **Copy defining citation** entry. Its block's body stays empty, and `update` empties one that holds text. When the term leaves the report, the glyph becomes `❓`, the summary goes and the body stays.
 
-On a Python-Markdown site, a definition holding `<`, `&`, `~` or `$` shows the backslash that escapes it, and one holding `</details>` ends the block early.
+A definition holding `</details>` ends the block early.
 
 ## Updating citations
 
-Pass the documents or directories to update. The JSON report must come from [the run that wrote your HTML report](#how-it-fits-together):
-
-```bash
-pytest-given citations update docs/ README.md
-```
-
-It rewrites what the report now says:
+`pytest-given citations update`, run as in [step 5](#how-it-fits-together), rewrites what the report now says:
 
 - a citation's glyph, link text and summary;
 - the body of a narrated or defining citation;
-- the fragment of any report link that uses a scenario's slug or a `[case]`, to its node ID;
+- a scenario link that names a single `[case]` or another form of the scenario, to its node ID;
 - the node ID of a renamed test, when exactly one scenario still has the citation's title.
 
 It can't fix everything. These stay as citation findings for you to resolve, and the command exits 1:
@@ -230,7 +224,7 @@ The bundled [`pytest-given-citing` skill](../ai-agents.md#agent-skills) walks an
 
 ## Checking in CI
 
-`pytest-given citations check` takes the same arguments, writes nothing, and exits 1 on any citation finding, including what `pytest-given citations update` would rewrite:
+`pytest-given citations check` writes nothing and exits 1 on any citation finding, including what `pytest-given citations update` would rewrite. A CI job runs:
 
 ```bash
 pytest --given-json --given-html

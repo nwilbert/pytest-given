@@ -70,11 +70,20 @@ pytest-given marks every `@scenario` test, each case of a parametrized one inclu
 
 A `-m` on the command line replaces one in your `addopts`, so combine them yourself: `-m "pytest_given and not slow"`. In a suite with no scenarios, `-m pytest_given` deselects every test and pytest exits with code 5.
 
-Mind `-k`: it matches any part of a test's keywords, and a scenario's include `pytest_given` and `_scenario`, so `-k given` or `-k scenario` selects every scenario too.
+Mind `-k`: `-k given` and `-k scenario` select every scenario too, because a scenario's keywords include those words.
 
 ## pytest-xdist
 
-**pytest-given writes reports and runs the narration lint under `pytest-xdist` with `--dist loadfile`.** Grouping a parametrized scenario needs all its cases on one worker, and `loadfile` sends each file to one worker. When a `-n` run asks for a report (`--given-json`, `--given-html`, `--given-md`) or the narration lint, pytest-given turns a bare `-n` into `--dist loadfile`. Any other `--dist` or `-d`, including one in `addopts`, stops the run with a usage error. The workers send their scenarios to the main process, which writes the report and runs the lint as a run without `-n` does. If a worker crashes, the run fails and writes no report. A run interrupted before every worker reported keeps the previous report. Without a report or the lint, `--dist` is left alone.
+**pytest-given writes reports and runs the narration lint under `pytest-xdist` with `--dist loadfile`.** Grouping a parametrized scenario needs all its cases on one worker, and `loadfile` sends each file to one worker.
+
+When a `-n` run asks for a report (`--given-json`, `--given-html`, `--given-md`) or the narration lint:
+
+- a bare `-n` becomes `--dist loadfile`.
+- any other `--dist` or `-d`, including one in `addopts`, stops the run with a usage error.
+- a crashed worker fails the run, and no report is written.
+- a run interrupted before every worker reported keeps the previous report.
+
+Without a report or the lint, `--dist` is left alone.
 
 ## JSON schema
 

@@ -74,7 +74,7 @@ Every handle offers the same four forms, whether you captured it (`guest = g.act
 
 Each term is an actor, an activity or a work object. A term gets its kind in one of three ways:
 
-1. **Explicitly:** `g.actor(...)`, `g.activity(...)` or `g.work_object(...)`, or a `kind_column` in the glossary file. `kind_column` is opt-in: a column headed "Kind" is ignored unless you pass `kind_column=`.
+1. **Explicitly:** `g.actor(...)`, `g.activity(...)` or `g.work_object(...)`, or a `kind_column` in the glossary file. `kind_column` is opt-in: a column headed "Kind" is ignored unless you pass `kind_column=`. A kind cell reads `actor`, `work object` or `activity`, in any case.
 2. **Inferred from stories:** a term with no declared kind takes its kind from its positions in clauses. Position 0 makes it an actor, odd positions (the verb slots) an activity, and even positions from 2 on a work object. A term seen both as an actor and in a noun slot becomes an actor, because an actor can receive a hand-off. A term seen in a verb slot *and* in any other slot raises an error; add a kind column to settle it. A term used only in steps stays kindless (grey).
    **A declared kind is never overridden:** putting a term in a slot its kind doesn't allow raises an error at `sentence(...)`.
 3. **Deliberately deferred:** `g('foo')` declares a term the team hasn't classified yet. It goes into the *Uncategorized* kind group and shows an *Undefined* badge until someone writes a definition. Treat this as a place to sort terms later, not a place to leave them. This works only for code-defined glossaries. A Markdown glossary is a **closed vocabulary**: `g('foo')` and `g['foo']` both only look up, and raise on an unknown name. To add vocabulary, add it to the file.

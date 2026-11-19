@@ -10,20 +10,20 @@ pytest-given groups all cases of a parametrized test into one scenario with a pa
 
 The group fails if any case failed. Otherwise it is an expected failure (`xfailed`) if any case is one, skipped if every case was skipped, and passed if not. When the cases differ in status, the table gets a status column that shows which case is which.
 
-When you give any case a custom ID, with `pytest.param(..., id=...)` or with `ids=` on a mark or a fixture, the table starts with a `case ID` column. It shows each case's ID as pytest prints it, so `test_overlap[touching-edges]` in a failure summary points straight at its row. Cases whose ids pytest generated show those ids in the column too. Without any custom ID, the column is left out, since generated ids only repeat the values. A custom ID that only repeats them counts as generated.
+When you give any case a custom ID, with `pytest.param(..., id=...)` or with `ids=` on a mark or a fixture, the table starts with a `case ID` column. It shows each case's ID as pytest prints it, so `test_overlap[touching-edges]` in a failure summary points straight at its row. Without any custom ID, the column is left out, since generated IDs only repeat the values.
 
-The columns appear in the order the narration first shows them: the scenario title, then the steps from top to bottom. Inputs narrated in a `given` come before outcomes narrated in a `then`. A parametrize argument that no step narrates stays next to the argument before it.
+The columns appear in the order the narration first shows them: the scenario title, then the steps from top to bottom, so inputs come before outcomes.
 
 When the exact value matters, as with a padded or an empty string, narrate it with `{name!r}`. The column then shows each value's repr, with its quotes, and the HTML report sets it in a monospace font so that its whitespace is easy to see. `!a` does the same.
 
 ```python
 @scenario('Pricing')
-@pytest.mark.parametrize('euros,expect', [(1, False), (2, True), (3, True)])
-def test_pricing(machine, euros, expect):
+@pytest.mark.parametrize('euros,affordable', [(1, False), (2, True), (3, True)])
+def test_pricing(machine, euros, affordable):
     with when(t'I insert ${euros}'):
         can_buy = euros >= machine['price']
-    with then(t'can_buy is {expect}'):
-        assert can_buy == expect
+    with then(t'a coffee {affordable:is affordable|is too expensive}'):
+        assert can_buy == affordable
 ```
 
 ## Scenario titles
@@ -45,7 +45,7 @@ A title can't contain both a parameter value and a glossary term ref. A `Templat
 
 Grouping only works when all cases have the same steps, with different values. If the steps really differ from case to case, add `group_parametrized=False` to `@scenario`.
 
-Each case then becomes its own scenario, without a parameter table. Its title ends with the parametrize id, like `Brew 200 ml [200]` for the example above. A `Template` title gets its placeholders filled in first; a plain-string title gets the id added the same way. Every case gets the id, even if its title already shows its values.
+Each case then becomes its own scenario, without a parameter table. Its title ends with the parametrize ID, like `Brew 200 ml [200]` for the example above. A `Template` title gets its placeholders filled in first; a plain-string title gets the ID added the same way. Every case gets the ID, even if its title already shows its values.
 
 `group_parametrized=False` on a test that isn't parametrized raises an error at collection.
 

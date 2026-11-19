@@ -56,6 +56,6 @@ Handle forms, discovery, kinds, sections, avoided words and the one-glossary-per
 ## Stories
 
 - **`story(title, [sentence(...), ...])`**: sentences are numbered by position (1 to N, never set by hand) and read from left to right: `sentence(actor, activity, work_object, ..., name=None)`. Each part is a handle or a bare string. Several arrow chains under one number take one `clause(...)` each: `sentence(clause(...), clause(...))`.
-- **Sentence handles** for `pins=`: `the_story['cancel']` (by `name=`) or `the_story[3]` (by number).
+- **Sentence handles** for `pins=`: `the_story['cancel']` (by `name=`) or `the_story[3]` (by number, starting at 1).
 
 Coverage matching, pins, and when a sentence counts as coverage-tracked are in [stories.md](stories.md).

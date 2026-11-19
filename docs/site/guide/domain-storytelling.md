@@ -1,10 +1,6 @@
 # Domain Storytelling
 
-[Domain Storytelling](https://domainstorytelling.org/quick-start-guide) describes how a domain works as short stories. With pytest-given you write these stories in code, and the report shows which scenarios cover each sentence of a story.
-
-!!! info "About Domain Storytelling"
-
-    [Domain Storytelling](https://domainstorytelling.org) is a technique for building a shared understanding between domain experts and developers. Together they describe the domain as stories: who does what, with what, and in which order. These stories give your tests context. Your scenarios sit one level below them, and each one documents a specific piece of domain logic in much more detail.
+[Domain Storytelling](https://domainstorytelling.org/quick-start-guide) is a technique in which domain experts and developers describe how a domain works as short stories: who does what, with what, and in which order. With pytest-given you write these stories in code. Your scenarios sit one level below them, each documenting one piece of domain logic in more detail, and the report shows which scenarios cover each sentence of a story.
 
 In Domain Storytelling, **actors** do **activities** with **work objects**. "Carol selects a room" has an actor (Carol), an activity (selects), and a work object (room). A story is a numbered list of such **sentences**. In a Domain Storytelling diagram, each activity is an arrow labelled with a verb.
 
@@ -52,15 +48,17 @@ To cover a sentence with several clauses, one step must mention every glossary t
 
 ### Kind inference
 
-If a term has no declared [kind](glossary.md#kinds), pytest-given infers it from the term's position in story sentences when the test session finishes:
+If a term has no declared [kind](glossary.md#kinds), pytest-given infers it from the term's position in story sentences:
 
 - first position: **actor**
 - an activity position (2nd, 4th, …): **activity**
 - any other position (3rd, 5th, …): **work object**
 
-If a term's kind is declared, pytest-given checks the kind against the term's position when the sentence is created. A term in the wrong position raises `PytestGivenError`, naming the term and its kind.
+An actor can also stand in a work-object position, for example when it receives something.
 
-If a term without a declared kind appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a `kind_column` to your Markdown glossary) to fix it.
+A term with a declared kind in a position that doesn't fit it raises `PytestGivenError`.
+
+A term without a declared kind that appears both in an activity position and in another position raises an error too. Declare the term's kind (or add a `kind_column` to your Markdown glossary) to fix it.
 
 ## Linking scenarios to stories
 
@@ -81,14 +79,6 @@ pytest-given works out which sentences of these stories the scenario covers. By 
 
 A step covers a sentence when the step's text mentions every glossary term in that sentence. The form of the term ref doesn't matter: `{room}`, `{room.l.s}` and `room('Deluxe Suite')` all count as the term *Room*.
 
-### Coverage in the report
-
-The Stories tab shows each story as a timeline of its sentences. Each sentence has a coverage chip and lists the scenarios that cover it. Select a sentence and choose *Open in Scenarios* to see only those scenarios. Below the timeline, the story's scenarios open in place to show their steps, and selecting sentences shows only the scenarios covering one of them. Every story you declare appears in the tab, even if no scenario covers it.
-
-`pytest-given coverage` prints the same data from a JSON report (see [Standalone CLI](../cli.md#coverage)).
-
-Story coverage helps a reader find the scenarios behind a part of the flow, and see the flow behind a scenario. It is not a measure of how completely the suite tests the system: a covered sentence means a step talks about it, not that its behavior is tested. To ask what the scenarios exercise, measure the code coverage of [`-m pytest_given`](../configuration/pytest-options.md#selecting-scenarios).
-
 ### Sentence handles
 
 To refer to one sentence, get a **sentence handle** from the story, by name or by number:
@@ -98,7 +88,7 @@ book_a_group_trip['select']  # by name, set with name='select' above
 book_a_group_trip[2]         # by number
 ```
 
-Numbers are positions in the list, so they change when you insert a sentence before them. Names stay the same.
+A number is the sentence's number in the story, starting at 1, as the Stories tab shows it. Numbers change when you insert a sentence before them. Names stay the same.
 
 ### Pins
 
@@ -122,7 +112,13 @@ The default, `pins=None`, means "no pins at this level". So narration matching o
 
 Use scenario pins with care: no step text backs them up. A pinned sentence counts as covered even if the test fails early or is skipped (its chip then shows the scenario's status). Only pin a sentence if the test really exercises it.
 
-Pins also work for sentences with fewer than two glossary terms, which narration matching can't cover.
+### Coverage in the report
+
+The Stories tab shows each story as a timeline of its sentences. Each sentence has a coverage chip and lists the scenarios that cover it. Select a sentence and choose *Open in Scenarios* to see only those scenarios. Below the timeline, the story's scenarios open in place to show their steps, and selecting sentences shows only the scenarios covering one of them. Every story you declare appears in the tab, even if no scenario covers it.
+
+`pytest-given coverage` prints the same data from a JSON report (see [Standalone CLI](../cli.md#coverage)).
+
+Story coverage helps a reader find the scenarios behind a part of the flow, and see the flow behind a scenario. It is not a measure of how completely the suite tests the system: a covered sentence means a step talks about it, not that its behavior is tested. To ask what the scenarios exercise, measure the code coverage of [`-m pytest_given`](../configuration/pytest-options.md#selecting-scenarios).
 
 ## Examples
 

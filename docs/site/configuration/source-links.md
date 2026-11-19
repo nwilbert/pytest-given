@@ -7,7 +7,6 @@ Source links add a clickable file:line link to each scenario card, story panel, 
 Source links only exist in the HTML report. A run that writes no HTML ignores the setting completely and doesn't even check it, so a typo in the preset only shows up when you run with `--given-html`.
 
 ```toml
-# pyproject.toml — pytest 9+ canonical form
 [tool.pytest]
 given_source_link = "vscode"
 ```
@@ -33,20 +32,15 @@ For your own URL template, use any of these variables:
 | `{project}`  | Basename of pytest's rootdir                                                                             |
 | `{sha}`      | Commit SHA from `GITHUB_SHA` / `CI_COMMIT_SHA` / `BUILDKITE_COMMIT`, falling back to `git rev-parse HEAD` |
 
-For reports archived in CI, `given_source_link = "github"` links to the exact commit. If `origin` is a mirror, a fork, or a remote the preset can't read, write the same link as a template: `"https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line}"`.
+For reports archived in CI, `given_source_link = "github"` links to the exact commit, so the links keep working after the code moves. If `origin` is a mirror, a fork, or a remote the preset can't read, write the same link as a template: `"https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line}"`.
 
-Caveats:
-
-- Editor presets (`vscode`, `cursor`, `zed`, `pycharm`) build `{path}` from pytest's rootdir. A saved JSON report doesn't record the rootdir, so `pytest-given report` uses the directory you run it in: run it from your checkout's root, or the links break.
-- GitHub links point to a specific commit, so they keep working after the code moves. That's what an archived CI report needs.
+Editor presets (`vscode`, `cursor`, `zed`, `pycharm`) build `{path}` from pytest's rootdir. A saved JSON report doesn't record the rootdir, so `pytest-given report` uses the directory you run it in: run it from your checkout's root, or the links break.
 
 ## Traceback frames
 
 When a scenario fails, the report shows its traceback. By default, it only keeps frames from your own code. Frames from `pluggy`, pytest's runner (`_pytest`), and pytest-given itself are dropped, because you rarely need them.
 
-Dropping them early also keeps the report fast when many scenarios fail: pytest's analysis of each frame is the slowest part of building the report then.
-
-Pass `--given-all-frames` to keep every frame. Each frame is then stored with an `is_internal` flag, and the HTML report shows a **Show internal frames** toggle on each failure. Use it to debug pytest-given or pytest itself; it makes reports with many failures slower again.
+Pass `--given-all-frames` to keep every frame. A failure that has internal frames then gets a **Show *N* internal frames** toggle in the HTML report. Use it to debug pytest-given or pytest itself. It makes a report with many failures slower to build.
 
 Skipped scenarios have no traceback. The report shows their skip reason instead.
 

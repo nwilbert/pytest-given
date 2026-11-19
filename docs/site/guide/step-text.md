@@ -17,34 +17,31 @@ You can write step text in several forms. Which form to use depends on where the
 
 Scenario titles, step text, glossary definitions and avoided words can use a little Markdown. Everything else shows exactly as written, in the HTML report, the Markdown report and citations alike.
 
-| Text | Bold, italic, code | Newline | `<br>` | Where it shows |
+| Text | Bold, italic, code | A newline shows as | `<br>` | Where it shows |
 |---|---|---|---|---|
-| Scenario title | rendered | space | literal | HTML, Markdown, citations |
-| Step text | rendered | space | literal | HTML, Markdown, narrated citations |
-| Glossary term definition | rendered | line break | line break | HTML: Glossary tab, term ref tooltip |
-| Avoided word | rendered | line break | line break | HTML: Glossary tab |
-| Markdown glossary term names, kind cells and section headings | removed: `**Guest**` reads as `Guest` | | literal | wherever the term or section shows |
-| Everything else | literal | | literal | |
+| Scenario title | rendered | a space | literal | HTML, Markdown, citations |
+| Step text | rendered | a space | literal | HTML, Markdown, narrated citations |
+| Glossary term definition | rendered | a line break | a line break | HTML: Glossary tab, term ref tooltip |
+| Avoided word | rendered | a line break | a line break | HTML: Glossary tab |
+| Markdown glossary term names, kind cells and section headings | removed: `**Guest**` reads as `Guest` | — | literal | wherever the term or section shows |
+| Everything else | literal | — | literal | |
 
 *Rendered* means `**bold**` shows as bold, `*italic*` as italic and `` `code` `` as code. *Literal* means the characters show as written in every output, the Markdown report included. *Everything else* is the report title, term names and term refs, interpolated values, case IDs, story titles and clauses, tags, skip and xfail reasons, parameter column names and values, attachments and error messages.
 
-The rules follow CommonMark for the forms you usually write:
+Spans are read as [CommonMark](https://spec.commonmark.org/0.31.2/#emphasis-and-strong-emphasis) reads them, with these differences:
 
-- **Code:** a backtick, at least one character, and the next backtick, neither of them part of a run like ` `` `. What's inside shows as written.
-- **Bold and italic:** `**text**` and `*text*`. The opening marker must be followed by a non-space and the closing marker preceded by one, so `2 * 3 * 4` stays as written. Next to punctuation, a marker follows CommonMark's [flanking rules](https://spec.commonmark.org/0.31.2/#left-flanking-delimiter-run): `**(text)**` is bold after a space, but not directly after a letter. A run of three or more asterisks, as in `***text***`, shows as written.
+- **Code takes single backticks.** A run like ` `` ` shows as written.
 - **Underscores never format**, so `__init__`, `_private_` and `snake_case` show as written.
-- **One level:** bold and italic can contain code, but nothing else. Code comes first, so the `*` in ``*matches `*.py`*`` doesn't end the italic. Otherwise spans never overlap: the first one to close wins.
-- **Everything else is literal**, including unmatched markers and backslashes. There is no escape syntax: to show a marker, put it in a code span.
+- **One level:** bold and italic can contain code, but nothing else.
+- **No escapes:** a backslash shows as written. To show a marker, put it in a code span.
 
-Markdown is read only in the text you write, never in a value or a term ref: a value such as `'*'` is always just an asterisk. So a span can't hold one. `t'**{guest}** books'` or ``t'`run {command}`'`` raises `PytestGivenError`, since its markers would show as written. Keep the span within the text beside it, as in ``t'`run` {command}'``.
+Markdown is read only in the text you write, never in a value or a term ref: a value such as `'*'` is always just an asterisk. So a span can't hold a value or a term ref. `t'**{guest}** books'` or ``t'`run {command}`'`` raises `PytestGivenError`, since its markers would show as written. Keep the span within the text beside it, as in ``t'`run` {command}'``.
 
 ## Template placeholders
 
 `pytest_given.Template` only accepts plain names: `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`) and other expressions (`{x + 1}`) raise `PytestGivenError` when the `Template` is created.
 
 Instead, parametrize by the attribute values directly, or move the step into the test body and use a t-string, which allows any expression.
-
-A spec can also word a Boolean, as described in [Boolean phrases](#boolean-phrases).
 
 ## Boolean phrases
 
@@ -64,9 +61,8 @@ This works in a t-string and in a `Template`. The two phrases should complete th
 
 - **Phrases are literal.** Spaces around each phrase are removed. A phrase holds no Markdown and no term ref.
 - **An apostrophe needs double quotes.** `t'{pinned:doesn't pin it|pins it}'` is a Python syntax error, so write `t"{pinned:doesn't pin it|pins it}"`.
-- **Only a `bool` can take phrases.** Any other value, or a conversion such as `!r`, raises `PytestGivenError`. A t-string step or a `Template` on a helper fails its test. A `Template` in `@scenario(...)` or `Annotated[..., given(...)]` fails the run when a case passes with that value, or for any case under `group_parametrized=False`. See [rule 7](parametrized.md#rejected-authoring-forms).
-- **The two phrases must differ.** `{flag:a|a}` raises `PytestGivenError`.
-- **The shape is reserved.** Any spec with one `|` and text on both sides counts as phrases, so `{when:%H|%M}` on a `datetime` raises. Assign the text to a local variable (`clock = when.strftime('%H|%M')`) and use `{clock}` instead. A fill character such as `{count:|>5}` has no text before the `|`, so it still works.
+- **Only a `bool` can take phrases**, and the two phrases must differ. Anything else, or a conversion such as `!r`, raises `PytestGivenError`.
+- **The shape is reserved.** A spec like `{when:%H|%M}` on a `datetime` reads as phrases and raises. Format the text into a local variable first (`clock = when.strftime('%H|%M')`) and use `{clock}`.
 
 ## Template or t-string
 

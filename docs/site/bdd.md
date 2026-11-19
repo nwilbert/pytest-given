@@ -66,12 +66,7 @@ pytest-given has no rules. [Domain Storytelling](guide/domain-storytelling.md) p
 
 ## Running it
 
-In the pytest-given repository, `uv run nox -s bdd_example` runs the [pytest-bdd example](https://github.com/nwilbert/pytest-given/tree/main/examples/pytest-bdd). In that run:
-
-1. When pytest imports `test_coffee.py`, `scenarios('coffee.feature')` reads the feature file and generates one test per scenario, here `test_buying_a_coffee_takes_one_from_the_machine`.
-2. That test walks the scenario's lines in order and looks up a step definition for each by its text. `a coffee machine with 10 coffees` matches the `@given` pattern, which parses `10` into the `coffees` argument. Through `target_fixture`, the step's return value becomes the `machine` fixture.
-3. The `@when` and `@then` steps take `machine` like any fixture, and the `then` step's `assert` decides the outcome. A line that matches no step definition fails the test with `StepDefinitionNotFoundError`.
-4. The `@checkout` tag becomes a pytest mark, so `-m checkout` selects the scenario. The example's [`conftest.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/pytest-bdd/conftest.py) registers that mark, since pytest warns about an unregistered one.
+In the pytest-given repository, `uv run nox -s bdd_example` runs the [pytest-bdd example](https://github.com/nwilbert/pytest-given/tree/main/examples/pytest-bdd). `scenarios('coffee.feature')` generates one test per scenario, here `test_buying_a_coffee_takes_one_from_the_machine`, and the `@checkout` tag becomes a pytest mark, so `-m checkout` selects it.
 
 The session passes `--gherkin-terminal-reporter`, so the output replays the scenario's lines:
 

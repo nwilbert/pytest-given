@@ -12,7 +12,7 @@ What the agent itself gets out of it:
 - **Specs that stay true.** A design spec the agent writes can [cite](guide/citations.md) the scenarios that implement it. `pytest-given citations check` fails CI when one of them stops passing or disappears, so the spec doesn't drift from the code the way separate documentation does.
 - **Early, typed errors.** Misusing a step-text form (a t-string on a decorator, a `Template` in a test body) raises `PytestGivenError` immediately with a clear message — cheap for an agent to learn from.
 
-Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; the bundled [authoring skill](https://github.com/nwilbert/pytest-given/blob/main/src/pytest_given/.agents/skills/pytest-given-authoring/SKILL.md) ships a battle-tested set of rules for keeping narration truthful.
+Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a sixth of its tests. Codify your narration conventions where agents will read them; the bundled [authoring skill](https://github.com/nwilbert/pytest-given/blob/main/src/pytest_given/.agents/skills/pytest-given-authoring/SKILL.md) ships a battle-tested set of rules for keeping narration truthful.
 
 ## Agent skills
 

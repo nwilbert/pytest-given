@@ -23,7 +23,9 @@ book = g('book', definition='Reserve a **room** for a stay.')
 
 A definition can use [bold, italic, code and line breaks](step-text.md#formatting). Bold marks a reference to another term: in the report, `**room**` shows the Room term's definition on hover and opens its entry in the Glossary tab when clicked. A bold word matches a term's name or its [S-form](#term-refs) in any case, so `**Rooms**` works too. Use italics for emphasis, because the lint flags a bold word that names no term ([`unresolved-definition-ref`](../configuration/narration-lint.md)).
 
-Each call returns a **handle**. If the term already exists, `g(...)` returns its handle. To only look up a term, use `g['Guest']`, which raises an error if the term doesn't exist.
+Each call returns a **handle**. Declaring a term again with the same arguments returns its handle. A different kind, definition, section or avoided words raises an error. To only look up a term, use `g['Guest']`, which raises an error if the term doesn't exist.
+
+Every declared term appears in the report, whether a test uses it or not.
 
 ## Term refs
 
@@ -33,7 +35,7 @@ A term ref has four forms. Use the simplest one that fits your sentence:
 
 - **`{guest}`** shows the term as declared: *Guest*.
 - **`{guest.l}`** shows the term in lowercase: *guest*. This is the usual form in the middle of a sentence. Only capitalized words are lowercased, so acronyms keep their case: `LLM Call` reads *LLM call*.
-- **`{room.s}`** shows the term's **S-form**: the plural of a noun (*Rooms*), or the third person singular of a verb (`book.s` reads *books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies. Anything else, such as *people* or *checks in*, takes the called form.
+- **`{room.s}`** shows the term's **S-form**: the plural of a noun (*Rooms*), or the third person singular of a verb (`book.s` reads *books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies. An irregular form, such as *people* or *checks in*, needs the called form below.
 - **`guest('Alice')`** shows any other text: an irregular form (`person('people')`), another verb form (`search('searches for')`), or a specific instance (`guest('Alice')`). Don't write `guest('Guest')`, `guest('guest')` or `room('rooms')`; use `{guest}`, `{guest.l}` or `{room.l.s}` instead. The Glossary tab lists every called form of a term under *Other forms*, whether it names an instance or is another form of the word.
 
 `.l` and `.s` chain and also apply to the called form: `{room.l.s}` reads *rooms*, `{room('suite').s}` reads *suites*. All forms work on every handle, including handles you look up by name.
@@ -62,7 +64,7 @@ from pytest_given import TableGlossary
 g = TableGlossary(Path(__file__).parent / 'GLOSSARY.md')
 ```
 
-The file needs at least one Markdown table (a GFM pipe table). pytest-given reads the tables a GFM renderer shows, including one in a blockquote or a list but not one in a code or HTML block, and a cell missing from a row reads as empty. Every table is read, except one whose header lacks a column you select by name. By default, the first column is the term and the second is its definition. To use other columns, pass `term_column`, `definition_column`, `kind_column` or `avoid_column`. Each takes a column number (starting at 0) or a header name (case-insensitive):
+The file needs at least one pipe table. Every table is read, except one whose header lacks a column you select by name. By default, the first column is the term and the second is its definition. To use other columns, pass `term_column`, `definition_column`, `kind_column` or `avoid_column`. Each takes a column number (starting at 0) or a header name (case-insensitive):
 
 ```python
 g = TableGlossary(
@@ -109,9 +111,9 @@ from pytest_given import ParagraphGlossary
 g = ParagraphGlossary(Path(__file__).parent / 'GLOSSARY.md')
 ```
 
-- **A term paragraph starts with a term line:** a line that opens with the term's name in bold, followed directly by a colon, as in `**Order**:`. In `**Order:**` the colon sits inside the bold, so the line is no term line. The term paragraph ends at the next term line or at the end of the paragraph, so two terms with no blank line between them are still two terms.
-- **The definition** is the rest of the term paragraph. It starts on the term line after the colon or on the next line. Its line breaks become spaces, as GitHub shows them. A `<br>`, or a backslash or two spaces at the end of a line, is a line break.
-- **An avoid line** starts with `_Avoid_:` or `*Avoid*:` and lists the term's [avoided words](#avoided-words), separated by commas. A list too long for one line can wrap onto the term paragraph's next lines.
+- **A term paragraph starts with a term line:** a line that opens with the term's name in bold, followed directly by a colon, as in `**Order**:`. The term paragraph ends at the next term line or at the end of the paragraph.
+- **The definition** is the rest of the term paragraph, on the term line or the lines below it. Its line breaks show as GitHub shows them.
+- **An avoid line** starts with `_Avoid_:` or `*Avoid*:` and lists the term's [avoided words](#avoided-words), separated by commas.
 - **Everything else is prose**, which pytest-given ignores: the title, the description under it, any text before a paragraph's first term line, lists and blockquotes. A heading reading `Relationships` or `Flagged ambiguities` starts a part that is ignored too, up to the next heading of the same or a higher level.
 
 The format has no place for a kind, so a term in it gets its kind from [kind inference](domain-storytelling.md#kind-inference) or stays kindless.
@@ -128,15 +130,13 @@ room = g.work_object('Room', definition='A bookable hotel room.')
 book = g.activity('book', definition='Reserve a room for a stay.')
 ```
 
-In a `TableGlossary`, the kinds come from the column you pass as `kind_column`.
+In a `TableGlossary`, the kinds come from the column you pass as `kind_column`. A kind cell reads `actor`, `work object` (or `work_object`, `object`) or `activity`, in any case. An empty cell leaves the term without a kind, and any other text raises an error.
 
 If you don't declare a kind, pytest-given [infers it](domain-storytelling.md#kind-inference) from the story sentences that use the term. A term that gets no kind either way is **kindless**. The report shows it in a neutral color and lists it under **Uncategorized** when the Glossary tab groups terms by kind.
 
 ## Undefined terms
 
 A term without a `definition=` is **undefined**. The Glossary tab marks it with an *Undefined* badge and can filter for these terms.
-
-Every declared term appears in the report, whether a test uses it or not.
 
 ## Glossary sections
 
@@ -157,13 +157,12 @@ clerk = g.actor('Clerk', definition='Staff at the front desk.')  # no section
 
 Look up a term on the glossary, whatever its section: `g['Guest']`. Calling `g.section('Booking')` again, in the same module or another, adds to the same section. Section names are compared as written, so `Booking` and `booking` are two sections.
 
-In a Markdown glossary, a term's section is the nearest heading above its table or term paragraph, with its formatting removed. A heading is a line starting with `#` to `######`, or a line underlined with `===` or `---`. A heading inside a list or a blockquote doesn't count. These headings name no section:
+In a Markdown glossary, a term's section is the nearest heading above its table or term paragraph, with its formatting removed. Two headings name no section:
 
-- **The title:** a file's only level-1 heading. A file with several level-1 headings has no title, and each of them names a section.
-- **`Language` and `Terms`** in a `ParagraphGlossary`, in any case. They hold the terms rather than group them.
-- **An empty heading**, such as a lone `##`.
+- **The title:** a file's only level-1 heading.
+- **`Language` and `Terms`** in a `ParagraphGlossary`. They hold the terms rather than group them.
 
-A term above every qualifying heading has no section. Two headings with the same text name one section.
+A term above every other heading has no section. Two headings with the same text name one section.
 
 The [paragraph-glossary example](https://github.com/nwilbert/pytest-given/blob/main/examples/paragraph-glossary/GLOSSARY.md) puts its terms under `###` sections inside `## Language`, and the hotel-booking example declares its sections in [code](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py). Their reports group the Glossary tab by section: [paragraph-glossary](../examples/paragraph-glossary.html){ target=_blank }, [hotel-booking](../examples/hotel-booking.html){ target=_blank }.
 
@@ -181,7 +180,6 @@ A `TableGlossary` reads them from its `avoid_column`, a `ParagraphGlossary` from
 
 - **An entry may end with a note** in parentheses, as in `Reservation (in partner APIs only)`. The card shows the whole entry, and the lint matches only the text before the note. An entry that is only a note raises an error.
 - **An entry shows its [formatting](step-text.md#formatting)** on the card, but a bold word in it links no term.
-- **A repeated entry is dropped.** Two entries of one term repeat when their words match, ignoring case, notes, and a hyphen in place of a space.
 - **An avoided word may not name a term** of the same glossary, by its name or its [S-form](#term-refs), in any case. A glossary that avoids `Booking` while it defines `Booking` or `Bookings` raises an error.
 - **Several terms may avoid the same word.** The lint then names each of them, and you pick the one the step means.
 

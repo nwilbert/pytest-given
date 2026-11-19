@@ -2,7 +2,7 @@
 
 `attach(label, content)`
 
-Attach data to the current step. Strings are stored as they are; other values are stored as JSON.
+Attach data to the current step. Strings are stored as they are, and other values as JSON. A value JSON can't hold, such as a `datetime`, shows as its `str()`.
 
 ```python
 attach('Receipt', 'Coffee x1     $2.00')             # text
