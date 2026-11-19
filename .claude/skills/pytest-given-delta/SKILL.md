@@ -16,7 +16,7 @@ To publish a delta with each release:
 - Start the first delta at the previous release tag.
 - Start each later delta at the commit the last published one ended at, its *after* commit (`.metadata.after.metadata.commit_sha` in its JSON).
 - Skip a release whose delta lists no change. The next delta then starts at the last published one.
-- For a release not tagged yet, pass `--after-label v<version>`.
+- A side's label is the tag on its commit. For a commit without one, such as a release not tagged yet, pass `--before-label` or `--after-label v<version>`.
 - Pass `--title` naming the product and the release, in words its stakeholders know: `--title "Hotel booking changes for v2.4"`. It defaults to the after report's title.
 
 ## Getting the two reports
@@ -31,18 +31,20 @@ Both must come from full runs: a scenario that a partial run left out reads as r
 - Unset `GITHUB_SHA`, `CI_COMMIT_SHA` and `BUILDKITE_COMMIT` for that run, or a report built inside CI carries the current commit's SHA.
 - Run `pytest-given delta` from the current checkout, so it reads the current rename log.
 
-**One pytest-given and one pytest version for both.** Another version can narrate a test or name its cases differently. On a schema version refusal or a version warning, regenerate the older report in its worktree's own environment, with the current versions installed in place of its lockfile's. When the older suite can't run under the current pytest-given, because the public API changed, no delta spans that change: say so.
+**One pytest-given and one pytest version for both.** Another version can narrate a test or name its cases differently. On a schema version refusal or a version warning, regenerate the older report in its worktree's own environment, with the current versions installed in place of its lockfile's. Under uv, run it with `uv run --no-sync`: a plain `uv run` reinstalls the locked versions. If the older suite can't run under the current pytest-given, convert the older JSON report by hand instead, with a scratch script that applies the changelog's breaking changes to the JSON report, until `pytest-given delta` reads it. If that fails too, no delta spans the change: say so.
 
 ## Triage
 
 These are rename candidates:
 
 - every suggested match, in the delta JSON's `.suggestions[]` (`of` is `scenario`, `case` or `term`)
-- a removed scenario and an added one in the same module
+- a removed scenario and an added one in the same module, or in a module split off from it
 - a removed term and an added one of the same kind, or one of them kindless
 - a removed case and an added case of a paired scenario, whose generated case IDs differ
 
-Resolve each from git: `git diff --find-renames BEFORE_SHA..AFTER_SHA`, and `git log --follow -- <test file>`. Find the commit with `git log -S '<function name>'` for a function, or `git log --diff-filter=R --stat` for a moved file. Then read both sides' steps and test bodies: a rename states the same rule, not a similar one or its opposite. Add an entry for each confirmed rename, and leave a genuine removal alone. Without a commit SHA in a report, git can't help: tell the human which pairs you couldn't resolve.
+Resolve the terms first: a renamed term changes every scenario that refers to it.
+
+Resolve each from git: `git diff --find-renames BEFORE_SHA..AFTER_SHA`, and `git log --follow -- <test file>`. Find the commit with `git log -S '<function name>'` for a function, or `git log --diff-filter=R --stat` for a moved file. Then read both sides' steps and test bodies: a rename states the same rule, not a similar, narrower or broader one, or its opposite. Add an entry for each confirmed rename, and leave a genuine removal alone. Without a commit SHA in a report, git can't help: tell the human which pairs you couldn't resolve.
 
 If Markdown documents cite the report, run `pytest-given citations check` after a rename. Fix its citation findings as the `pytest-given-citing` skill does: `citations update` for a renamed test whose title one scenario still has, its repair guide for a target not in the report.
 
