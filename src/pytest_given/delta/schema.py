@@ -349,6 +349,10 @@ class DeltaSide:
     metadata: Metadata
     label: str | None = None
     modules: tuple[str, ...] = ()
+    report_file: Annotated[
+        str | None,
+        SchemaDoc("The compared report's file name, without the directories."),
+    ] = None
 
 
 @dataclass(frozen=True, kw_only=True)

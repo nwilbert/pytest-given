@@ -51,17 +51,66 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta .scenario.multi-case > .scenario-header::before,
 .delta .entry::before { background: var(--change-line); }
 
-/* The compared sides, the page's subject: spaced off from the run meta, each
-   side's name in the title's colour, then its SHA or time. */
+/* The compared sides, the page's subject: each side's name in the title's
+   colour, the arrow's margins between them. A rule parts them from the
+   delta's own version. */
 .delta-range {
-  margin: 0 var(--space-md) 0 0;
+  margin: 0;
   white-space: nowrap;
 }
+.delta-range-side {
+  position: relative;
+  border-radius: var(--radius-sm);
+  cursor: default;
+}
+.delta-range-side:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .delta-range-name {
   font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-primary);
 }
+.delta .topbar-version {
+  padding-left: var(--space-md);
+  border-left: 1px solid var(--border);
+  line-height: 16px;
+}
+/* A side's run in full: the term tooltip's inverted sheet, hung from the
+   side's right edge, so it opens away from the window's.
+   Under a heading naming the side, a row per fact: its label in a quiet
+   column, its value beside it. */
+.delta-range-tip {
+  position: absolute;
+  top: calc(100% + var(--space-sm));
+  right: 0;
+  z-index: 1000;
+  display: none;
+  grid-template-columns: max-content max-content;
+  column-gap: var(--space-md);
+  row-gap: 1px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--text-primary);
+  color: var(--bg-surface);
+  box-shadow: var(--shadow-tip);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  text-align: left;
+  pointer-events: none;
+}
+/* One tip at a time: the hovered side's over a focused one's. */
+.delta-range-side:is(:hover, :focus-visible) .delta-range-tip { display: grid; }
+.delta-range:hover .delta-range-side:not(:hover) .delta-range-tip { display: none; }
+.delta-range-tip-head {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-xs);
+  font-size: var(--font-size-base);
+}
+.delta-range-tip-name { font-weight: 700; }
+.delta-range-tip-name + span { margin-left: var(--space-xs); opacity: 0.72; }
+.delta-range-row { display: contents; }
+.delta-range-row > :first-child { opacity: 0.72; }
+/* Source Code Pro runs larger than Source Sans at one size. */
+.delta-range-sha { font-family: var(--font-mono); font-size: 0.92em; }
 .delta-range-to { font-size: 0; }
 .delta-range-to::before {
   content: "\2192" / "";

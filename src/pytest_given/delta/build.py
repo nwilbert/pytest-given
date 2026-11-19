@@ -71,6 +71,8 @@ class DeltaInputs:
     skipped_revs: frozenset[str] = frozenset()
     before_label: str | None = None
     after_label: str | None = None
+    before_file: str | None = None
+    after_file: str | None = None
     title: str | None = None
     plugin_version: str
     timestamp: str
@@ -133,8 +135,8 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
     suggested = suggest(listed, terms.delta, before_reading, after_reading)
     delta = DeltaData(
         metadata=DeltaMetadata(
-            before=_side(before, inputs.before_label),
-            after=_side(after, inputs.after_label),
+            before=_side(before, inputs.before_label, inputs.before_file),
+            after=_side(after, inputs.after_label, inputs.after_file),
             plugin_version=inputs.plugin_version,
             timestamp=inputs.timestamp,
             title=inputs.title,
@@ -155,11 +157,12 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
     )
 
 
-def _side(report: ReportData, label: str | None) -> DeltaSide:
+def _side(report: ReportData, label: str | None, file: str | None) -> DeltaSide:
     return DeltaSide(
         metadata=report.metadata,
         label=label,
         modules=tuple(dict.fromkeys(scenario.module for scenario in report.scenarios)),
+        report_file=file,
     )
 
 

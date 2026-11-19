@@ -534,10 +534,16 @@ def _regenerate_examples(session: nox.Session) -> None:
 _DELTA_EXAMPLE = Path('examples/delta')
 _DELTA_EXAMPLE_JSON = _DELTA_EXAMPLE / 'delta-data.json'
 _DELTA_EXAMPLE_FILE = 'test_delta_booking.py'
-# Unset for the staged runs, so both see the same commit whatever CI exports.
-# A copy of `git/commands.py`'s, since nox runs without the package; a test
-# holds the two equal.
+# Unset for the staged runs, whatever CI exports, but the first: it hands each
+# run its side's made-up commit, as a real pair of runs would record one. The
+# rename log names no `rev`, so the delta never asks git about them. A copy of
+# `git/commands.py`'s, since nox runs without the package; a test holds the
+# two equal.
 _COMMIT_ENV_VARS = ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT')
+_DELTA_EXAMPLE_SHAS = {
+    'before': 'e13e037f15df9e15ad79727d874f8457819b872c',
+    'after': 'f801e68a529717ed6f9f00492be6753acc62e9c0',
+}
 
 
 def _regenerate_delta_example(session: nox.Session) -> None:
@@ -573,7 +579,10 @@ def _regenerate_delta_example(session: nox.Session) -> None:
                     '--tb=no',
                     '--no-header',
                     '-q',
-                    env=dict.fromkeys(_COMMIT_ENV_VARS),
+                    env={
+                        **dict.fromkeys(_COMMIT_ENV_VARS),
+                        _COMMIT_ENV_VARS[0]: _DELTA_EXAMPLE_SHAS[side],
+                    },
                     success_codes=[0, 1],
                 )
             finally:

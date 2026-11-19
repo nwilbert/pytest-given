@@ -13,7 +13,7 @@
 <div class="main">
 
   {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, nav_tab, reason_box, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar, scenario_disclosure, toggle_all_terms_button, term_tip with context -%}
-  {%- from '_delta_macros.html.j2' import change_filter, changed_in_filter, term_card, delta_sides with context -%}
+  {%- from '_delta_macros.html.j2' import change_filter, changed_in_filter, term_card, delta_sides, tip_row with context -%}
   {{ icon_sprite() }}
 
   {#- The Glossary tab only when a term is listed; no Stories tab. -#}
@@ -27,15 +27,25 @@
     </nav>
     {% endif %}
     <div class="topbar-meta">
-      {#- The two compared sides, each its name and its SHA or time. The
+      {#- The two compared sides by name, each one's run in full in a tooltip
+          on hover or focus: a heading, then a labelled row per fact. The
           arrow is drawn by CSS over a zero-size " to ", so a screen reader
           and a copy get one line. Inline throughout: a block box would break
-          that line. #}
+          that line, and a `<p>` ends at one. #}
       <p class="delta-range">
         {%- for side in range %}
         {%- if not loop.first %}<span class="delta-range-to"> to </span>{% endif -%}
-        <span class="delta-range-name">{{ side.name }}</span>
-        {%- if side.detail %} <span class="delta-range-detail">{{ side.detail }}</span>{% endif %}
+        <span class="delta-range-side" tabindex="0" aria-describedby="range-tip-{{ side.side }}">
+          {#- -#}<span class="delta-range-name">{{ side.name }}</span>
+          <span class="delta-range-tip" id="range-tip-{{ side.side }}" role="tooltip">
+            {#- -#}<span class="delta-range-tip-head"><span class="delta-range-tip-name">{{ side.name }}</span> <span>{{ side.side }}</span></span>
+            {%- if side.commit_sha %}{{ tip_row('Commit', side.commit_sha, 'delta-range-sha') }}{% endif %}
+            {{- tip_row('Run', side.ran_at) }}
+            {%- if side.report_file %}{{ tip_row('File', side.report_file) }}{% endif %}
+            {{- tip_row('Report', side.report_title ~ ', ' ~ side.scenario_count ~ (' scenario' if side.scenario_count == 1 else ' scenarios')) }}
+            {{- tip_row('Tools', 'pytest ' ~ side.pytest_version ~ ', pytest-given ' ~ side.plugin_version) }}
+          {#- -#}</span>
+        {#- -#}</span>
         {%- endfor %}
       </p>
       <span class="topbar-version">pytest-given {{ plugin_version }}</span>

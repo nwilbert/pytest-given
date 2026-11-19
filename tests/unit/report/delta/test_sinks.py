@@ -55,26 +55,48 @@ def test_a_listed_scenario_is_shown_from_its_after_side_or_its_before_side_if_re
 
 
 @pytest.mark.parametrize(
-    ('label', 'sha', 'expected'),
+    ('label', 'sha', 'name'),
     [
-        ('v0.6.0', 'e4f5a6b7c8d9', RangeSide('v0.6.0', 'e4f5a6b')),
-        (None, 'e4f5a6b7c8d9', RangeSide('e4f5a6b')),
-        (None, None, RangeSide('2026-01-01 00:00')),
-        ('v0.6.0', None, RangeSide('v0.6.0', '2026-01-01 00:00')),
+        ('v0.6.0', 'e4f5a6b7c8d9', 'v0.6.0'),
+        (None, 'e4f5a6b7c8d9', 'e4f5a6b'),
+        (None, None, '2026-01-01 00:00'),
     ],
 )
-def test_a_range_side_is_named_by_its_label_short_sha_or_timestamp_to_the_minute(
-    label: str | None, sha: str | None, expected: RangeSide
+def test_a_range_side_is_named_by_its_label_else_its_short_sha_else_its_run_time(
+    label: str | None, sha: str | None, name: str
 ) -> None:
     delta = built_delta(report(sha=sha), report(sha=sha), before_label=label)
-    assert range_side(delta.metadata.before) == expected
+    assert range_side(delta, 'before').name == name
+
+
+def test_a_range_side_s_tooltip_holds_its_run_in_full() -> None:
+    before = report(scn('t.py::test_pay', 'Pay'), scn('t.py::test_gone', 'Gone'))
+    after = ReportData(
+        metadata=meta('e4f5a6b7c8d9', title='Shop'),
+        scenarios=[scn('t.py::test_pay', 'Pay')],
+    )
+    delta = built_delta(before, after, after_label='v2')
+    assert range_side(delta, 'after') == RangeSide(
+        side='after',
+        name='v2',
+        commit_sha='e4f5a6b7c8d9',
+        ran_at='2026-01-01 00:00 UTC',
+        report_file=None,
+        report_title='Shop',
+        scenario_count=1,
+        pytest_version='9.0.0',
+        plugin_version='0.1.0',
+    )
+    assert range_side(delta, 'before').report_title == 'project'
+    assert range_side(delta, 'before').scenario_count == 2
 
 
 def test_the_header_shows_the_range_the_delta_s_version_and_the_after_title() -> None:
     before = report(sha='a1b2c3d4')
     after = ReportData(metadata=meta('e4f5a6b7', title='Shop'), scenarios=[])
     context = delta_render_context(built_delta(before, after, after_label='v2'))
-    assert context['range'] == (RangeSide('a1b2c3d'), RangeSide('v2', 'e4f5a6b'))
+    assert isinstance(context['range'], tuple)
+    assert [side.name for side in context['range']] == ['a1b2c3d', 'v2']
     assert context['plugin_version'] == '0.1.0'
     assert context['title'] == 'Shop'
 

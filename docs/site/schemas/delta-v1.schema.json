@@ -404,12 +404,25 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "report_file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The compared report's file name, without the directories."
         }
       },
       "required": [
         "metadata",
         "label",
-        "modules"
+        "modules",
+        "report_file"
       ],
       "type": "object"
     },

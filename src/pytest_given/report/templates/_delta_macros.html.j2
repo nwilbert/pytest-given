@@ -2,7 +2,8 @@
   What the delta page adds to the report's macros: the Change and Changed in
   filters, a changed scenario's two sides (the report's phase blocks and
   step lines, each step's change marked on its side, styled as
-  `.delta-step`, and the parameter tables), and a listed term's card.
+  `.delta-step`, and the parameter tables), a listed term's card, and a
+  compared side's tooltip row.
 #}
   {%- from '_macros.html.j2' import source_link, anchor_link, term_disclosure, render_step, step_text, step_children, scenario_steps, param_table, attachment_cell, attachment_icon, expandable_attachment, case_extras, case_error_row, attachment_panel_row, status_dot with context -%}
 
@@ -19,6 +20,12 @@
       </div>
       <div class="delta-unchanged">{{ unchanged_count }} unchanged</div>
     </div>
+  {%- endmacro -%}
+
+  {#- A row of a compared side's tooltip: a fact's label and its value,
+      a word space apart for a screen reader. -#}
+  {%- macro tip_row(label, value, value_class=none) -%}
+    <span class="delta-range-row"> <span>{{ label }}</span> <span{% if value_class %} class="{{ value_class }}"{% endif %}>{{ value }}</span></span>
   {%- endmacro -%}
 
   {#- The Changed in filter: a box per changed part, the report's kind

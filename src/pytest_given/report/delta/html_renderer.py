@@ -19,11 +19,11 @@ from ...delta import (
     SIDE_MARK,
     Change,
     DeltaData,
-    DeltaSide,
     Mark,
     Side,
     TextSegment,
     change_counts,
+    on_side,
 )
 from ...markdown import definition_html
 from ...model import (
@@ -83,7 +83,7 @@ def delta_render_context(
     tips = tip_terms(delta)
     return {
         'title': delta.metadata.title or after.title or after.project,
-        'range': (range_side(delta.metadata.before), range_side(delta.metadata.after)),
+        'range': (range_side(delta, 'before'), range_side(delta, 'after')),
         # The version that built the delta: each side's run has its own.
         'plugin_version': delta.metadata.plugin_version,
         'listed': listed,
@@ -111,20 +111,39 @@ def delta_render_context(
 
 
 class RangeSide(NamedTuple):
+    """A compared side: the header shows its name, its tooltip the rest."""
+
+    side: Side
     name: str
-    detail: str | None = None
+    commit_sha: str | None
+    ran_at: str
+    report_file: str | None
+    report_title: str
+    scenario_count: int
+    pytest_version: str
+    plugin_version: str
 
 
-def range_side(side: DeltaSide) -> RangeSide:
-    """The side's label over its short SHA; the report's timestamp, to the
-    minute, stands in for a SHA it doesn't carry."""
-    sha = side.metadata.commit_sha
-    when = (
-        sha[:_SHORT_SHA]
-        if sha
-        else f'{datetime.fromisoformat(side.metadata.timestamp):%Y-%m-%d %H:%M}'
+def range_side(delta: DeltaData, side: Side) -> RangeSide:
+    """Named by its label, else its short SHA, else its run time."""
+    delta_side = on_side(side, delta.metadata.before, delta.metadata.after)
+    metadata = delta_side.metadata
+    sha = metadata.commit_sha
+    when = datetime.fromisoformat(metadata.timestamp)
+    return RangeSide(
+        side=side,
+        name=delta_side.label
+        or (sha[:_SHORT_SHA] if sha else f'{when:%Y-%m-%d %H:%M}'),
+        commit_sha=sha,
+        ran_at=f'{when:%Y-%m-%d %H:%M %Z}'.rstrip(),
+        report_file=delta_side.report_file,
+        report_title=metadata.title or metadata.project,
+        # Every scenario of the side is listed or unchanged.
+        scenario_count=len(delta.unchanged)
+        + sum(item.on(side) is not None for item in delta.scenarios),
+        pytest_version=metadata.pytest_version,
+        plugin_version=metadata.plugin_version,
     )
-    return RangeSide(side.label, when) if side.label else RangeSide(when)
 
 
 def text_diff(words: tuple[TextSegment, ...], side: Side) -> Markup:

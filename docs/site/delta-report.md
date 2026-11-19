@@ -20,7 +20,7 @@ Build both with the same pytest-given and the same pytest. Another version can n
 
 Both reports must have the report format (the schema version) of the pytest-given that compares them. Otherwise the delta exits 2, and the older report needs regenerating.
 
-Each report carries the commit SHA it ran at. The delta header shows the SHAs and a version label for each side. The label is the git tag on that commit, or what `--before-label` and `--after-label` name. For a release not tagged yet, pass `--after-label v<version>`.
+Each report carries the commit SHA it ran at. The delta header names each side by its version label. The label is the git tag on that commit, or what `--before-label` and `--after-label` name. For a release not tagged yet, pass `--after-label v<version>`. Hover a side for its commit, run time, report file, and pytest and pytest-given versions.
 
 The delta's title is the after report's title. Pass `--title` to name what the delta covers in words its readers know, such as `--title "Hotel booking changes for v2.4"`.
 

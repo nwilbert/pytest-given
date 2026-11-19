@@ -10,11 +10,7 @@ from pytest_given.cli import main
 from pytest_given.delta import delta_from_dict
 from pytest_given.model import Glossary, ReportData, report_to_dict
 from pytest_given.report import DEFAULT_DELTA_HTML_PATH, DEFAULT_DELTA_JSON_PATH
-from pytest_given.report.delta.html_renderer import (
-    RangeSide,
-    delta_render_context,
-    range_side,
-)
+from pytest_given.report.delta.html_renderer import delta_render_context
 from tests.git_repo import GitRepo
 from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import meta, report, scn, step, term
@@ -471,7 +467,6 @@ def test_a_before_report_without_a_sha_applies_every_entry_with_one_warning(
     )
     delta = delta_from_dict(_read_delta())
     assert [item.change for item in delta.scenarios] == ['changed']
-    assert range_side(delta.metadata.before) == RangeSide('2026-01-01 00:00')
 
 
 def test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed(
@@ -480,14 +475,23 @@ def test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed(
     monkeypatch.chdir(git_repo.path)
     inputs = _write_pair(report(sha=git_repo.first), report(sha=git_repo.head))
     assert main(['delta', *inputs]) == 0
-    context = delta_render_context(delta_from_dict(_read_delta()))
-    assert context['range'] == (
-        RangeSide('v1', git_repo.first[:7]),
-        RangeSide('v1.10', git_repo.head[:7]),
-    )
+    metadata = delta_from_dict(_read_delta()).metadata
+    assert [metadata.before.label, metadata.after.label] == ['v1', 'v1.10']
     assert main(['delta', *inputs, '--after-label', 'next']) == 0
-    delta = delta_from_dict(_read_delta())
-    assert range_side(delta.metadata.after) == RangeSide('next', git_repo.head[:7])
+    assert delta_from_dict(_read_delta()).metadata.after.label == 'next'
+
+
+def test_each_side_records_its_report_s_file_name(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    Path('runs').mkdir()
+    assert main(['delta', *_write_pair(report(), report(), Path('runs'))]) == 0
+    metadata = delta_from_dict(_read_delta()).metadata
+    assert [metadata.before.report_file, metadata.after.report_file] == [
+        'before.json',
+        'after.json',
+    ]
 
 
 @scenario(

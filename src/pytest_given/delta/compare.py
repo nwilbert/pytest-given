@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 from importlib.metadata import version
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from ..git import tags_by_commit
 from ..model import JsonObject, report_from_dict
@@ -46,6 +46,8 @@ def compare_reports(
             skipped_revs=skipped_revs,
             before_label=before_label,
             after_label=after_label,
+            before_file=PurePosixPath(before_source).name,
+            after_file=PurePosixPath(after_source).name,
             title=title,
             plugin_version=version('pytest-given'),
             timestamp=datetime.now(tz=UTC).isoformat(),
