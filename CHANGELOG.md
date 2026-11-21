@@ -24,6 +24,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
+- pytest-given's development status is now Beta.
 - pytest-given now depends on Pydantic 2.12 or later.
 - **Breaking.** `pytest-given report` and `pytest-given citations` refuse a JSON report of another schema version or with an unknown key, which includes every report written by 0.6.0 or earlier. Regenerate the report under the current pytest-given.
 - **Breaking.** The JSON report has no top-level `coverage` section. Read story coverage from `pytest-given coverage report.json` instead.
