@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-14T15:47:15.630513+00:00",
+    "timestamp": "2026-11-21T06:46:15.594677+00:00",
     "pytest_version": "9.2.0",
-    "plugin_version": "0.5.2",
-    "commit_sha": "5bf67439234c7253e0c64f4dfe13c06bdb7efd9d",
+    "plugin_version": "0.6.0",
+    "commit_sha": "f01511c10c76722c1a60f6cfeace75fbcbcec0a8",
     "title": "Paragraph Glossary Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html"
   },
