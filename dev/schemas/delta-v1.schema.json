@@ -1,0 +1,1742 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nwilbert.github.io/pytest-given/latest/schemas/delta-v1.schema.json",
+  "$defs": {
+    "Attachment": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "content_type": {
+          "$ref": "#/$defs/ContentType",
+          "default": "text"
+        }
+      },
+      "required": [
+        "label",
+        "content",
+        "content_type"
+      ],
+      "type": "object"
+    },
+    "AttachmentChange": {
+      "enum": [
+        "equal",
+        "changed",
+        "added",
+        "removed"
+      ],
+      "type": "string"
+    },
+    "AttachmentDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "change": {
+          "$ref": "#/$defs/AttachmentChange"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Its index among its step's attachments."
+        },
+        "after": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Its index among its step's attachments."
+        },
+        "lines": {
+          "default": [],
+          "description": "The line diff of a changed pair of payloads.",
+          "items": {
+            "$ref": "#/$defs/LineDelta"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "change",
+        "before",
+        "after",
+        "lines"
+      ],
+      "type": "object"
+    },
+    "AttachmentRef": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "content_type": {
+          "$ref": "#/$defs/ContentType"
+        },
+        "column_id": {
+          "description": "The parameter column whose cells hold the content, which varies by case.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "content_type",
+        "column_id"
+      ],
+      "type": "object"
+    },
+    "CasePair": {
+      "additionalProperties": false,
+      "properties": {
+        "before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "after": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "paired_by": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CasePairing"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "changed_cells": {
+          "default": [],
+          "description": "The after side's IDs of the paired columns whose cells changed.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "changed_attachments": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CellDelta"
+          },
+          "type": "array"
+        },
+        "id_changed": {
+          "default": false,
+          "type": "boolean"
+        },
+        "status_changed": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "before",
+        "after",
+        "paired_by",
+        "changed_cells",
+        "changed_attachments",
+        "id_changed",
+        "status_changed"
+      ],
+      "type": "object"
+    },
+    "CasePairing": {
+      "enum": [
+        "rename-log",
+        "case-id",
+        "values"
+      ],
+      "type": "string"
+    },
+    "CellDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "description": "The after side's column ID.",
+          "type": "string"
+        },
+        "lines": {
+          "items": {
+            "$ref": "#/$defs/LineDelta"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "column",
+        "lines"
+      ],
+      "type": "object"
+    },
+    "CellValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ParamValue"
+        },
+        {
+          "$ref": "#/$defs/Attachment"
+        }
+      ]
+    },
+    "Change": {
+      "enum": [
+        "added",
+        "removed",
+        "changed"
+      ],
+      "type": "string"
+    },
+    "ChangedPart": {
+      "enum": [
+        "title",
+        "steps",
+        "tags",
+        "status",
+        "parameters",
+        "attachments"
+      ],
+      "type": "string"
+    },
+    "ColumnKind": {
+      "enum": [
+        "param",
+        "derived",
+        "attachment"
+      ],
+      "type": "string"
+    },
+    "ColumnPair": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/ColumnKind"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "after": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "paired_by": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ColumnPairing"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "kind",
+        "before",
+        "after",
+        "paired_by"
+      ],
+      "type": "object"
+    },
+    "ColumnPairing": {
+      "enum": [
+        "name",
+        "values"
+      ],
+      "type": "string"
+    },
+    "ContentType": {
+      "enum": [
+        "text",
+        "json"
+      ],
+      "type": "string"
+    },
+    "Definition": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "parts": {
+          "items": {
+            "$ref": "#/$defs/DefinitionPart"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "parts"
+      ],
+      "type": "object"
+    },
+    "DefinitionPart": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NarrationLiteral"
+        },
+        {
+          "$ref": "#/$defs/NarrationTermRef"
+        }
+      ]
+    },
+    "DeltaMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "before": {
+          "$ref": "#/$defs/DeltaSide"
+        },
+        "after": {
+          "$ref": "#/$defs/DeltaSide"
+        },
+        "plugin_version": {
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "kind": {
+          "const": "delta",
+          "default": "delta",
+          "type": "string"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/DeltaSchemaVersion",
+          "default": 1
+        }
+      },
+      "required": [
+        "before",
+        "after",
+        "plugin_version",
+        "timestamp",
+        "title",
+        "kind",
+        "schema_version"
+      ],
+      "type": "object"
+    },
+    "DeltaSchemaVersion": {
+      "const": 1,
+      "type": "integer"
+    },
+    "DeltaSide": {
+      "additionalProperties": false,
+      "properties": {
+        "metadata": {
+          "$ref": "#/$defs/Metadata"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "modules": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "report_file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The compared report's file name, without the directories."
+        }
+      },
+      "required": [
+        "metadata",
+        "label",
+        "modules",
+        "report_file"
+      ],
+      "type": "object"
+    },
+    "DiffSegment": {
+      "additionalProperties": false,
+      "properties": {
+        "mark": {
+          "$ref": "#/$defs/Mark"
+        },
+        "before": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NarrationPart"
+          },
+          "type": "array"
+        },
+        "after": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NarrationPart"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "mark",
+        "before",
+        "after"
+      ],
+      "type": "object"
+    },
+    "ErrorCause": {
+      "additionalProperties": false,
+      "properties": {
+        "frames": {
+          "items": {
+            "$ref": "#/$defs/TracebackFrame"
+          },
+          "type": "array"
+        },
+        "error_tail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "connector": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "frames",
+        "error_tail",
+        "connector"
+      ],
+      "type": "object"
+    },
+    "ErrorInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "frames": {
+          "items": {
+            "$ref": "#/$defs/TracebackFrame"
+          },
+          "type": "array"
+        },
+        "error_tail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "causes": {
+          "items": {
+            "$ref": "#/$defs/ErrorCause"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "message",
+        "frames",
+        "error_tail",
+        "causes"
+      ],
+      "type": "object"
+    },
+    "Glossary": {
+      "additionalProperties": false,
+      "properties": {
+        "terms": {
+          "items": {
+            "$ref": "#/$defs/GlossaryTerm"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "terms"
+      ],
+      "type": "object"
+    },
+    "GlossaryDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Glossary"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Glossary"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "terms": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TermDelta"
+          },
+          "type": "array"
+        },
+        "unchanged": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/IdentityPair"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "before",
+        "after",
+        "terms",
+        "unchanged"
+      ],
+      "type": "object"
+    },
+    "GlossaryTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TermKind"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null when no kind was declared or inferred."
+        },
+        "canonical": {
+          "type": "string"
+        },
+        "definition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Definition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "section": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "avoid": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "canonical",
+        "definition",
+        "source",
+        "section",
+        "avoid"
+      ],
+      "type": "object"
+    },
+    "IdentityPair": {
+      "additionalProperties": false,
+      "properties": {
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "before",
+        "after"
+      ],
+      "type": "object"
+    },
+    "LineChange": {
+      "enum": [
+        "equal",
+        "modified",
+        "removed",
+        "added"
+      ],
+      "type": "string"
+    },
+    "LineDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "change": {
+          "$ref": "#/$defs/LineChange"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The first line's index on its side."
+        },
+        "after": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The first line's index on its side."
+        },
+        "count": {
+          "default": 1,
+          "description": "An equal run's length. 1 for any other change.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "words": {
+          "default": [],
+          "description": "A modified line's word diff.",
+          "items": {
+            "$ref": "#/$defs/TextSegment"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "change",
+        "before",
+        "after",
+        "count",
+        "words"
+      ],
+      "type": "object"
+    },
+    "Mark": {
+      "enum": [
+        "equal",
+        "removed",
+        "added"
+      ],
+      "type": "string"
+    },
+    "Metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "project": {
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "pytest_version": {
+          "type": "string"
+        },
+        "plugin_version": {
+          "type": "string"
+        },
+        "commit_sha": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "report_url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "kind": {
+          "const": "report",
+          "default": "report",
+          "type": "string"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/ReportSchemaVersion",
+          "default": 1
+        }
+      },
+      "required": [
+        "project",
+        "timestamp",
+        "pytest_version",
+        "plugin_version",
+        "commit_sha",
+        "title",
+        "report_url",
+        "kind",
+        "schema_version"
+      ],
+      "type": "object"
+    },
+    "Narration": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "parts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NarrationPart"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "parts"
+      ],
+      "type": "object"
+    },
+    "NarrationLiteral": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "type": "object"
+    },
+    "NarrationPart": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NarrationLiteral"
+        },
+        {
+          "$ref": "#/$defs/NarrationValue"
+        },
+        {
+          "$ref": "#/$defs/NarrationPlaceholder"
+        },
+        {
+          "$ref": "#/$defs/NarrationTermRef"
+        }
+      ]
+    },
+    "NarrationPlaceholder": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "column_id": {
+          "description": "The parameter column whose cells fill it in.",
+          "type": "string"
+        },
+        "format_spec": {
+          "default": "",
+          "type": "string"
+        },
+        "conversion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "column_id",
+        "format_spec",
+        "conversion"
+      ],
+      "type": "object"
+    },
+    "NarrationTermRef": {
+      "additionalProperties": false,
+      "properties": {
+        "term_id": {
+          "type": "string"
+        },
+        "display": {
+          "type": "string"
+        },
+        "expression": {
+          "default": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "term_id",
+        "display",
+        "expression"
+      ],
+      "type": "object"
+    },
+    "NarrationValue": {
+      "additionalProperties": false,
+      "properties": {
+        "rendered": {
+          "type": "string"
+        },
+        "expression": {
+          "type": "string"
+        },
+        "format_spec": {
+          "default": "",
+          "type": "string"
+        },
+        "conversion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "rendered",
+        "expression",
+        "format_spec",
+        "conversion"
+      ],
+      "type": "object"
+    },
+    "ParamValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ParameterCase": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "values": {
+          "description": "One cell per column, in the order of the table's columns. What a cell holds depends on its column's kind. Null is a parametrize value in a param column and no value in any other.",
+          "items": {
+            "$ref": "#/$defs/CellValue"
+          },
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/Status",
+          "default": "passed"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ErrorInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "custom_id": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "values",
+        "status",
+        "error",
+        "custom_id"
+      ],
+      "type": "object"
+    },
+    "ParameterColumn": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ColumnKind"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "ParameterDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/ColumnPair"
+          },
+          "type": "array"
+        },
+        "cases": {
+          "items": {
+            "$ref": "#/$defs/CasePair"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "columns",
+        "cases"
+      ],
+      "type": "object"
+    },
+    "ParameterTable": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/ParameterColumn"
+          },
+          "type": "array"
+        },
+        "cases": {
+          "items": {
+            "$ref": "#/$defs/ParameterCase"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "columns",
+        "cases"
+      ],
+      "type": "object"
+    },
+    "Phase": {
+      "enum": [
+        "given",
+        "when",
+        "then"
+      ],
+      "type": "string"
+    },
+    "Pin": {
+      "additionalProperties": false,
+      "properties": {
+        "story_id": {
+          "type": "string"
+        },
+        "sentence_id": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "story_id",
+        "sentence_id"
+      ],
+      "type": "object"
+    },
+    "ReportSchemaVersion": {
+      "const": 1,
+      "type": "integer"
+    },
+    "Scenario": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The pytest node ID. A grouped parametrized scenario keeps its first case's.",
+          "type": "string"
+        },
+        "narration": {
+          "$ref": "#/$defs/Narration"
+        },
+        "module": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/Status",
+          "default": "passed"
+        },
+        "duration_ms": {
+          "default": 0,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "type": "array"
+        },
+        "parameters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterTable"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ErrorInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Null on a grouped parametrized scenario, whose cases each hold their own."
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Why it was skipped or expected to fail, as its status says. Null for any other status."
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "story_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "pins": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Pin"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Null when nothing pins it. An empty array when pinning turned narration matching off."
+        }
+      },
+      "required": [
+        "id",
+        "narration",
+        "module",
+        "tags",
+        "status",
+        "duration_ms",
+        "steps",
+        "parameters",
+        "error",
+        "reason",
+        "source",
+        "story_ids",
+        "pins"
+      ],
+      "type": "object"
+    },
+    "ScenarioDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "change": {
+          "$ref": "#/$defs/Change"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Scenario"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Scenario"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "paired_by": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScenarioPairing"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "changed_in": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ChangedPart"
+          },
+          "type": "array"
+        },
+        "steps": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/StepDelta"
+          },
+          "type": "array"
+        },
+        "parameters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterDelta"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "change",
+        "before",
+        "after",
+        "paired_by",
+        "changed_in",
+        "steps",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "ScenarioPairing": {
+      "enum": [
+        "rename-log",
+        "node-id",
+        "title"
+      ],
+      "type": "string"
+    },
+    "SourceLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "relpath": {
+          "type": "string"
+        },
+        "line": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "relpath",
+        "line"
+      ],
+      "type": "object"
+    },
+    "Status": {
+      "enum": [
+        "passed",
+        "failed",
+        "skipped",
+        "xfailed"
+      ],
+      "type": "string"
+    },
+    "Step": {
+      "additionalProperties": false,
+      "properties": {
+        "phase": {
+          "$ref": "#/$defs/Phase"
+        },
+        "narration": {
+          "$ref": "#/$defs/Narration"
+        },
+        "children": {
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "type": "array"
+        },
+        "attachments": {
+          "items": {
+            "$ref": "#/$defs/StepAttachment"
+          },
+          "type": "array"
+        },
+        "pins": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Pin"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Null when nothing pins it. An empty array when pinning turned narration matching off."
+        },
+        "fixture_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "phase",
+        "narration",
+        "children",
+        "attachments",
+        "pins",
+        "fixture_name"
+      ],
+      "type": "object"
+    },
+    "StepAttachment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Attachment"
+        },
+        {
+          "$ref": "#/$defs/AttachmentRef"
+        }
+      ]
+    },
+    "StepChange": {
+      "enum": [
+        "equal",
+        "modified",
+        "added",
+        "removed"
+      ],
+      "type": "string"
+    },
+    "StepDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "change": {
+          "$ref": "#/$defs/StepChange"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StepPath"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StepPath"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "words": {
+          "default": [],
+          "description": "A modified step's word diff.",
+          "items": {
+            "$ref": "#/$defs/DiffSegment"
+          },
+          "type": "array"
+        },
+        "children": {
+          "default": [],
+          "description": "Only on an equal or modified step.",
+          "items": {
+            "$ref": "#/$defs/StepDelta"
+          },
+          "type": "array"
+        },
+        "attachments": {
+          "default": [],
+          "description": "Only on an equal or modified step.",
+          "items": {
+            "$ref": "#/$defs/AttachmentDelta"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "change",
+        "before",
+        "after",
+        "words",
+        "children",
+        "attachments"
+      ],
+      "type": "object"
+    },
+    "StepPath": {
+      "description": "A step's position in its scenario: the child index at each depth, outermost first.",
+      "items": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "Suggestion": {
+      "additionalProperties": false,
+      "properties": {
+        "of": {
+          "$ref": "#/$defs/SuggestionOf"
+        },
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentityPair"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A case suggestion's scenario."
+        }
+      },
+      "required": [
+        "of",
+        "before",
+        "after",
+        "scenario"
+      ],
+      "type": "object"
+    },
+    "SuggestionOf": {
+      "enum": [
+        "scenario",
+        "case",
+        "term"
+      ],
+      "type": "string"
+    },
+    "TermDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "change": {
+          "$ref": "#/$defs/Change"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GlossaryTerm"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GlossaryTerm"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "paired_by": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TermPairing"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "before_facts": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TermFacts"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "after_facts": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TermFacts"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "definition": {
+          "default": [],
+          "description": "A changed definition's word diff.",
+          "items": {
+            "$ref": "#/$defs/DiffSegment"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "change",
+        "before",
+        "after",
+        "paired_by",
+        "before_facts",
+        "after_facts",
+        "definition"
+      ],
+      "type": "object"
+    },
+    "TermFacts": {
+      "additionalProperties": false,
+      "properties": {
+        "other_forms": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "scenario_count": {
+          "default": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "other_forms",
+        "scenario_count"
+      ],
+      "type": "object"
+    },
+    "TermKind": {
+      "enum": [
+        "actor",
+        "object",
+        "activity"
+      ],
+      "type": "string"
+    },
+    "TermPairing": {
+      "enum": [
+        "rename-log",
+        "term-id"
+      ],
+      "type": "string"
+    },
+    "TextSegment": {
+      "additionalProperties": false,
+      "properties": {
+        "mark": {
+          "$ref": "#/$defs/Mark"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "mark",
+        "text"
+      ],
+      "type": "object"
+    },
+    "TracebackFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "lineno": {
+          "type": "integer"
+        },
+        "func": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "is_internal": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path",
+        "lineno",
+        "func",
+        "code",
+        "is_internal"
+      ],
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "default": "https://nwilbert.github.io/pytest-given/latest/schemas/delta-v1.schema.json",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/DeltaMetadata"
+    },
+    "scenarios": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ScenarioDelta"
+      },
+      "type": "array"
+    },
+    "unchanged": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/IdentityPair"
+      },
+      "type": "array"
+    },
+    "suggestions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Suggestion"
+      },
+      "type": "array"
+    },
+    "glossary": {
+      "$ref": "#/$defs/GlossaryDelta",
+      "default": {
+        "before": null,
+        "after": null,
+        "terms": [],
+        "unchanged": []
+      }
+    }
+  },
+  "required": [
+    "$schema",
+    "metadata",
+    "scenarios",
+    "unchanged",
+    "suggestions",
+    "glossary"
+  ],
+  "type": "object"
+}
