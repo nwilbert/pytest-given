@@ -1,5 +1,5 @@
 from pytest_given.model import Glossary, Metadata, ReportData, Story, StoryId
-from pytest_given.report.diagram import render_diagrams_html
+from pytest_given.report.diagram import layout_stories, render_diagrams_html
 from pytest_given.report.diagram.renderer import label_lines
 
 
@@ -21,7 +21,9 @@ def _report(trip_story: Story, trip_glossary: Glossary) -> ReportData:
 def test_renders_a_self_contained_page_with_story_data(
     trip_story: Story, trip_glossary: Glossary
 ) -> None:
-    html = render_diagrams_html(_report(trip_story, trip_glossary))
+    html = render_diagrams_html(
+        report := _report(trip_story, trip_glossary), layout_stories(report)
+    )
     assert trip_story.id in html  # deep-link anchor data
     assert trip_story.title in html
     assert 'Individual traveler.' in html  # tooltip definition payload
@@ -33,7 +35,7 @@ def test_no_glossary_and_empty_story(trip_story: Story) -> None:
     empty = Story(id=StoryId('empty'), title='Empty Story', sentences=())
     report = _report(trip_story, None)
     report.stories.append(empty)
-    html = render_diagrams_html(report)
+    html = render_diagrams_html(report, layout_stories(report))
     assert 'Empty Story' in html  # renders with empty-state note
     assert 'This story has no sentences yet.' in html
 
@@ -53,7 +55,7 @@ def test_no_stories_at_all_renders_empty_state() -> None:
         stories=[],
         glossary=None,
     )
-    html = render_diagrams_html(report)
+    html = render_diagrams_html(report, layout_stories(report))
     assert 'No stories were recorded' in html
 
 

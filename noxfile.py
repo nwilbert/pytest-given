@@ -507,6 +507,7 @@ def _regenerate_examples(session: nox.Session) -> None:
             f'--given-html=examples/{slug}/{slug}.html',
             f'--given-md=examples/{slug}/{slug}.md',
             *_diagrams_flag(slug, '--given-diagrams', Path('examples', slug)),
+            *([f'--given-egn=examples/{slug}/egn'] if slug in _DIAGRAM_REPORTS else []),
             f'--given-title={title}',
             '--given-source-link=github',
             f'--given-report-url={_PAGES_EXAMPLES_URL}/{slug}.html',

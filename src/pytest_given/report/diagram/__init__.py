@@ -1,3 +1,4 @@
+from .egon import render_egn
 from .graph import DiagramEdge, DiagramGraph, DiagramNode, build_graph
 from .layout import (
     DiagramLayout,
@@ -7,7 +8,7 @@ from .layout import (
     count_crossings,
     layout_graph,
 )
-from .renderer import render_diagrams_html
+from .renderer import layout_stories, render_diagrams_html
 
 __all__ = [
     'DiagramEdge',
@@ -20,5 +21,7 @@ __all__ = [
     'build_graph',
     'count_crossings',
     'layout_graph',
+    'layout_stories',
     'render_diagrams_html',
+    'render_egn',
 ]

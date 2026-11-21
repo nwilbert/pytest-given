@@ -19,6 +19,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The `pytest-given-delta` agent skill: building a delta between two commits or for a pull request, and recording renames in `given-renames.toml`.
 - `pytest-given coverage` prints which scenarios cover each story sentence of a JSON report, and exits 1 when a tracked sentence has none.
 - `--given-diagrams` and `pytest-given report --diagrams` write a story diagrams page that draws each story in Domain Storytelling notation, and the HTML report links each story to its diagram.
+- `--given-egn` and `pytest-given report --egn` write each story diagram as an egon.io file, one per story, to edit in the Domain Story Modeler.
 - JSON Schemas for the report and the delta are published on the documentation site, and every written report and delta names its schema under a top-level `$schema` key.
 
 ### Changed

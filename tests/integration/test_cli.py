@@ -232,6 +232,34 @@ def test_cli_diagrams_keep_their_status_line_off_markdown_stdout(
     assert captured.err == f'Report generated: {diagrams_path}\n'
 
 
+def test_cli_egn_writes_one_file_per_story(tmp_path: Path, capsys) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': _metadata('cli'),
+                'scenarios': [],
+                'stories': [{'id': 'empty', 'title': 'Empty', 'sentences': []}],
+            }
+        )
+    )
+    egn_dir = tmp_path / 'egn'
+    rc = main(
+        [
+            'report',
+            str(json_path),
+            '-o',
+            str(tmp_path / 'r.html'),
+            '--egn',
+            str(egn_dir),
+        ]
+    )
+    assert rc == 0
+    egn = json.loads((egn_dir / 'empty.egn').read_text(encoding='utf-8'))
+    assert egn['dst'] == [{'info': ''}, {'version': '2.0.1'}]
+    assert f'Report generated: {egn_dir / "empty.egn"}' in capsys.readouterr().out
+
+
 def test_cli_md_to_stdout_is_utf8_on_a_codepage_console(tmp_path, monkeypatch) -> None:
     """Python 3.14 writes a pipe in the locale's code page: cp1252 on Windows,
     which has no glyph for a status mark."""

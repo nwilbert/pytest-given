@@ -131,6 +131,10 @@ Story coverage helps a reader find the scenarios behind a part of the flow, and 
 
 The layout is computed when the page is written, and it keeps arrows from crossing wherever the story allows. An HTML report written in the same run links each story's header to its diagram. `pytest-given report --diagrams` draws the page from a saved JSON report (see [Standalone CLI](../cli.md#report)).
 
+### egon.io files
+
+`--given-egn` writes each story diagram as a `.egn` file, named by the story's id. Open it in [egon.io](https://egon.io/), the Domain Story Modeler, to move the icons and arrows by hand. Every actor gets egon.io's person icon and every work object its document icon, which you can change there. A run that fails to write its reports removes every `.egn` file in that directory, so keep your edited files elsewhere. `pytest-given report --egn` writes the files from a saved JSON report.
+
 ## Examples
 
 The hotel-booking and table-glossary [examples](../examples.md) show stories and coverage in use. The hotel-booking example also has its [story diagrams](../examples/hotel-booking-diagrams.html){ target=_blank }.

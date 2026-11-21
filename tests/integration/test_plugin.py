@@ -3952,6 +3952,29 @@ def test_given_diagrams_writes_the_diagrams_page(pytester: pytest.Pytester) -> N
     assert 'id="booking"' in html
 
 
+def test_given_egn_writes_one_file_per_story(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(
+        """
+        from pytest_given import Glossary, scenario, sentence, story, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        s = story('Booking', [sentence(guest, search, room)])
+
+        @scenario('A', pins=s[1])
+        def test_a():
+            with when('x'):
+                pass
+        """
+    )
+    result = pytester.runpytest('--given-egn=out/egn')
+    result.assert_outcomes(passed=1)
+    egn = (pytester.path / 'out' / 'egn' / 'booking.egn').read_text(encoding='utf-8')
+    assert '"domainStory:workObjectDocument"' in egn
+
+
 @scenario(
     t'An output flag pointed at a source file is refused before the suite runs',
     tags=['validation'],

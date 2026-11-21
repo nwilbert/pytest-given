@@ -11,6 +11,7 @@ from pytest_given.model import (
     Definition,
     Glossary,
     GlossaryTerm,
+    JsonObject,
     Metadata,
     Narration,
     NarrationLiteral,
@@ -202,6 +203,44 @@ def test_an_html_report_links_each_story_to_its_diagram(tmp_path: Path) -> None:
         assert '<section class="diagram-story" id="book"' in diagrams
     with then('the report links the story to it, relative to the report'):
         assert 'href="../diagrams/stories.html#book"' in html
+
+
+@scenario(
+    t'Each {pg["Story"].l} gets an egon.io file of its {pg["Story diagram"].l}, '
+    t'to rearrange by hand'
+)
+def test_each_story_gets_an_egon_file(tmp_path: Path) -> None:
+    with given(t'a {pg["Report"].l} with one {pg["Story"].l}'):
+        report_dict = report_to_dict(story_report())
+    with when('the egon.io files are written to a directory'):
+        rendered = sinks.render_sinks(report_dict, SinkConfig(egn_dir=tmp_path / 'egn'))
+    with then(t'the directory gets one file, named by the {pg["Story"].l} id'):
+        [egn] = rendered.files
+        assert egn.path == tmp_path / 'egn' / 'book.egn'
+    with then("the file holds the shapes egon.io draws, at the diagram's layout"):
+        names = {element.get('name') for element in json.loads(egn.text)['dst']}
+        assert {'guest', 'room', 'search'} <= names
+
+
+def test_a_failed_run_discards_the_previous_egon_files(tmp_path: Path) -> None:
+    """Their names come from stories the failed run never read."""
+    egn_dir = tmp_path / 'egn'
+    egn_dir.mkdir()
+    stale = egn_dir / 'removed-story.egn'
+    stale.write_text('{}', encoding='utf-8')
+    kept = egn_dir / 'notes.txt'
+    kept.write_text('mine', encoding='utf-8')
+
+    def unreadable() -> JsonObject:
+        raise PytestGivenError('unreadable report')
+
+    with pytest.raises(PytestGivenError, match='unreadable report'):
+        sinks.emit_sinks(unreadable, SinkConfig(egn_dir=egn_dir))
+    assert list(egn_dir.iterdir()) == [kept]
+
+
+def test_an_empty_egon_directory_still_counts_as_a_sink(tmp_path: Path) -> None:
+    assert SinkConfig(egn_dir=tmp_path / 'egn').writes_anything()
 
 
 def test_an_html_report_without_the_diagrams_page_links_no_diagram(

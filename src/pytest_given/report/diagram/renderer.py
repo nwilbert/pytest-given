@@ -1,5 +1,6 @@
 """The diagrams page: one self-contained HTML file for all of a run's stories."""
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from ...markdown import definition_html
@@ -18,18 +19,30 @@ class StoryView:
     sentence_count: int  # sentence ids may have gaps, so not max_step
 
 
-def render_diagrams_html(report: ReportData, theme: Theme = DEFAULT_THEME) -> str:
+def layout_stories(report: ReportData) -> list[DiagramLayout]:
+    """One layout per story, in story order: the diagrams page and the egon.io
+    files draw the same ones."""
+    return [
+        layout_graph(build_graph(story, report.glossary)) for story in report.stories
+    ]
+
+
+def render_diagrams_html(
+    report: ReportData,
+    layouts: Sequence[DiagramLayout],
+    theme: Theme = DEFAULT_THEME,
+) -> str:
     env = base_env()
     env.filters['label_lines'] = label_lines
     views = [
         StoryView(
-            layout=(layout := layout_graph(build_graph(story, report.glossary))),
+            layout=layout,
             max_step=max(
                 (placed.edge.number or 0 for placed in layout.edges), default=0
             ),
             sentence_count=len(story.sentences),
         )
-        for story in report.stories
+        for story, layout in zip(report.stories, layouts, strict=True)
     ]
     terms = report.glossary.terms if report.glossary is not None else []
     app_data = {

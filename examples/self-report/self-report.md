@@ -4890,6 +4890,14 @@
 - **then** the diagrams page draws the «story diagram»
 - **then** the report links the story to it, relative to the report
 
+## ✓ Each «story» gets an egon.io file of its «story diagram», to rearrange by hand
+`tests/unit/report/test_sinks.py::test_each_story_gets_an_egon_file`
+
+- **given** a «report» with one «story»
+- **when** the egon.io files are written to a directory
+- **then** the directory gets one file, named by the «story» id
+- **then** the file holds the shapes egon.io draws, at the diagram's layout
+
 ## ✓ A «source link» config value resolves to its template · 6 cases
 `tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template`
 

@@ -12,6 +12,7 @@ The checks, however, always run. Every run builds the report, even if it doesn't
 | `--given-html[=PATH]` | off | Write the HTML report. Without a path: `given-report/report.html`. |
 | `--given-md[=PATH]` | off | Write the [Markdown report](../markdown-report.md). **Without a path, it prints to stdout**, between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers. |
 | `--given-diagrams[=PATH]` | off | Write the [story diagrams](../guide/domain-storytelling.md#story-diagrams) page. Without a path: `given-report/diagrams.html`. An HTML report written in the same run links each story to its diagram. |
+| `--given-egn[=DIR]` | off | Write each story diagram as an [egon.io file](../guide/domain-storytelling.md#egonio-files) into `DIR`, one per story. Without a directory: `given-report/egn`. |
 | `--given-md-lines` / `--no-given-md-lines` | `true` | Show the line in the `file.py:line::test_name` anchor under each Markdown heading. Off, the anchor is the node ID, so a Markdown diff doesn't show every anchor below an inserted test. |
 | `--given-md-source` | off | End each Markdown scenario with its test function, decorators included, each line under its number in the file, for reviewing step text against step body. Only the test function is shown, not the step fixtures or helpers it uses. |
 | `--given-title=TEXT` | rootdir name | The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. |
@@ -56,7 +57,7 @@ addopts = ["--given-html"]
 
 If an output flag has no `=PATH`, pytest reads the next word on the command line as its path, not as a test to run. To avoid this, either:
 
-- put `--given-json`, `--given-html`, `--given-md` or `--given-diagrams` **last** on the command line, or
+- put `--given-json`, `--given-html`, `--given-md`, `--given-diagrams` or `--given-egn` **last** on the command line, or
 - use the `=PATH` form: `--given-html=out.html`, not `--given-html out.html`.
 
 If that path can't be a report file, like a `.py` test file, pytest-given stops before running the tests, so it never overwrites your test.
@@ -77,7 +78,7 @@ Mind `-k`: `-k given` and `-k scenario` select every scenario too, because a sce
 
 **pytest-given writes reports and runs the narration lint under `pytest-xdist` with `--dist loadfile`.** Grouping a parametrized scenario needs all its cases on one worker, and `loadfile` sends each file to one worker.
 
-When a `-n` run asks for a report (`--given-json`, `--given-html`, `--given-md`, `--given-diagrams`) or the narration lint:
+When a `-n` run asks for a report (`--given-json`, `--given-html`, `--given-md`, `--given-diagrams`, `--given-egn`) or the narration lint:
 
 - a bare `-n` becomes `--dist loadfile`.
 - any other `--dist` or `-d`, including one in `addopts`, stops the run with a usage error.

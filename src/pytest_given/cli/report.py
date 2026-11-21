@@ -14,6 +14,7 @@ from ..model import (
 )
 from ..report import (
     DEFAULT_DIAGRAMS_PATH,
+    DEFAULT_EGN_DIR,
     DEFAULT_HTML_PATH,
     DEFAULT_THEME,
     MD_SUFFIXES,
@@ -100,6 +101,17 @@ def add_report_parser(
             'each story to its diagram.'
         ),
     )
+    report_parser.add_argument(
+        '--egn',
+        type=Path,
+        nargs='?',
+        const=DEFAULT_EGN_DIR,
+        default=None,
+        help=(
+            'Also write one egon.io .egn file per story into this directory '
+            f'(bare: {DEFAULT_EGN_DIR.as_posix()}), to rearrange at https://egon.io/.'
+        ),
+    )
 
 
 def run_report(args: argparse.Namespace) -> int:
@@ -122,6 +134,7 @@ def run_report(args: argparse.Namespace) -> int:
             resolve_report_url(args.report_url, '--report-url'),
             args.glossary_only,
             args.diagrams,
+            args.egn,
         )
         refuse_writing_over_an_input(
             {
@@ -176,9 +189,10 @@ def _sink_config(
     report_url: ReportUrl | None,
     glossary_only: bool,
     diagrams: Path | None,
+    egn_dir: Path | None,
 ) -> SinkConfig:
-    """The one report sink this invocation writes, and the diagrams page
-    beside it when asked for.
+    """The one report sink this invocation writes, and the diagrams page and
+    egon.io files beside it when asked for.
 
     Markdown with no `-o` goes to stdout; HTML always needs a file, so it falls
     back to the default path rather than to stdout.
@@ -203,11 +217,13 @@ def _sink_config(
             md_to_stdout=output is None,
             md_lines=lines,
             diagrams_path=diagrams,
+            egn_dir=egn_dir,
             theme=resolved_theme,
         )
     return SinkConfig(
         html_path=output or DEFAULT_HTML_PATH,
         diagrams_path=diagrams,
+        egn_dir=egn_dir,
         source_link_template=source_link_template,
         theme=resolved_theme,
         report_url=report_url,

@@ -1,9 +1,9 @@
 """The sinks a run writes, rendered as a set and written as a set.
 
-A run may be told to write any combination of JSON, HTML, Markdown and the
-diagrams page, and they have to agree with each other: a render that raises
-must not leave this run's JSON beside the previous run's HTML, with nothing on
-either saying so.
+A run may be told to write any combination of JSON, HTML, Markdown, the
+diagrams page and the egon.io files, and they have to agree with each other: a
+render that raises must not leave this run's JSON beside the previous run's
+HTML, with nothing on either saying so.
 So rendering and writing are separate steps — `render_sinks` does everything
 that can fail and touches no file, `write_all_or_none` touches files and
 cannot fail on content, and `discard_files` removes a previous run's report
@@ -35,7 +35,7 @@ from ..model import (
     ReportUrl,
     report_from_dict,
 )
-from .diagram import render_diagrams_html
+from .diagram import layout_stories, render_diagrams_html, render_egn
 from .function_source import read_function_sources
 from .html_renderer import render_html_string, tab_visibility
 from .md_renderer import render_md
@@ -48,6 +48,7 @@ from .theme import DEFAULT_THEME, Theme
 DEFAULT_JSON_PATH = Path('given-report/report-data.json')
 DEFAULT_HTML_PATH = Path('given-report/report.html')
 DEFAULT_DIAGRAMS_PATH = Path('given-report/diagrams.html')
+DEFAULT_EGN_DIR = Path('given-report/egn')
 DEFAULT_DELTA_JSON_PATH = Path('given-report/delta-data.json')
 DEFAULT_DELTA_HTML_PATH = Path('given-report/delta.html')
 
@@ -68,13 +69,14 @@ class SinkConfig:
     `html_glossary_only` renders the HTML without scenarios, stories or report
     URL: a term citation counts its scenarios, so a copied one would be stale.
     `md_source` reads the test functions from under `source_root`, so only a
-    live run sets it.
+    live run sets it. `egn_dir` gets one `<story id>.egn` file per story.
     """
 
     json_path: Path | None = None
     html_path: Path | None = None
     md_path: Path | None = None
     diagrams_path: Path | None = None
+    egn_dir: Path | None = None
     md_to_stdout: bool = False
     md_lines: bool = True
     md_source: bool = False
@@ -100,8 +102,10 @@ class SinkConfig:
 
     def file_paths(self) -> list[Path]:
         """The paths this run would write, in sink order. Only real files —
-        Markdown bound for stdout has no path to overwrite or discard."""
-        return [
+        Markdown bound for stdout has no path to overwrite or discard. The
+        egon.io files are named by stories the report has not yet been read
+        for, so every `.egn` file already in `egn_dir` counts."""
+        paths = [
             path
             for path in (
                 self.json_path,
@@ -111,11 +115,15 @@ class SinkConfig:
             )
             if path is not None
         ]
+        if self.egn_dir is not None:
+            paths.extend(sorted(self.egn_dir.glob('*.egn')))
+        return paths
 
     def writes_anything(self) -> bool:
         """Whether any sink is configured — `file_paths()` plus stdout Markdown,
-        which writes no file but still has to be rendered."""
-        return bool(self.file_paths()) or self.md_to_stdout
+        which writes no file but still has to be rendered, and an `egn_dir`
+        that holds no file yet."""
+        return bool(self.file_paths()) or self.md_to_stdout or self.egn_dir is not None
 
 
 def require_suffix(sink: str, path: Path | None, allowed: tuple[str, ...]) -> None:
@@ -250,12 +258,22 @@ def render_sinks(
             md_stdout = md
         if config.md_path is not None:
             files.append(RenderedFile(config.md_path, md))
-    if config.diagrams_path is not None:
-        files.append(
-            RenderedFile(
-                config.diagrams_path, render_diagrams_html(report, config.theme)
+    if config.diagrams_path is not None or config.egn_dir is not None:
+        layouts = layout_stories(report)
+        if config.diagrams_path is not None:
+            files.append(
+                RenderedFile(
+                    config.diagrams_path,
+                    render_diagrams_html(report, layouts, config.theme),
+                )
             )
-        )
+        if config.egn_dir is not None:
+            files.extend(
+                RenderedFile(
+                    config.egn_dir / f'{layout.graph.story_id}.egn', render_egn(layout)
+                )
+                for layout in layouts
+            )
     return RenderedSinks(files=files, md_stdout=md_stdout)
 
 

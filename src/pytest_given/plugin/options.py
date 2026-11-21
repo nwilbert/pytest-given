@@ -18,6 +18,7 @@ from ..lint import parse_lint_config
 from ..model import PytestGivenError, resolve_report_url
 from ..report import (
     DEFAULT_DIAGRAMS_PATH,
+    DEFAULT_EGN_DIR,
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
     DEFAULT_THEME,
@@ -73,6 +74,17 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help=(
             'Write the story diagrams page. Bare uses the default path; =PATH '
             'overrides. Off when absent.'
+        ),
+    )
+    group.addoption(
+        '--given-egn',
+        nargs='?',
+        const=str(DEFAULT_EGN_DIR),
+        default=None,
+        help=(
+            'Write one egon.io .egn file per story into this directory, to '
+            'rearrange at https://egon.io/. Bare uses the default directory; '
+            '=DIR overrides. Off when absent.'
         ),
     )
     group.addoption(
@@ -323,12 +335,14 @@ def _resolve_sinks(
     json_opt = config.getoption('given_json')
     html_opt = config.getoption('given_html')
     diagrams_opt = config.getoption('given_diagrams')
+    egn_opt = config.getoption('given_egn')
     try:
         return SinkConfig(
             json_path=Path(json_opt) if json_opt is not None else None,
             html_path=Path(html_opt) if html_opt is not None else None,
             md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
             diagrams_path=Path(diagrams_opt) if diagrams_opt is not None else None,
+            egn_dir=Path(egn_opt) if egn_opt is not None else None,
             md_to_stdout=md_opt == '-',
             md_lines=md_lines,
             md_source=bool(config.getoption('given_md_source')),
@@ -338,7 +352,7 @@ def _resolve_sinks(
         )
     except PytestGivenError as error:
         raise PytestGivenError(
-            f'{error} A bare --given-json/--given-html/--given-md/--given-diagrams '
-            'takes the next argument as its path, so write the path with an "=" '
-            '(--given-html=PATH) or put the bare flag last.'
+            f'{error} A bare --given-json/--given-html/--given-md/--given-diagrams/'
+            '--given-egn takes the next argument as its path, so write the path '
+            'with an "=" (--given-html=PATH) or put the bare flag last.'
         ) from error
