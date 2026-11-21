@@ -63,6 +63,9 @@ jobs:
   # nobody regenerated passes, so it stays in the local gate alone.
   reports:
     runs-on: ubuntu-latest
+    outputs:
+      delta-summary: ${{ steps.delta.outputs.summary }}
+      delta-url: ${{ steps.delta-artifact.outputs.artifact-url }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -78,23 +81,57 @@ jobs:
       # just regenerated. It never fails the job: a pull request that bumps the
       # report schema version can't be compared with its base.
       - name: Self-report delta
+        id: delta
         if: github.event_name == 'pull_request'
         env:
           PR_NUMBER: ${{ github.event.number }}
         run: |
           git show HEAD^1:examples/self-report/self-report-data.json > "$RUNNER_TEMP/before.json"
+          uv run --no-dev pytest-given delta "$RUNNER_TEMP/before.json" \
+            examples/self-report/self-report-data.json \
+            --before-label main --after-label "#$PR_NUMBER" \
+            --title "pytest-given self-report changes in #$PR_NUMBER" \
+            > "$RUNNER_TEMP/delta.txt" 2>&1 || true
           {
             echo '### Self-report delta'
             echo '```'
-            uv run --no-dev pytest-given delta "$RUNNER_TEMP/before.json" \
-              examples/self-report/self-report-data.json \
-              --before-label main --after-label "#$PR_NUMBER" \
-              --title "pytest-given self-report changes in #$PR_NUMBER" 2>&1 || true
+            cat "$RUNNER_TEMP/delta.txt"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-      - if: github.event_name == 'pull_request'
+          echo "summary=$(grep -m1 '^delta: ' "$RUNNER_TEMP/delta.txt")" >> "$GITHUB_OUTPUT"
+      - id: delta-artifact
+        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v7
         with:
           name: self-report-delta
           path: given-report/delta.html
           if-no-files-found: ignore
+
+  # Posts the self-report delta's counts on the pull request, editing its own
+  # earlier comment on later pushes. A job of its own, so the write token never
+  # meets the pull request's code. A fork's pull request gets no write token,
+  # so its delta stays on the run summary.
+  delta-comment:
+    needs: reports
+    if: >-
+      github.event_name == 'pull_request'
+      && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.number }}
+          SUMMARY: ${{ needs.reports.outputs.delta-summary }}
+          ARTIFACT_URL: ${{ needs.reports.outputs.delta-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -n "$SUMMARY" ] && [ -n "$ARTIFACT_URL" ]; then
+            body=$(printf '### Self-report delta\n\n`%s`\n\nDownload [delta.html](%s) and open it locally, or read the [run summary](%s).\n' \
+              "$SUMMARY" "$ARTIFACT_URL" "$RUN_URL")
+          else
+            body=$(printf '### Self-report delta\n\nNo delta was built. See the [run summary](%s).\n' "$RUN_URL")
+          fi
+          gh pr comment "$PR_NUMBER" --edit-last --create-if-none --body "$body"
