@@ -19,6 +19,13 @@ def _preserve_session_rootdir():
     restore_rootdir(previous)
 
 
+@pytest.fixture(autouse=True)
+def _utf8_subprocess_output(monkeypatch):
+    """`runpytest_subprocess` decodes the child's output as UTF-8, but before
+    Python 3.15 a Windows child writes a pipe in its code page (cp1252)."""
+    monkeypatch.setenv('PYTHONIOENCODING', 'utf-8')
+
+
 @pytest.fixture
 def isolated_story_registry():
     """An empty story registry for the test, and the session's back after.
