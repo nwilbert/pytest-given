@@ -38,7 +38,7 @@ A delta on a pull request shows reviewers what merging it changes about the syst
 
 Neither commit has a tag, so label the sides with `--before-label` and `--after-label`. Record a rename in the rename log in the pull request itself, without `rev`. See [When an entry applies](#when-an-entry-applies).
 
-This workflow builds both reports, writes the delta's summary to the run's summary page, and keeps the HTML as a workflow artifact. Replace `uv run` with your project's runner.
+This workflow builds both reports and keeps the delta's HTML as a workflow artifact. A second job posts the delta's summary as a comment on the pull request and edits that comment on later runs. It runs none of the pull request's code, because it holds a token that can write. A pull request from a fork gets no such token, so the second job skips it. `--edit-last` edits the newest comment by `github-actions`, so no other workflow should comment on pull requests as `github-actions`. Replace `uv run` with your project's runner.
 
 ```yaml
 name: Delta
@@ -52,6 +52,9 @@ permissions:
 jobs:
   delta:
     runs-on: ubuntu-latest
+    outputs:
+      summary: ${{ steps.delta.outputs.summary }}
+      url: ${{ steps.artifact.outputs.artifact-url }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -70,17 +73,39 @@ jobs:
           env -u GITHUB_SHA uv run pytest -m pytest_given \
             --given-json="$RUNNER_TEMP/before.json"
       - name: Delta
+        id: delta
         env:
           BASE_REF: ${{ github.base_ref }}
           PR_NUMBER: ${{ github.event.number }}
         run: |
           uv run pytest-given delta "$RUNNER_TEMP/before.json" "$RUNNER_TEMP/after.json" \
             --before-label "$BASE_REF" --after-label "#$PR_NUMBER" \
-            >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v7
+            > "$RUNNER_TEMP/delta.txt"
+          cat "$RUNNER_TEMP/delta.txt" >> "$GITHUB_STEP_SUMMARY"
+          echo "summary=$(grep -m1 '^delta: ' "$RUNNER_TEMP/delta.txt")" >> "$GITHUB_OUTPUT"
+      - id: artifact
+        uses: actions/upload-artifact@v7
         with:
           name: delta
           path: given-report/delta.html
+
+  comment:
+    needs: delta
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.number }}
+          SUMMARY: ${{ needs.delta.outputs.summary }}
+          ARTIFACT_URL: ${{ needs.delta.outputs.url }}
+        run: |
+          body=$(printf '`%s`\n\nDownload [delta.html](%s) and open it locally.\n' \
+            "$SUMMARY" "$ARTIFACT_URL")
+          gh pr comment "$PR_NUMBER" --edit-last --create-if-none --body "$body"
 ```
 
 ## What counts as a change
