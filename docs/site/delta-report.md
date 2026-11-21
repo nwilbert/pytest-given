@@ -32,6 +32,57 @@ The command compares the two reports you give it. Which commits they come from i
 - Start each later delta at the commit the last published one ended at, its *after* commit, so together they cover every commit once. Its SHA is in `.metadata.after.metadata.commit_sha` of that delta's JSON.
 - Skip a release whose delta lists no change. The next delta then starts at the last published one and covers the skipped release too.
 
+### For a pull request
+
+A delta on a pull request shows reviewers what merging it changes about the system's behavior. A GitHub `pull_request` run checks out a merge commit of the pull request into its base branch. Compare that commit, the *after*, with its first parent `HEAD^1`, the *before*. A comparison of the pull request's head with the base branch's tip would also list the base branch's newer changes, in reverse.
+
+Neither commit has a tag, so label the sides with `--before-label` and `--after-label`. Record a rename in the rename log in the pull request itself, without `rev`. See [When an entry applies](#when-an-entry-applies).
+
+This workflow builds both reports, writes the delta's summary to the run's summary page, and keeps the HTML as a workflow artifact. Replace `uv run` with your project's runner.
+
+```yaml
+name: Delta
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  delta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0  # HEAD^1 and the rename log's rev checks need history
+      - uses: astral-sh/setup-uv@v7
+      - name: After report
+        run: uv run pytest -m pytest_given --given-json="$RUNNER_TEMP/after.json"
+      - name: Before report
+        run: |
+          # A report's project is its rootdir's name, so keep the repository's.
+          before="$RUNNER_TEMP/before/${GITHUB_REPOSITORY#*/}"
+          git worktree add "$before" HEAD^1
+          cd "$before"
+          # GITHUB_SHA names the merge commit, not this one.
+          env -u GITHUB_SHA uv run pytest -m pytest_given \
+            --given-json="$RUNNER_TEMP/before.json"
+      - name: Delta
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          uv run pytest-given delta "$RUNNER_TEMP/before.json" "$RUNNER_TEMP/after.json" \
+            --before-label "$BASE_REF" --after-label "#$PR_NUMBER" \
+            >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: delta
+          path: given-report/delta.html
+```
+
 ## What counts as a change
 
 A scenario found on both sides is *changed* when one of these parts differs. The delta JSON lists them in `changed_in`.

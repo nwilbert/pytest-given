@@ -19,6 +19,13 @@ To publish a delta with each release:
 - A side's label is the tag on its commit. For a commit without one, such as a release not tagged yet, pass `--before-label` or `--after-label v<version>`.
 - Pass `--title` naming the product and the release, in words its stakeholders know: `--title "Hotel booking changes for v2.4"`. It defaults to the after report's title.
 
+To show what a pull request changes:
+
+- Compare what merging it changes. *After* is the merge commit that a GitHub `pull_request` run checks out, and *before* is its first parent, `HEAD^1`. Comparing the pull request's head with the base branch's tip would list the base branch's newer changes in reverse.
+- A shallow CI checkout lacks `HEAD^1`. Fetch the history, with `fetch-depth: 0` for `actions/checkout`.
+- Label the sides `--before-label <base branch> --after-label "#<number>"`.
+- Record each rename the delta shows in the pull request's own `given-renames.toml`, without `rev`.
+
 ## Getting the two reports
 
 Both must come from full runs: a scenario that a partial run left out reads as removed. Use CI's JSON reports of both commits, if it kept them. Otherwise build each in a git worktree:
