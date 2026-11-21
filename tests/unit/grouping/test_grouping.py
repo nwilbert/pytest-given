@@ -1037,7 +1037,7 @@ def test_rule_two_names_the_violating_steps_own_phase() -> None:
 @scenario(
     t'A varying expression in a then is refused with the fix of an expected-outcome '
     t'column',
-    tags=['diagnostics', 'parametrization', 'validation', 'versions/0.5.0'],
+    tags=['diagnostics', 'parametrization', 'validation'],
 )
 def test_rule_two_in_a_then_offers_an_expected_outcome_column() -> None:
     with given(

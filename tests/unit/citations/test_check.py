@@ -79,7 +79,7 @@ CURRENT = f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
 @scenario(
     t"`citations update` rewrites a stale {pg['Citation'].l} to its target's "
     t'glyph, text and summary',
-    tags=['spec/citations', 'versions/0.5.0'],
+    tags=['spec/citations'],
 )
 def test_update_rewrites_a_stale_citation(tmp_path: Path) -> None:
     with given(
@@ -162,7 +162,7 @@ def _save_while_analyzing(monkeypatch: pytest.MonkeyPatch, document: Path) -> No
 
 @scenario(
     t'A plain {pg["Report link"].l} claims only that its target exists',
-    tags=['spec/citations', 'versions/0.5.0'],
+    tags=['spec/citations'],
 )
 def test_a_plain_report_link_claims_only_that_its_target_exists(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} whose one {pg["Scenario"].l} fails'):
@@ -186,7 +186,7 @@ def test_a_plain_report_link_claims_only_that_its_target_exists(tmp_path: Path) 
 @scenario(
     t'A {pg["Citation"].l} whose target left the {pg["Report"].l} is marked ❓ '
     t'and recovers once it is back',
-    tags=['spec/citations', 'versions/0.5.0'],
+    tags=['spec/citations'],
 )
 def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> None:
     with given(t'a {pg["Citation"].l} of a passing {pg["Scenario"].l}'):
@@ -210,7 +210,7 @@ def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> N
 @scenario(
     t'A {pg["Citation"].l} of any {pg["Case"].l} cites the grouped '
     t'{pg["Scenario"].l} holding it',
-    tags=['spec/citations', 'versions/0.5.0'],
+    tags=['spec/citations'],
 )
 def test_a_citation_of_any_case_cites_its_grouped_scenario(tmp_path: Path) -> None:
     with given(
@@ -243,7 +243,7 @@ def test_a_citation_of_any_case_cites_its_grouped_scenario(tmp_path: Path) -> No
 @scenario(
     t'A {pg["Citation"].l} keeps the emphasis its {pg["Scenario title"].l} '
     t'renders with',
-    tags=['spec/citations', 'versions/0.5.0'],
+    tags=['spec/citations'],
 )
 def test_a_citation_keeps_the_emphasis_of_its_title(tmp_path: Path) -> None:
     with given(
@@ -266,7 +266,7 @@ def test_a_citation_keeps_the_emphasis_of_its_title(tmp_path: Path) -> None:
 @scenario(
     t'`citations update` repoints the {pg["Citation"].l} of a renamed test by its '
     t'unchanged {pg["Scenario title"].l}',
-    tags=['spec/citations', 'versions/0.5.0'],
+    tags=['spec/citations'],
 )
 def test_a_renamed_test_is_repointed_by_its_unchanged_title(tmp_path: Path) -> None:
     with given(
@@ -622,7 +622,7 @@ def test_an_empty_scenario_key_reads_as_one_when_repointed(tmp_path: Path) -> No
 @scenario(
     t'A relative {pg["Report link"].l} resolves from its document to where '
     t'`--report-path` places the {pg["Report"].l}',
-    tags=['spec/citations', 'versions/0.5.0'],
+    tags=['spec/citations'],
 )
 def test_relative_links_resolve_from_the_documents_directory(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} that stores no URL, placed at `examples/r.html`'):
@@ -892,7 +892,7 @@ _COVERING_REPORT = report_(
 @scenario(
     t'`--covering` keeps each {pg["Report link"].l} whose target counts the '
     t'{pg["Scenario"].l}, and each it cannot rule out',
-    tags=['spec/citations-list', 'versions/0.5.0'],
+    tags=['spec/citations-list'],
 )
 @pytest.mark.parametrize(
     ('link', 'kept'),
@@ -1098,7 +1098,7 @@ FILLED = f'\n{NARRATION}\n\n'
 @scenario(
     t"`citations update` writes a {pg['Narrated citation'].l}'s body from the "
     t'{pg["Report"].l}',
-    tags=['spec/narrated-citations', 'versions/0.5.0'],
+    tags=['spec/narrated-citations'],
 )
 def test_update_writes_a_narrated_citations_body(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} whose {pg["Scenario"].l} has two steps'):
@@ -1121,7 +1121,7 @@ def test_update_writes_a_narrated_citations_body(tmp_path: Path) -> None:
 @scenario(
     t'`citations check` reports a {pg["Narrated citation"].l} whose body differs '
     t'from the {pg["Report"].l}',
-    tags=['spec/narrated-citations', 'versions/0.5.0'],
+    tags=['spec/narrated-citations'],
 )
 def test_check_reports_a_stale_narrated_body(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} whose {pg["Scenario"].l} ends in "it is paid"'):
@@ -1148,7 +1148,7 @@ def test_check_reports_a_stale_narrated_body(tmp_path: Path) -> None:
 @scenario(
     t'A {pg["Narrated citation"].l} of a tag or story is a {pg["Citation finding"].l} '
     t'`update` leaves',
-    tags=['spec/narrated-citations', 'versions/0.5.0'],
+    tags=['spec/narrated-citations'],
 )
 @pytest.mark.parametrize('target', ['tag', 'story'])
 def test_a_narrated_tag_citation_is_a_finding_update_leaves(
@@ -1206,7 +1206,7 @@ _MISTYPED_DETAILS = {
 @scenario(
     t'A `<details>` block citing the {pg["Report"].l} in any other shape is a '
     t'mistyped {pg["Citation finding"].l}, never skipped',
-    tags=['spec/narrated-citations', 'versions/0.5.0'],
+    tags=['spec/narrated-citations'],
 )
 @pytest.mark.parametrize(
     ('shape', 'reason'),
@@ -1243,7 +1243,7 @@ def test_a_details_block_in_another_shape_is_a_mistyped_finding(
 @scenario(
     t'A {pg["Narrated citation"].l} copied from the {pg["Report"].l} is current '
     t'once `citations update` fills its body',
-    tags=['spec/narrated-citations', 'versions/0.5.0'],
+    tags=['spec/narrated-citations'],
 )
 def test_a_narrated_citation_copied_from_the_report_is_current_once_filled(
     tmp_path: Path,
@@ -1305,7 +1305,7 @@ def test_a_narrated_citation_of_a_gone_scenario_keeps_its_body(tmp_path: Path) -
 @scenario(
     t'A failing {pg["Narrated citation"].l} has its body rewritten and stays a '
     t'{pg["Citation finding"].l}',
-    tags=['spec/narrated-citations', 'versions/0.5.0'],
+    tags=['spec/narrated-citations'],
 )
 def test_a_failed_narrated_citation_has_its_body_rewritten_and_stays_a_finding(
     tmp_path: Path,
@@ -1359,7 +1359,7 @@ def test_a_renamed_test_is_repointed_by_its_shown_title_with_a_code_span(
 @scenario(
     t'`citations update` adds `markdown="1"` to a {pg["Narrated citation"].l}\'s '
     t'opening tag, keeping its other attributes',
-    tags=['spec/narrated-citations', 'versions/0.5.0'],
+    tags=['spec/narrated-citations'],
 )
 def test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes(
     tmp_path: Path, opening: str, expected: str
@@ -1439,7 +1439,7 @@ _CONTAINED = {
 @scenario(
     t'A {pg["Narrated citation"].l} in a list item or blockquote has its body '
     t'written under that prefix',
-    tags=['spec/narrated-citations', 'versions/0.5.0'],
+    tags=['spec/narrated-citations'],
 )
 @pytest.mark.parametrize('container', list(_CONTAINED))
 def test_a_body_under_a_list_item_or_blockquote_is_written_under_its_prefix(

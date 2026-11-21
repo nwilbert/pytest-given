@@ -1,7 +1,7 @@
 # pytest-given Self-Report
 
 ## ✓ `pytest-given report --report-url` re-renders a saved «report» for another URL
-`tests/integration/test_cli.py::test_cli_report_url_replaces_the_saved_one` · spec/citations, versions/0.5.0
+`tests/integration/test_cli.py::test_cli_report_url_replaces_the_saved_one` · spec/citations
 
 - **given** a saved «report» served from `/dev/`
 - **when** it is re-rendered with `--report-url` set to `/1.0/`
@@ -54,7 +54,7 @@
 - **then** the JSON «report» is unchanged
 
 ## ✓ The `citations` exit code says whether a «citation finding» remains, so CI can gate on it · 5 cases
-`tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains` · spec/citations, versions/0.5.0
+`tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains` · spec/citations
 
 - **given** a document with a «citation» that is {citation}
     - 📎 document — *see parameter table*
@@ -97,7 +97,7 @@
     ```
 
 ## ✓ `citations` refuses documents that never link the «report», rather than passing them
-`tests/integration/test_cli_citations.py::test_documents_that_never_link_the_report_are_refused` · spec/citations, versions/0.5.0
+`tests/integration/test_cli_citations.py::test_documents_that_never_link_the_report_are_refused` · spec/citations
 
 - **given** a document whose «citation» links another URL
     - 📎 document:
@@ -123,7 +123,7 @@
 - **then** the «citation» reads what that report says
 
 ## ✓ `citations check --list` prints every «report link», its findings under it
-`tests/integration/test_cli_citations.py::test_check_list_prints_every_report_link_with_its_findings` · spec/citations-list, versions/0.5.0
+`tests/integration/test_cli_citations.py::test_check_list_prints_every_report_link_with_its_findings` · spec/citations-list
 
 - **given** a document with two «citations», one of them stale, and a plain «report link»
     - 📎 document:
@@ -147,7 +147,7 @@
 - **then** it exits 1 for the finding
 
 ## ✓ `--covering` leaves «report links» out of the list but still counts their findings
-`tests/integration/test_cli_citations.py::test_covering_still_counts_the_findings_it_leaves_out` · spec/citations-list, versions/0.5.0
+`tests/integration/test_cli_citations.py::test_covering_still_counts_the_findings_it_leaves_out` · spec/citations-list
 
 - **given** a document whose stale «citation» cites `test_refund`, not `test_pay`
     - 📎 document:
@@ -367,7 +367,7 @@
 - **then** the grouped steps carry a placeholder per matching name
 
 ## ✓ A «parameter table» names its rows by their «case IDs» when any is custom · 2 cases
-`tests/integration/test_plugin.py::test_a_parameter_table_names_its_rows_by_their_case_ids` · parametrization, spec/parameter-table-case-ids, versions/0.5.0
+`tests/integration/test_plugin.py::test_a_parameter_table_names_its_rows_by_their_case_ids` · parametrization, spec/parameter-table-case-ids
 
 - **given** a «parametrized scenario» whose first «case» is written {first_case}, the other left to pytest
 - **when** the suite runs with --given-md
@@ -1081,14 +1081,14 @@
 | --setup-plan | a --setup-plan run plans setup but runs no tests |
 
 ## ✓ The Markdown «report» leaves the line out of each «scenario» anchor under `given_md_lines = false`
-`tests/integration/test_plugin.py::test_given_md_lines_ini_drops_the_anchor_line` · versions/0.5.0
+`tests/integration/test_plugin.py::test_given_md_lines_ini_drops_the_anchor_line`
 
 - **given** a suite with one «scenario», and `given_md_lines = false`
 - **when** the suite runs with --given-md
 - **then** the anchor is the node ID, without a line number
 
 ## ✓ `--given-md-source` ends each «scenario» of the Markdown «report» with its test function, under its line numbers
-`tests/integration/test_plugin.py::test_given_md_source_shows_the_test_function` · versions/0.5.0
+`tests/integration/test_plugin.py::test_given_md_source_shows_the_test_function`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-md and --given-md-source
@@ -1223,7 +1223,7 @@
 - **then** the run still fails, naming the offending form
 
 ## ✓ Every «scenario» carries the `pytest_given` marker
-`tests/integration/test_plugin.py::test_the_marker_selects_the_scenarios_alone` · versions/0.5.0
+`tests/integration/test_plugin.py::test_the_marker_selects_the_scenarios_alone`
 
 - **given** a suite with a «scenario», a «parametrized scenario» and a plain test
     - 📎 suite:
@@ -1417,7 +1417,7 @@
 - **then** the run exits failed, naming the «lint rule» and the step
 
 ## ✓ A «narration lint» run that finds nothing says so
-`tests/integration/test_plugin_lint.py::test_enabled_clean_suite_exits_zero_and_captures_sources` · versions/0.5.0
+`tests/integration/test_plugin_lint.py::test_enabled_clean_suite_exits_zero_and_captures_sources`
 
 - **given** a suite whose «steps» are all sound
     - 📎 suite:
@@ -2163,7 +2163,7 @@
 - **then** the «term» is registered as «kindless»
 
 ## ✓ The lowercase «handle» form lowercases only capitalized words · 8 cases
-`tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words` · versions/0.5.0
+`tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words`
 
 - **given** a «term» named {canonical}
 - **when** its lowercase «handle» form is taken
@@ -2181,7 +2181,7 @@
 | 'McDonald' | 'McDonald' |
 
 ## ✓ The «S-form» and lowercase «handle» forms chain, and every reading stays the same «term» · 8 cases
-`tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form` · versions/0.5.0
+`tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form`
 
 - **given** a «term» named {canonical}
 - **when** the «handle» forms {forms} are applied in order
@@ -2199,7 +2199,7 @@
 | 'book' | 's' | 'books' |
 
 ## ✓ The «S-form» and lowercase «handle» forms also apply to a called form
-`tests/unit/capture/test_glossary.py::test_s_form_and_lowercase_form_apply_to_a_called_form` · versions/0.5.0
+`tests/unit/capture/test_glossary.py::test_s_form_and_lowercase_form_apply_to_a_called_form`
 
 - **given** a «term» named "Room"
 - **when** it is called as "Deluxe Suite" and both forms are applied
@@ -2412,7 +2412,7 @@
     ```
 
 ## ✓ A «markdown glossary» reads the tables a GFM renderer shows, and no others · 6 cases
-`tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows` · versions/0.5.0
+`tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows`
 
 - **given** a Markdown document with {document}
     - 📎 Markdown document — *see parameter table*
@@ -2935,7 +2935,7 @@
 - **then** the step carries a single «term ref»
 
 ## ✓ A span holding a value, a placeholder or a «term ref» is refused
-`tests/unit/capture/test_template.py::test_a_span_holding_a_value_is_refused` · validation, versions/0.5.0
+`tests/unit/capture/test_template.py::test_a_span_holding_a_value_is_refused` · validation
 
 - **given** a code span around a t-string value, bold around a «term ref» and italics around a `Template` placeholder
 - **when** the narration of each is built
@@ -2943,7 +2943,7 @@
 - **then** each says the span would not render
 
 ## ✓ `citations update` rewrites a stale «citation» to its target's glyph, text and summary
-`tests/unit/citations/test_check.py::test_update_rewrites_a_stale_citation` · spec/citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_update_rewrites_a_stale_citation` · spec/citations
 
 - **given** a «report» where the tag `checkout` has a passed and an xfailed «scenario»
 - **given** a document citing the tag under another name, as all passed
@@ -2972,7 +2972,7 @@
 - **then** the other writer's save is what is on disk
 
 ## ✓ A plain «report link» claims only that its target exists
-`tests/unit/citations/test_check.py::test_a_plain_report_link_claims_only_that_its_target_exists` · spec/citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_plain_report_link_claims_only_that_its_target_exists` · spec/citations
 
 - **given** a «report» whose one «scenario» fails
 - **given** a document linking it, and a deleted test, in its own words
@@ -2985,7 +2985,7 @@
 - **then** the document is left as written
 
 ## ✓ A «citation» whose target left the «report» is marked ❓ and recovers once it is back
-`tests/unit/citations/test_check.py::test_a_citation_to_a_gone_target_is_marked_and_recovers` · spec/citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_citation_to_a_gone_target_is_marked_and_recovers` · spec/citations
 
 - **given** a «citation» of a passing «scenario»
     - 📎 document:
@@ -3003,7 +3003,7 @@
 - **then** it reads as current again
 
 ## ✓ A «citation» of any «case» cites the grouped «scenario» holding it
-`tests/unit/citations/test_check.py::test_a_citation_of_any_case_cites_its_grouped_scenario` · spec/citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_citation_of_any_case_cites_its_grouped_scenario` · spec/citations
 
 - **given** a «report» where the «cases» `[a]` and `[c]` of `test_pour` group into one «scenario»
 - **given** a document citing the «case» `[c]`
@@ -3020,7 +3020,7 @@
 - **then** no finding remains
 
 ## ✓ A «citation» keeps the emphasis its «scenario title» renders with
-`tests/unit/citations/test_check.py::test_a_citation_keeps_the_emphasis_of_its_title` · spec/citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_citation_keeps_the_emphasis_of_its_title` · spec/citations
 
 - **given** a «report» whose «scenario title» sets a word in bold
 - **given** a document with a placeholder «citation» of it
@@ -3036,7 +3036,7 @@
         ```
 
 ## ✓ `citations update` repoints the «citation» of a renamed test by its unchanged «scenario title»
-`tests/unit/citations/test_check.py::test_a_renamed_test_is_repointed_by_its_unchanged_title` · spec/citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_renamed_test_is_repointed_by_its_unchanged_title` · spec/citations
 
 - **given** a «report» where `test_pay` was renamed `test_pay_by_card`, still titled "Pay by card"
 - **given** a document whose «citation» still names `test_pay`
@@ -3055,7 +3055,7 @@
 - **then** no finding remains
 
 ## ✓ A relative «report link» resolves from its document to where `--report-path` places the «report»
-`tests/unit/citations/test_check.py::test_relative_links_resolve_from_the_documents_directory` · spec/citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_relative_links_resolve_from_the_documents_directory` · spec/citations
 
 - **given** a «report» that stores no URL, placed at `examples/r.html`
 - **given** a stale «citation» in `guide/doc.md` linking `../examples/r.html`
@@ -3071,7 +3071,7 @@
         ```
 
 ## ✓ `--covering` keeps each «report link» whose target counts the «scenario», and each it cannot rule out · 9 cases
-`tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario` · spec/citations-list, versions/0.5.0
+`tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario` · spec/citations-list
 
 - **given** a «report» where `test_pay` is tagged `checkout/card` and in a «story», `test_refund` tagged `checkout/refund`
 - **given** a document holding the «report link» {link}
@@ -3091,7 +3091,7 @@
 | ✅ \[search\](https://example.org/report.html#q=pay) | True |
 
 ## ✓ `citations update` writes a «narrated citation»'s body from the «report»
-`tests/unit/citations/test_check.py::test_update_writes_a_narrated_citations_body` · spec/narrated-citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_update_writes_a_narrated_citations_body` · spec/narrated-citations
 
 - **given** a «report» whose «scenario» has two steps
 - **given** a document holding a «narrated citation» of it, copied with an empty body
@@ -3121,7 +3121,7 @@
 - **then** no finding remains
 
 ## ✓ `citations check` reports a «narrated citation» whose body differs from the «report»
-`tests/unit/citations/test_check.py::test_check_reports_a_stale_narrated_body` · spec/narrated-citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_check_reports_a_stale_narrated_body` · spec/narrated-citations
 
 - **given** a «report» whose «scenario» ends in "it is paid"
 - **given** a document whose «narrated citation» of it still ends in "it is charged"
@@ -3140,7 +3140,7 @@
 - **then** it names the first line that differs, written and expected
 
 ## ✓ A «narrated citation» of a tag or story is a «citation finding» `update` leaves · 2 cases
-`tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves` · spec/narrated-citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves` · spec/narrated-citations
 
 - **given** a «report» whose «scenario» is tagged `checkout` and covers the «story» `checkout`
 - **given** a document with a «narrated citation» of the {target}, its glyph and body stale
@@ -3175,7 +3175,7 @@
     ```
 
 ## ✓ A `<details>` block citing the «report» in any other shape is a mistyped «citation finding», never skipped · 4 cases
-`tests/unit/citations/test_check.py::test_a_details_block_in_another_shape_is_a_mistyped_finding` · spec/narrated-citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_details_block_in_another_shape_is_a_mistyped_finding` · spec/narrated-citations
 
 - **given** a document whose `<details>` block cites the «report» with {shape}
     - 📎 document — *see parameter table*
@@ -3233,7 +3233,7 @@
     ```
 
 ## ✓ A «narrated citation» copied from the «report» is current once `citations update` fills its body
-`tests/unit/citations/test_check.py::test_a_narrated_citation_copied_from_the_report_is_current_once_filled` · spec/narrated-citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_narrated_citation_copied_from_the_report_is_current_once_filled` · spec/narrated-citations
 
 - **given** a «report» whose «scenario title» holds a code span and an ampersand
 - **given** the «narrated citation» the copy menu copies, pasted into a document
@@ -3260,7 +3260,7 @@
 - **then** no finding remains
 
 ## ✓ A failing «narrated citation» has its body rewritten and stays a «citation finding»
-`tests/unit/citations/test_check.py::test_a_failed_narrated_citation_has_its_body_rewritten_and_stays_a_finding` · spec/narrated-citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_failed_narrated_citation_has_its_body_rewritten_and_stays_a_finding` · spec/narrated-citations
 
 - **given** a «report» whose «scenario» fails
 - **given** a document holding a «narrated citation» of it, copied with an empty body
@@ -3286,7 +3286,7 @@
 - **then** the failure is the only finding that remains
 
 ## ✓ `citations update` adds `markdown="1"` to a «narrated citation»'s opening tag, keeping its other attributes · 5 cases
-`tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes` · spec/narrated-citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes` · spec/narrated-citations
 
 - **given** a current «narrated citation» whose opening tag is {opening}
 - **when** the document is checked
@@ -3303,7 +3303,7 @@
 | \<details title="see markdown here"> | \<details markdown="1" title="see markdown here"> |
 
 ## ✓ A «narrated citation» in a list item or blockquote has its body written under that prefix · 2 cases
-`tests/unit/citations/test_check.py::test_a_body_under_a_list_item_or_blockquote_is_written_under_its_prefix` · spec/narrated-citations, versions/0.5.0
+`tests/unit/citations/test_check.py::test_a_body_under_a_list_item_or_blockquote_is_written_under_its_prefix` · spec/narrated-citations
 
 - **given** a «narrated citation» copied with an empty body into a {container}
     - 📎 document — *see parameter table*
@@ -3866,7 +3866,7 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A varying expression in a then is refused with the fix of an expected-outcome column
-`tests/unit/grouping/test_grouping.py::test_rule_two_in_a_then_offers_an_expected_outcome_column` · diagnostics, parametrization, validation, versions/0.5.0
+`tests/unit/grouping/test_grouping.py::test_rule_two_in_a_then_offers_an_expected_outcome_column` · diagnostics, parametrization, validation
 
 - **given** two «cases» whose then narrates an outcome derived from an input
 - **when** the «cases» are «grouped»
@@ -4022,7 +4022,7 @@
 - **then** each «step» still shows its own phrases
 
 ## ✓ A per-case «scenario title» ends with its «case ID» as a value
-`tests/unit/grouping/test_percase.py::test_a_plain_string_title_carries_its_case_id_as_a_value` · parametrization, versions/0.5.0
+`tests/unit/grouping/test_percase.py::test_a_plain_string_title_carries_its_case_id_as_a_value` · parametrization
 
 - **given** a «parametrized scenario» titled "Split" that declines the «grouping», with the case ID a*b*c
 - **when** its «case» becomes a «scenario» of its own
@@ -4058,7 +4058,7 @@
 - **then** a then-without-check «lint finding» reports the unchecked then
 
 ## ✓ «Narration lint» flags a then «step» that checks only on some runs
-`tests/unit/lint/test_ast_rules.py::test_conditional_check_fires_on_assert_only_under_an_if` · versions/0.5.0
+`tests/unit/lint/test_ast_rules.py::test_conditional_check_fires_on_assert_only_under_an_if`
 
 - **given** a then «step» whose only assert sits under an `if`
     - 📎 step body:
@@ -4365,7 +4365,7 @@
 - **then** neither the actor nor the work object records an «instance»
 
 ## ✓ An «S-form» reference is the «term» itself, not an «instance» or an «inflection»
-`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_s_form_ref_is_the_term_itself` · versions/0.5.0
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_s_form_ref_is_the_term_itself`
 
 - **given** a «story» «sentence» referencing a work object and an activity by their «s-forms», each lowercase and capitalized
 - **when** the «glossary» aggregations are built
@@ -4552,7 +4552,7 @@
         ```
 
 ## ✓ A line break in a «scenario title» or «step» reads as a space in the Markdown «report»
-`tests/unit/report/test_md_renderer.py::test_a_newline_in_a_title_or_step_reads_as_a_space` · versions/0.5.0
+`tests/unit/report/test_md_renderer.py::test_a_newline_in_a_title_or_step_reads_as_a_space`
 
 - **given** a «scenario» whose title, and a value in its «step», break across lines
 - **when** the Markdown «report» is rendered
@@ -4778,7 +4778,7 @@
         ```
 
 ## ✓ Failure notes below a «parameter table» that would share a key add their row number
-`tests/unit/report/test_md_renderer.py::test_notes_sharing_a_key_add_their_row` · versions/0.5.0
+`tests/unit/report/test_md_renderer.py::test_notes_sharing_a_key_add_their_row`
 
 - **given** three failed «cases»: one with the custom ID 11, one with no ID whose value is 11, and one with the ID 3
 - **when** the Markdown «report» is rendered
@@ -4810,14 +4810,14 @@
 - **then** the note with a key of its own keeps it bare
 
 ## ✓ The Markdown «report» nests steps by four spaces
-`tests/unit/report/test_md_renderer.py::test_nested_steps_and_attachments_indent_by_four_spaces` · spec/narrated-citations, versions/0.5.0
+`tests/unit/report/test_md_renderer.py::test_nested_steps_and_attachments_indent_by_four_spaces` · spec/narrated-citations
 
 - **given** a «step» with a child whose attachment is multi-line
 - **when** the Markdown «report» is rendered
 - **then** each level, its attachment and the attachment fence indent four more
 
 ## ✓ A «narrated citation»'s body is the scenario's Markdown narration without heading, anchor line or errors
-`tests/unit/report/test_md_renderer.py::test_the_narration_body_leaves_out_heading_subtitle_and_errors` · spec/narrated-citations, versions/0.5.0
+`tests/unit/report/test_md_renderer.py::test_the_narration_body_leaves_out_heading_subtitle_and_errors` · spec/narrated-citations
 
 - **given** a failed grouped «scenario» with a tag, a skip reason and a failed case
 - **when** its narration body is taken
@@ -4907,7 +4907,7 @@
 - **then** the label gives the number, then reads as prose under a story-scoped key, with the «clause» texts joined
 
 ## ✓ A «scenario title»'s emphasis renders the same in every output
-`tests/unit/report/test_title_spans.py::test_a_title_s_emphasis_renders_the_same_in_every_output` · spec/inline-markdown, versions/0.5.0
+`tests/unit/report/test_title_spans.py::test_a_title_s_emphasis_renders_the_same_in_every_output` · spec/inline-markdown
 
 - **given** a «scenario title» with a bold word and a code span
 - **when** the HTML, the Markdown «report» and a «citation» show it
@@ -4921,7 +4921,7 @@
 - **then** the Markdown keeps the same markers, so a viewer renders the same
 
 ## ✓ A span crossed by a «term ref» stays literal in every output
-`tests/unit/report/test_title_spans.py::test_a_span_crossed_by_a_term_ref_stays_literal` · spec/inline-markdown, versions/0.5.0
+`tests/unit/report/test_title_spans.py::test_a_span_crossed_by_a_term_ref_stays_literal` · spec/inline-markdown
 
 - **given** a «scenario title» whose `**` markers enclose a «term ref»
 - **when** the HTML, the Markdown «report» and a «citation» show it

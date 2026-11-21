@@ -372,7 +372,6 @@ def test_a_lookup_equals_the_registration_of_the_same_term():
 
 @scenario(
     t'The lowercase {pg["Handle"].l} form lowercases only capitalized words',
-    tags=['versions/0.5.0'],
 )
 @pytest.mark.parametrize(
     ('canonical', 'lowered'),
@@ -399,7 +398,6 @@ def test_lowercase_form_keeps_acronyms_and_mixed_case_words(canonical, lowered):
 @scenario(
     t'The {pg["S-form"]} and lowercase {pg["Handle"].l} forms chain, '
     t'and every reading stays the same {pg["Term"].l}',
-    tags=['versions/0.5.0'],
 )
 @pytest.mark.parametrize(
     ('canonical', 'forms', 'reading'),
@@ -427,7 +425,6 @@ def test_s_form_chains_with_lowercase_form(canonical, forms, reading):
 @scenario(
     t'The {pg["S-form"]} and lowercase {pg["Handle"].l} forms also apply to '
     t'a called form',
-    tags=['versions/0.5.0'],
 )
 def test_s_form_and_lowercase_form_apply_to_a_called_form():
     with given(t'a {pg["Term"].l} named "Room"'):
