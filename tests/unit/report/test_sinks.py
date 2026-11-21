@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import PytestGivenError, scenario, then, when
+from pytest_given import PytestGivenError, given, scenario, then, when
 from pytest_given.model import (
     Definition,
     Glossary,
@@ -165,10 +165,11 @@ def test_the_json_sink_writes_the_dict_it_is_handed(tmp_path: Path) -> None:
     tags=['spec/report-schema-validation'],
 )
 def test_a_written_report_names_its_schema(tmp_path: Path) -> None:
-    with when(t'the JSON sink writes a {pg["Report"].l}'):
+    with given(t'a {pg["Report"].l} with one story'):
+        report_dict = report_to_dict(story_report())
+    with when(t'the JSON sink writes the {pg["Report"].l}'):
         rendered = sinks.render_sinks(
-            report_to_dict(story_report()),
-            SinkConfig(json_path=tmp_path / 'report.json'),
+            report_dict, SinkConfig(json_path=tmp_path / 'report.json')
         )
         written = json.loads(rendered.files[0].text)
     with then('`$schema` is its first key'):

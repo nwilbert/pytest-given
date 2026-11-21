@@ -54,7 +54,7 @@ def _refused(text: str, label: str) -> None:
 @scenario(
     t'A {pg["Rename log"].l} entry with neither `new` nor `cases` is refused, '
     t'naming the entry',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_an_entry_without_new_or_cases_is_malformed() -> None:
     with given(t'a {pg["Rename log"].l} whose second scenario entry only names `old`'):

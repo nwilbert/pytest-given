@@ -47,7 +47,7 @@ def _case_pairs(alignment: ParameterDelta) -> list[tuple[str, str]]:
 
 @scenario(
     t'An added column keeps the {pg["Parameter table"].l} paired case by case',
-    tags=['delta', 'parametrization'],
+    tags=['delta', 'parametrization', 'spec/delta-report'],
 )
 def test_an_added_column_keeps_the_table_paired_case_by_case() -> None:
     with given(
@@ -94,7 +94,7 @@ def test_an_added_column_keeps_the_table_paired_case_by_case() -> None:
 
 @scenario(
     t"An inserted {pg['Case'].l} doesn't shift the positional IDs' pairing",
-    tags=['delta', 'parametrization'],
+    tags=['delta', 'parametrization', 'spec/delta-report'],
 )
 def test_an_inserted_case_does_not_shift_the_positional_ids_pairing() -> None:
     with given(
@@ -125,7 +125,7 @@ def test_an_inserted_case_does_not_shift_the_positional_ids_pairing() -> None:
 
 @scenario(
     t'A renamed argname pairs when its values did not change',
-    tags=['delta', 'parametrization'],
+    tags=['delta', 'parametrization', 'spec/delta-report'],
 )
 def test_a_renamed_argname_pairs_when_its_values_did_not_change() -> None:
     with given(
@@ -157,7 +157,7 @@ def test_a_renamed_argname_pairs_when_its_values_did_not_change() -> None:
 
 @scenario(
     t'A value changed under a generated {pg["Case ID"].l} reads as removed and added',
-    tags=['delta', 'parametrization'],
+    tags=['delta', 'parametrization', 'spec/delta-report'],
 )
 def test_a_value_changed_under_a_generated_case_id_reads_as_removed_and_added() -> None:
     with given(t'a {pg["Parameter table"].l} whose case 2-True became 3-True'):

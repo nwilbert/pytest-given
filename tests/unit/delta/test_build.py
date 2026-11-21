@@ -110,7 +110,7 @@ def _pairs(delta: DeltaData) -> list[tuple[str, str]]:
 @scenario(
     t"A grouped scenario's {pg['Scenario identity'].l} survives its first "
     t'{pg["Case"].l} changing',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_grouped_identity_survives_its_first_case_changing() -> None:
     with given(
@@ -151,7 +151,7 @@ def test_a_grouped_identity_survives_its_first_case_changing() -> None:
 @scenario(
     t"A {pg['Per-case scenario'].l}'s {pg['Scenario identity'].l} is its full "
     t'{pg["Node ID"].l}',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_per_case_identity_is_its_full_node_id() -> None:
     with given(
@@ -178,7 +178,7 @@ def test_a_per_case_identity_is_its_full_node_id() -> None:
 
 @scenario(
     t'A {pg["Case"].l} pairs by its values, unless it is a {pg["Per-case scenario"].l}',
-    tags=['delta', 'parametrization'],
+    tags=['delta', 'parametrization', 'spec/delta-report'],
 )
 @pytest.mark.parametrize(
     ('group_parametrized', 'changes'),
@@ -222,7 +222,7 @@ def _rated(case_id: str) -> Scenario:
 
 @scenario(
     t'A moved test file pairs by its unique {pg["Scenario title"].l}',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_moved_test_file_pairs_by_its_unique_title() -> None:
     with given(
@@ -251,7 +251,7 @@ def test_a_moved_test_file_pairs_by_its_unique_title() -> None:
 @scenario(
     t'{pg["Pairing"]} on the rewritten {pg["Scenario identity"].l} keeps a '
     t'reused ID honest',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_pairing_on_the_rewritten_identity_keeps_a_reused_id_honest() -> None:
     with given(t'a {pg["Rename log"].l} entry renaming `A` to `B`'):
@@ -278,7 +278,7 @@ def test_pairing_on_the_rewritten_identity_keeps_a_reused_id_honest() -> None:
 
 @scenario(
     t"What doesn't make a scenario changed in a {pg['Delta report'].l}",
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_what_does_not_make_a_scenario_changed() -> None:
     with given(
@@ -332,7 +332,7 @@ def test_what_does_not_make_a_scenario_changed() -> None:
 
 @scenario(
     t'What makes a scenario changed in a {pg["Delta report"].l}',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_what_makes_a_scenario_changed() -> None:
     with given(
@@ -401,7 +401,7 @@ def _logged(content: str) -> Step:
 @scenario(
     t"A changed attachment cell counts as attachments and an added case's "
     t'cell as parameters in a {pg["Delta report"].l}',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_an_attachment_cell_change_counts_only_as_attachments() -> None:
     with given(
@@ -497,7 +497,7 @@ def test_added_and_removed_scenarios_have_no_changed_parts() -> None:
 
 @scenario(
     t'A schema version mismatch is refused, naming both versions',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_schema_version_mismatch_is_refused_naming_both_versions() -> None:
     with given(

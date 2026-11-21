@@ -64,7 +64,7 @@ def _segment(mark: Mark, *parts: NarrationPart) -> DiffSegment:
 
 @scenario(
     t'A value compares by what it renders, not its source expression',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_value_compares_by_what_it_renders() -> None:
     with given(
@@ -98,7 +98,7 @@ def test_a_value_s_changed_word_is_marked_alone_and_keeps_it_a_value() -> None:
 
 @scenario(
     t'A placeholder compares by the column it points at',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_placeholder_compares_by_its_column() -> None:
     with given(
@@ -132,7 +132,7 @@ def _phrased(format_spec: str) -> NarrationPlaceholder:
 @scenario(
     t'A placeholder with {pg["Boolean phrase"].l.s} also compares by its phrases, '
     t'which show in the step',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_placeholder_with_boolean_phrases_compares_by_its_phrases() -> None:
     with given(t'a placeholder with two {pg["Boolean phrase"].l.s}'):
@@ -165,7 +165,7 @@ def test_phrases_added_to_a_plain_placeholder_change_how_it_reads() -> None:
 
 @scenario(
     t'A {pg["Term ref"].l} compares by term and form, not by its display',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_term_ref_compares_by_term_and_form() -> None:
     with given(
@@ -204,7 +204,7 @@ def test_a_term_ref_compares_by_term_and_form() -> None:
 
 @scenario(
     t'A word diff keeps {pg["Term ref"].l.s}, placeholders and inline spans whole',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_word_diff_keeps_term_refs_placeholders_and_spans_whole() -> None:
     with given('the before narration `the **later** booking is cancelled`'):

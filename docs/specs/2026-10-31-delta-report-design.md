@@ -1,5 +1,7 @@
 # Delta Report — Design Spec
 
+✅ [spec/delta-report](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/delta-report) (38 ✅)
+
 ## Goal
 
 Show what changed in a suite's scenarios between two commits, typically two releases, as a report

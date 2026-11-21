@@ -61,7 +61,7 @@ def test_a_scenario_reaches_the_report_with_its_tags_and_term_refs(pytester, tmp
 
 @scenario(
     t'A JSON {pg["Report"].l} records its kind and the schema version of its shape',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_the_json_report_records_its_kind_and_schema_version(pytester, tmp_path):
     with given(t'a suite with one {pg["Scenario"].l}'):

@@ -44,7 +44,7 @@ def _facts_of(
 @scenario(
     t'A renamed {pg["Term"].l} pairs only through a `[[term]]` entry in the '
     t'{pg["Rename log"].l}',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_renamed_term_pairs_only_through_a_term_entry() -> None:
     with given(
@@ -74,7 +74,7 @@ def test_a_renamed_term_pairs_only_through_a_term_entry() -> None:
 
 @scenario(
     t'A {pg["Term"].l} whose kind changed is listed twice',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_term_whose_kind_changed_is_listed_twice() -> None:
     with given(

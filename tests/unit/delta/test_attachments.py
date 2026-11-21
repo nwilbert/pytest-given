@@ -47,7 +47,7 @@ def test_payloads_pair_by_label_and_unpaired_ones_are_added_or_removed() -> None
 @scenario(
     t'Attachments pair by label in a {pg["Delta report"].l}, a repeated label '
     t'pairing its unchanged ones first',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_repeated_label_pairs_its_unchanged_attachments_first() -> None:
     with given(
@@ -137,7 +137,7 @@ def test_line_diff_keeps_equal_lines_as_runs() -> None:
 @scenario(
     t'A reworded line of a changed attachment carries its word diff in a '
     t'{pg["Delta report"].l}',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_similar_line_is_modified_with_its_word_diff() -> None:
     with given(

@@ -37,7 +37,7 @@ def _read_delta() -> dict[str, object]:
 @scenario(
     t'`pytest-given delta` writes a {pg["Delta report"].l} as JSON and HTML, '
     t'and exits 0 whether or not anything changed',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 @pytest.mark.parametrize(
     ('after_title', 'listed'), [('Pay by card', 0), ('Pay by credit card', 1)]
@@ -96,15 +96,25 @@ def test_the_summary_counts_listed_terms_and_suggested_matches(
     )
 
 
+@scenario(
+    'With one output flag, `pytest-given delta` writes only that output',
+    tags=['delta', 'spec/delta-report'],
+)
 def test_one_output_flag_writes_only_that_output(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    inputs = _write_pair(report(), report())
-    assert main(['delta', *inputs, '--html', 'out/d.html']) == 0
-    assert Path('out/d.html').is_file()
-    assert not DEFAULT_DELTA_JSON_PATH.exists()
-    assert not DEFAULT_DELTA_HTML_PATH.exists()
+    with given(t'a before and an after {pg["Report"].l}'):
+        inputs = _write_pair(report(), report())
+    with when('`pytest-given delta` compares them with `--html out/d.html` alone'):
+        exit_code = main(['delta', *inputs, '--html', 'out/d.html'])
+    with then('it exits 0'):
+        assert exit_code == 0
+    with then('it writes the HTML to out/d.html'):
+        assert Path('out/d.html').is_file()
+    with then('it writes neither default output'):
+        assert not DEFAULT_DELTA_JSON_PATH.exists()
+        assert not DEFAULT_DELTA_HTML_PATH.exists()
 
 
 def test_identical_reports_make_an_empty_delta(
@@ -118,34 +128,58 @@ def test_identical_reports_make_an_empty_delta(
     assert delta_render_context(delta_from_dict(delta_dict))['listed'] == []
 
 
+@scenario(
+    'A delta JSON passed alone re-renders its HTML and stays unchanged',
+    tags=['delta', 'spec/delta-report'],
+)
 def test_a_delta_json_alone_rerenders_the_html_only(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    inputs = _write_pair(report(scn('t.py::test_a', 'A')), report())
-    assert main(['delta', *inputs]) == 0
-    json_before = DEFAULT_DELTA_JSON_PATH.read_bytes()
-    DEFAULT_DELTA_HTML_PATH.unlink()
-    capsys.readouterr()
-    assert main(['delta', DEFAULT_DELTA_JSON_PATH.as_posix()]) == 0
-    assert DEFAULT_DELTA_HTML_PATH.is_file()
-    assert DEFAULT_DELTA_JSON_PATH.read_bytes() == json_before
-    assert capsys.readouterr().out.splitlines() == [
-        f'Delta generated: {DEFAULT_DELTA_HTML_PATH}',
-        'delta: 0 added, 0 changed, 1 removed scenarios; 0 unchanged',
-    ]
+    with given(
+        t'a delta JSON listing one removed {pg["Scenario"].l}, without its HTML'
+    ):
+        inputs = _write_pair(report(scn('t.py::test_a', 'A')), report())
+        main(['delta', *inputs])
+        json_before = DEFAULT_DELTA_JSON_PATH.read_bytes()
+        DEFAULT_DELTA_HTML_PATH.unlink()
+        capsys.readouterr()
+    with when('`pytest-given delta` is passed that delta JSON alone'):
+        exit_code = main(['delta', DEFAULT_DELTA_JSON_PATH.as_posix()])
+    with then('it exits 0'):
+        assert exit_code == 0
+    with then('it writes the delta HTML'):
+        assert DEFAULT_DELTA_HTML_PATH.is_file()
+    with then('the delta JSON is unchanged'):
+        assert DEFAULT_DELTA_JSON_PATH.read_bytes() == json_before
+    with then('it names only the HTML it wrote, and counts the listed changes'):
+        assert capsys.readouterr().out.splitlines() == [
+            f'Delta generated: {DEFAULT_DELTA_HTML_PATH}',
+            'delta: 0 added, 0 changed, 1 removed scenarios; 0 unchanged',
+        ]
 
 
+@scenario(
+    t'A {pg["Delta report"].l} of two pytest-given versions warns, naming both',
+    tags=['delta', 'spec/delta-report'],
+)
 def test_version_warnings_go_to_stderr(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    before = ReportData(metadata=meta(plugin_version='0.1.0'), scenarios=[])
-    after = ReportData(metadata=meta(plugin_version='0.2.0'), scenarios=[])
-    assert main(['delta', *_write_pair(before, after)]) == 0
-    [warning] = capsys.readouterr().err.splitlines()
-    assert warning.startswith('Warning: ')
-    assert 'pytest-given 0.1.0' in warning
+    with given(t'a before {pg["Report"].l} written by pytest-given 0.1.0'):
+        before = ReportData(metadata=meta(plugin_version='0.1.0'), scenarios=[])
+    with given(t'an after {pg["Report"].l} written by pytest-given 0.2.0'):
+        after = ReportData(metadata=meta(plugin_version='0.2.0'), scenarios=[])
+    with when('`pytest-given delta` compares them'):
+        exit_code = main(['delta', *_write_pair(before, after)])
+    with then('it still exits 0'):
+        assert exit_code == 0
+    with then('one warning on stderr names both versions'):
+        [warning] = capsys.readouterr().err.splitlines()
+        assert warning.startswith('Warning: ')
+        assert 'pytest-given 0.1.0' in warning
+        assert 'pytest-given 0.2.0' in warning
 
 
 def _delta_file(tmp_path: Path) -> Path:
@@ -454,31 +488,69 @@ def test_a_rename_entry_whose_rev_is_outside_the_range_is_skipped(
     assert sorted(item['change'] for item in listed) == changes
 
 
+@scenario(
+    t'Without a before commit SHA, a {pg["Rename log"].l} entry applies '
+    t'whatever its rev, with one warning',
+    tags=['delta', 'spec/delta-report'],
+)
 def test_a_before_report_without_a_sha_applies_every_entry_with_one_warning(
     git_repo: GitRepo, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
 ) -> None:
     monkeypatch.chdir(git_repo.path)
-    Path('given-renames.toml').write_text(_RENAME.format(rev='v1'), encoding='utf-8')
-    assert main(['delta', *_renamed_pair(None, git_repo.head)]) == 0
-    [warning] = capsys.readouterr().err.splitlines()
-    assert warning == (
-        'Warning: no ancestry answer (the before report has no commit SHA); '
-        'rename-log entries with `rev` all apply'
-    )
-    delta = delta_from_dict(_read_delta())
-    assert [item.change for item in delta.scenarios] == ['changed']
+    with given(t'a {pg["Rename log"].l} entry whose rev is tag v1'):
+        Path('given-renames.toml').write_text(
+            _RENAME.format(rev='v1'), encoding='utf-8'
+        )
+    with given(t'a before {pg["Report"].l} without a commit SHA, holding the old test'):
+        inputs = _renamed_pair(None, git_repo.head)
+    with when(
+        '`pytest-given delta` compares it with an after report of the renamed test'
+    ):
+        exit_code = main(['delta', *inputs])
+    with then('one warning says every entry with a rev applies'):
+        assert exit_code == 0
+        [warning] = capsys.readouterr().err.splitlines()
+        assert warning == (
+            'Warning: no ancestry answer (the before report has no commit SHA); '
+            'rename-log entries with `rev` all apply'
+        )
+    with then(t'the entry pairs the two, so the {pg["Scenario"].l} reads as changed'):
+        delta = delta_from_dict(_read_delta())
+        assert [item.change for item in delta.scenarios] == ['changed']
 
 
+@scenario(
+    t'Each side of a {pg["Delta report"].l} is labelled with the highest git tag '
+    t'on its commit, unless a label is passed',
+    tags=['delta', 'spec/delta-report'],
+)
+@pytest.mark.parametrize(
+    ('label_passed', 'after_label'), [(False, 'v1.10'), (True, 'next')]
+)
 def test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed(
-    git_repo: GitRepo, monkeypatch: pytest.MonkeyPatch
+    git_repo: GitRepo,
+    monkeypatch: pytest.MonkeyPatch,
+    label_passed: bool,
+    after_label: str,
 ) -> None:
     monkeypatch.chdir(git_repo.path)
-    inputs = _write_pair(report(sha=git_repo.first), report(sha=git_repo.head))
-    assert main(['delta', *inputs]) == 0
-    metadata = delta_from_dict(_read_delta()).metadata
-    assert [metadata.before.label, metadata.after.label] == ['v1', 'v1.10']
-    assert main(['delta', *inputs, '--after-label', 'next']) == 0
-    assert delta_from_dict(_read_delta()).metadata.after.label == 'next'
+    with given(
+        t'a before {pg["Report"].l} of the commit tagged v1, and an after one '
+        t'of the commit tagged v1.9 and v1.10'
+    ):
+        inputs = _write_pair(report(sha=git_repo.first), report(sha=git_repo.head))
+    with when(
+        t'`pytest-given delta` compares them '
+        t'{label_passed:with `--after-label next`|without a label}'
+    ):
+        extra_args = ['--after-label', 'next'] if label_passed else []
+        exit_code = main(['delta', *inputs, *extra_args])
+        metadata = delta_from_dict(_read_delta()).metadata
+    with then('the before side is labelled v1'):
+        assert exit_code == 0
+        assert metadata.before.label == 'v1'
+    with then(t'the after side is labelled {after_label}'):
+        assert metadata.after.label == after_label
 
 
 def test_each_side_records_its_report_s_file_name(
@@ -497,7 +569,7 @@ def test_each_side_records_its_report_s_file_name(
 @scenario(
     t'A {pg["Delta report"].l} is titled by `--title`, '
     t'or else by the title of the after {pg["Report"].l}',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 @pytest.mark.parametrize(
     ('extra_args', 'shown'),

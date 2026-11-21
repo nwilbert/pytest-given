@@ -176,7 +176,7 @@
 - **then** it exits 1, naming how many tracked «sentence»s have no scenario
 
 ## ✓ `pytest-given delta` writes a «delta report» as JSON and HTML, and exits 0 whether or not anything changed · 2 cases
-`tests/integration/test_cli_delta.py::test_delta_writes_a_delta_json_and_html_and_exits_0` · delta
+`tests/integration/test_cli_delta.py::test_delta_writes_a_delta_json_and_html_and_exits_0` · delta, spec/delta-report
 
 - **given** a before «report» with a scenario titled "Pay by card"
 - **given** an after «report» that titles it "{after_title}"
@@ -190,8 +190,58 @@
 | Pay by card | 0 |
 | Pay by credit card | 1 |
 
+## ✓ With one output flag, `pytest-given delta` writes only that output
+`tests/integration/test_cli_delta.py::test_one_output_flag_writes_only_that_output` · delta, spec/delta-report
+
+- **given** a before and an after «report»
+- **when** `pytest-given delta` compares them with `--html out/d.html` alone
+- **then** it exits 0
+- **then** it writes the HTML to out/d.html
+- **then** it writes neither default output
+
+## ✓ A delta JSON passed alone re-renders its HTML and stays unchanged
+`tests/integration/test_cli_delta.py::test_a_delta_json_alone_rerenders_the_html_only` · delta, spec/delta-report
+
+- **given** a delta JSON listing one removed «scenario», without its HTML
+- **when** `pytest-given delta` is passed that delta JSON alone
+- **then** it exits 0
+- **then** it writes the delta HTML
+- **then** the delta JSON is unchanged
+- **then** it names only the HTML it wrote, and counts the listed changes
+
+## ✓ A «delta report» of two pytest-given versions warns, naming both
+`tests/integration/test_cli_delta.py::test_version_warnings_go_to_stderr` · delta, spec/delta-report
+
+- **given** a before «report» written by pytest-given 0.1.0
+- **given** an after «report» written by pytest-given 0.2.0
+- **when** `pytest-given delta` compares them
+- **then** it still exits 0
+- **then** one warning on stderr names both versions
+
+## ✓ Without a before commit SHA, a «rename log» entry applies whatever its rev, with one warning
+`tests/integration/test_cli_delta.py::test_a_before_report_without_a_sha_applies_every_entry_with_one_warning` · delta, spec/delta-report
+
+- **given** a «rename log» entry whose rev is tag v1
+- **given** a before «report» without a commit SHA, holding the old test
+- **when** `pytest-given delta` compares it with an after report of the renamed test
+- **then** one warning says every entry with a rev applies
+- **then** the entry pairs the two, so the «scenario» reads as changed
+
+## ✓ Each side of a «delta report» is labelled with the highest git tag on its commit, unless a label is passed · 2 cases
+`tests/integration/test_cli_delta.py::test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed` · delta, spec/delta-report
+
+- **given** a before «report» of the commit tagged v1, and an after one of the commit tagged v1.9 and v1.10
+- **when** `pytest-given delta` compares them {with \`--after-label next\` / without a label}
+- **then** the before side is labelled v1
+- **then** the after side is labelled {after_label}
+
+| label_passed | after_label |
+|---|---|
+| False | v1.10 |
+| True | next |
+
 ## ✓ A «delta report» is titled by `--title`, or else by the title of the after «report» · 2 cases
-`tests/integration/test_cli_delta.py::test_the_delta_is_titled_by_title_or_else_by_the_after_report` · delta
+`tests/integration/test_cli_delta.py::test_the_delta_is_titled_by_title_or_else_by_the_after_report` · delta, spec/delta-report
 
 - **given** an after «report» titled "Shop"
 - **when** `pytest-given delta` compares it to a before one, with the extra arguments {extra_args}
@@ -237,7 +287,7 @@
 - **then** the given «step» holds a «term ref» to the term
 
 ## ✓ A JSON «report» records its kind and the schema version of its shape
-`tests/integration/test_plugin.py::test_the_json_report_records_its_kind_and_schema_version` · delta
+`tests/integration/test_plugin.py::test_the_json_report_records_its_kind_and_schema_version` · delta, spec/delta-report
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-json
@@ -3522,7 +3572,7 @@
 - **then** a `failed` «citation finding» remains, blaming a scenario using the term
 
 ## ✓ Attachments pair by label in a «delta report», a repeated label pairing its unchanged ones first
-`tests/unit/delta/test_attachments.py::test_a_repeated_label_pairs_its_unchanged_attachments_first` · delta
+`tests/unit/delta/test_attachments.py::test_a_repeated_label_pairs_its_unchanged_attachments_first` · delta, spec/delta-report
 
 - **given** a before «step» attaching two responses and a receipt, and an after one attaching the receipt first and a new response ahead of the two
 - **when** their «attachments» are aligned
@@ -3531,7 +3581,7 @@
 - **then** the two responses pair with their equals, unchanged
 
 ## ✓ A reworded line of a changed attachment carries its word diff in a «delta report»
-`tests/unit/delta/test_attachments.py::test_a_similar_line_is_modified_with_its_word_diff` · delta
+`tests/unit/delta/test_attachments.py::test_a_similar_line_is_modified_with_its_word_diff` · delta, spec/delta-report
 
 - **given** a before and an after «attachment» whose one line has one word reworded
 - **when** the two «attachments» are aligned
@@ -3539,7 +3589,7 @@
 - **then** the modified line marks the reworded word removed and added
 
 ## ✓ A grouped scenario's «scenario identity» survives its first «case» changing
-`tests/unit/delta/test_build.py::test_a_grouped_identity_survives_its_first_case_changing` · delta
+`tests/unit/delta/test_build.py::test_a_grouped_identity_survives_its_first_case_changing` · delta, spec/delta-report
 
 - **given** a grouped scenario whose first «case» is `t[1]` before and a new `t[0]` after
 - **when** a «delta report» is built
@@ -3547,7 +3597,7 @@
 - **then** the two pair by it, changed by the added case
 
 ## ✓ A «per-case scenario»'s «scenario identity» is its full «node ID»
-`tests/unit/delta/test_build.py::test_a_per_case_identity_is_its_full_node_id` · delta
+`tests/unit/delta/test_build.py::test_a_per_case_identity_is_its_full_node_id` · delta, spec/delta-report
 
 - **given** «per-case scenarios» `t[a]` and `t[b]`, and a `t[c]` only after
 - **when** a «delta report» is built
@@ -3555,7 +3605,7 @@
 - **then** `t[c]` is added
 
 ## ✓ A «case» pairs by its values, unless it is a «per-case scenario» · 2 cases
-`tests/unit/delta/test_build.py::test_a_per_case_scenario_never_pairs_by_values` · delta, parametrization
+`tests/unit/delta/test_build.py::test_a_per_case_scenario_never_pairs_by_values` · delta, parametrization, spec/delta-report
 
 - **given** a «case» whose custom «case ID» `happy` becomes `happy-hour`
     - **given** `group_parametrized` is {group_parametrized}
@@ -3569,7 +3619,7 @@
 | False | removed and added |
 
 ## ✓ A moved test file pairs by its unique «scenario title»
-`tests/unit/delta/test_build.py::test_a_moved_test_file_pairs_by_its_unique_title` · delta
+`tests/unit/delta/test_build.py::test_a_moved_test_file_pairs_by_its_unique_title` · delta, spec/delta-report
 
 - **given** a scenario moved from `a.py` to `b.py` with its «scenario title» kept and a tag added
 - **when** a «delta report» is built
@@ -3578,7 +3628,7 @@
 - **then** nothing pairs: the old one is removed and both new ones added
 
 ## ✓ «Pairing» on the rewritten «scenario identity» keeps a reused ID honest
-`tests/unit/delta/test_build.py::test_pairing_on_the_rewritten_identity_keeps_a_reused_id_honest` · delta
+`tests/unit/delta/test_build.py::test_pairing_on_the_rewritten_identity_keeps_a_reused_id_honest` · delta, spec/delta-report
 
 - **given** a «rename log» entry renaming `A` to `B`
 - **given** before holds `A`, after holds `B` and a new test that took the name `A`
@@ -3587,7 +3637,7 @@
 - **then** the new `A` is added
 
 ## ✓ What doesn't make a scenario changed in a «delta report»
-`tests/unit/delta/test_build.py::test_what_does_not_make_a_scenario_changed` · delta
+`tests/unit/delta/test_build.py::test_what_does_not_make_a_scenario_changed` · delta, spec/delta-report
 
 - **given** a parametrized scenario, moved and renamed through the «rename log»
 - **given** its after side differs in module, source, duration, error message, fixture name, story IDs and pins
@@ -3595,14 +3645,14 @@
 - **then** the scenario is unchanged and nothing is listed
 
 ## ✓ What makes a scenario changed in a «delta report»
-`tests/unit/delta/test_build.py::test_what_makes_a_scenario_changed` · delta
+`tests/unit/delta/test_build.py::test_what_makes_a_scenario_changed` · delta, spec/delta-report
 
 - **given** seven scenarios whose after sides each differ in one of title, step, tag, status, reason, parameter table and attachment
 - **when** a «delta report» is built
 - **then** each is changed, and its «changed parts» name what differs
 
 ## ✓ A changed attachment cell counts as attachments and an added case's cell as parameters in a «delta report»
-`tests/unit/delta/test_build.py::test_an_attachment_cell_change_counts_only_as_attachments` · delta
+`tests/unit/delta/test_build.py::test_an_attachment_cell_change_counts_only_as_attachments` · delta, spec/delta-report
 
 - **given** a grouped scenario whose paired «case» changes its page cell, and one that adds a «case» with a page cell
 - **when** a «delta report» is built
@@ -3610,28 +3660,28 @@
 - **then** the second scenario's one «changed part» is parameters, from its added «case»
 
 ## ✓ A schema version mismatch is refused, naming both versions
-`tests/unit/delta/test_build.py::test_a_schema_version_mismatch_is_refused_naming_both_versions` · delta
+`tests/unit/delta/test_build.py::test_a_schema_version_mismatch_is_refused_naming_both_versions` · delta, spec/delta-report
 
 - **given** a before report at the current schema version and an after report without one
 - **when** the reports are checked
 - **then** the error names both versions and points at the delta skill
 
 ## ✓ A «rename log» chain ends at the last «scenario identity» present in the after report
-`tests/unit/delta/test_chains.py::test_a_chain_ends_at_the_last_identity_present_in_after` · delta
+`tests/unit/delta/test_chains.py::test_a_chain_ends_at_the_last_identity_present_in_after` · delta, spec/delta-report
 
 - **given** a «rename log» renaming A to B, and later B to C
 - **when** the before identity A is rewritten against reports that end at B or C
 - **then** A ends at C when C exists, and at B when only B does
 
 ## ✓ A chain that reaches nothing in the after report rewrites nothing, silently
-`tests/unit/delta/test_chains.py::test_a_chain_that_reaches_nothing_in_after_rewrites_nothing` · delta
+`tests/unit/delta/test_chains.py::test_a_chain_that_reaches_nothing_in_after_rewrites_nothing` · delta, spec/delta-report
 
 - **given** a «rename log» renaming A to B
 - **when** the after report holds neither A nor B
 - **then** nothing is rewritten and nothing is warned about
 
 ## ✓ An entry whose rev predates the range is skipped, so a reused «scenario identity» pairs with its old self
-`tests/unit/delta/test_chains.py::test_an_entry_whose_rev_predates_the_range_is_skipped` · delta
+`tests/unit/delta/test_chains.py::test_an_entry_whose_rev_predates_the_range_is_skipped` · delta, spec/delta-report
 
 - **given** a «rename log» entry renaming A to B at rev v1
 - **when** v1 predates the range and both A and B exist in the after report
@@ -3640,7 +3690,7 @@
 - **then** A is rewritten to B, though the after report holds an A too
 
 ## ✓ A swap goes through a name neither test has, and a plain swap is a merge
-`tests/unit/delta/test_chains.py::test_a_swap_goes_through_a_name_neither_test_has` · delta
+`tests/unit/delta/test_chains.py::test_a_swap_goes_through_a_name_neither_test_has` · delta, spec/delta-report
 
 - **given** a «rename log» swapping A and B through tmp
 - **given** a «rename log» that writes the swap as A to B, then B to A
@@ -3649,7 +3699,7 @@
 - **then** the plain swap rewrites neither, and warns once naming both entries
 
 ## ✓ A cases map from a later release leaves an earlier range alone
-`tests/unit/delta/test_chains.py::test_a_cases_map_from_a_later_release_leaves_an_earlier_range_alone` · delta
+`tests/unit/delta/test_chains.py::test_a_cases_map_from_a_later_release_leaves_an_earlier_range_alone` · delta, spec/delta-report
 
 - **given** a «rename log» that renames test_pricing to test_price_list at v0.6.0 and renames the case happy-hour at v0.7.0
 - **when** v0.5, where the test is still test_pricing, is compared with a later one
@@ -3658,7 +3708,7 @@
 - **then** against v0.7, happy-hour becomes happy-hour-weekdays
 
 ## ✓ A value compares by what it renders, not its source expression
-`tests/unit/delta/test_narration.py::test_a_value_compares_by_what_it_renders` · delta
+`tests/unit/delta/test_narration.py::test_a_value_compares_by_what_it_renders` · delta, spec/delta-report
 
 - **given** a «narration» that interpolates 200 ml from the expression volume
 - **given** a plain narration that reads the same
@@ -3666,7 +3716,7 @@
 - **then** they are equal
 
 ## ✓ A placeholder compares by the column it points at
-`tests/unit/delta/test_narration.py::test_a_placeholder_compares_by_its_column` · delta
+`tests/unit/delta/test_narration.py::test_a_placeholder_compares_by_its_column` · delta, spec/delta-report
 
 - **given** a before placeholder whose column pairs with the after column `derived:1`
 - **given** an after placeholder of another name and format spec in that column
@@ -3676,7 +3726,7 @@
 - **then** they differ
 
 ## ✓ A placeholder with «boolean phrases» also compares by its phrases, which show in the step
-`tests/unit/delta/test_narration.py::test_a_placeholder_with_boolean_phrases_compares_by_its_phrases` · delta
+`tests/unit/delta/test_narration.py::test_a_placeholder_with_boolean_phrases_compares_by_its_phrases` · delta, spec/delta-report
 
 - **given** a placeholder with two «boolean phrases»
 - **when** the true phrase is reworded on the same column
@@ -3687,7 +3737,7 @@
 - **then** the placeholder reads removed and added whole
 
 ## ✓ A «term ref» compares by term and form, not by its display
-`tests/unit/delta/test_narration.py::test_a_term_ref_compares_by_term_and_form` · delta
+`tests/unit/delta/test_narration.py::test_a_term_ref_compares_by_term_and_form` · delta, spec/delta-report
 
 - **given** a before «term ref» to room, lowercased, and a «rename log» renaming room to suite
 - **when** it is compared with suite, lowercased, and with suite in its «S-form»
@@ -3696,7 +3746,7 @@
 - **then** they differ
 
 ## ✓ A word diff keeps «term refs», placeholders and inline spans whole
-`tests/unit/delta/test_narration.py::test_a_word_diff_keeps_term_refs_placeholders_and_spans_whole` · delta
+`tests/unit/delta/test_narration.py::test_a_word_diff_keeps_term_refs_placeholders_and_spans_whole` · delta, spec/delta-report
 
 - **given** the before narration `the **later** booking is cancelled`
 - **given** the after narration `the **late** {Booking} is cancelled and refunded`, with a «term ref» to booking
@@ -3706,14 +3756,14 @@
 - **then** the placeholder reads removed and added whole
 
 ## ✓ A «rename log» entry with neither `new` nor `cases` is refused, naming the entry
-`tests/unit/delta/test_renames.py::test_an_entry_without_new_or_cases_is_malformed` · delta
+`tests/unit/delta/test_renames.py::test_an_entry_without_new_or_cases_is_malformed` · delta, spec/delta-report
 
 - **given** a «rename log» whose second scenario entry only names `old`
 - **when** it is parsed
 - **then** the error names `[[scenario]] #2`
 
 ## ✓ A reworded «step» reads as modified, an unrelated one as removed and added
-`tests/unit/delta/test_steps.py::test_a_reworded_step_reads_as_modified` · delta
+`tests/unit/delta/test_steps.py::test_a_reworded_step_reads_as_modified` · delta, spec/delta-report
 
 - **given** a before and an after «step» list of one booking story
 - **when** the two are aligned
@@ -3723,7 +3773,7 @@
 - **then** the old Then is removed and the new one added
 
 ## ✓ A removed and an added scenario with nearly the same steps are a «suggested match», never applied
-`tests/unit/delta/test_suggestions.py::test_nearly_the_same_steps_are_a_suggested_match_never_applied` · delta
+`tests/unit/delta/test_suggestions.py::test_nearly_the_same_steps_are_a_suggested_match_never_applied` · delta, spec/delta-report
 
 - **given** a scenario removed, and one added under another name with one step reworded
 - **when** the delta is built
@@ -3731,7 +3781,7 @@
 - **then** the scenarios stay removed and added, never paired
 
 ## ✓ An added column keeps the «parameter table» paired case by case
-`tests/unit/delta/test_table.py::test_an_added_column_keeps_the_table_paired_case_by_case` · delta, parametrization
+`tests/unit/delta/test_table.py::test_an_added_column_keeps_the_table_paired_case_by_case` · delta, parametrization, spec/delta-report
 
 - **given** a «parameter table» of n and big, and one gaining a size column that changes every generated «case ID»
 - **when** the two are aligned
@@ -3740,14 +3790,14 @@
 - **then** the table changed
 
 ## ✓ An inserted «case» doesn't shift the positional IDs' pairing
-`tests/unit/delta/test_table.py::test_an_inserted_case_does_not_shift_the_positional_ids_pairing` · delta, parametrization
+`tests/unit/delta/test_table.py::test_an_inserted_case_does_not_shift_the_positional_ids_pairing` · delta, parametrization, spec/delta-report
 
 - **given** a «parameter table» of objects A and B with the positional IDs order0 and order1, and one with a new object Z in front of them
 - **when** the two are aligned
 - **then** A and B pair by their values, and Z is added
 
 ## ✓ A renamed argname pairs when its values did not change
-`tests/unit/delta/test_table.py::test_a_renamed_argname_pairs_when_its_values_did_not_change` · delta, parametrization
+`tests/unit/delta/test_table.py::test_a_renamed_argname_pairs_when_its_values_did_not_change` · delta, parametrization, spec/delta-report
 
 - **given** a «parameter table» with a euros column, and one naming it eur
 - **when** the two are aligned
@@ -3755,7 +3805,7 @@
 - **then** the table changed, though no cell did
 
 ## ✓ A value changed under a generated «case ID» reads as removed and added
-`tests/unit/delta/test_table.py::test_a_value_changed_under_a_generated_case_id_reads_as_removed_and_added` · delta, parametrization
+`tests/unit/delta/test_table.py::test_a_value_changed_under_a_generated_case_id_reads_as_removed_and_added` · delta, parametrization, spec/delta-report
 
 - **given** a «parameter table» whose case 2-True became 3-True
 - **when** the two are aligned, with and without a rename-log rewrite
@@ -3763,7 +3813,7 @@
 - **then** with the rewrite they pair by the rename log, the n cell changed
 
 ## ✓ A renamed «term» pairs only through a `[[term]]` entry in the «rename log»
-`tests/unit/delta/test_terms.py::test_a_renamed_term_pairs_only_through_a_term_entry` · delta
+`tests/unit/delta/test_terms.py::test_a_renamed_term_pairs_only_through_a_term_entry` · delta, spec/delta-report
 
 - **given** a «glossary» whose guest term is called visitor in the next one, and a «rename log» with a `[[term]]` entry for guest
 - **when** the terms are aligned with and without the entry
@@ -3772,7 +3822,7 @@
 - **then** a narration ref to guest is rewritten to visitor with the entry
 
 ## ✓ A «term» whose kind changed is listed twice
-`tests/unit/delta/test_terms.py::test_a_term_whose_kind_changed_is_listed_twice` · delta
+`tests/unit/delta/test_terms.py::test_a_term_whose_kind_changed_is_listed_twice` · delta, spec/delta-report
 
 - **given** a «term» that is an object in one «glossary» and an actor in the next
 - **when** the terms are aligned
@@ -4827,7 +4877,8 @@
 ## ✓ A written «report» names its JSON schema
 `tests/unit/report/test_sinks.py::test_a_written_report_names_its_schema` · spec/report-schema-validation
 
-- **when** the JSON sink writes a «report»
+- **given** a «report» with one story
+- **when** the JSON sink writes the «report»
 - **then** `$schema` is its first key
 - **then** it names the schema the documentation site publishes
 

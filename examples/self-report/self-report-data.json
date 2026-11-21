@@ -2,10 +2,10 @@
   "$schema": "https://nwilbert.github.io/pytest-given/latest/schemas/report-v1.schema.json",
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-21T07:57:26.702126+00:00",
+    "timestamp": "2026-11-21T08:07:39.459984+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.6.0",
-    "commit_sha": "43273f91e44d860ce8ba6099805aabe35391700e",
+    "commit_sha": "4bbe21c8885255893a1bb904b27e8427aa75e8ad",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html",
     "kind": "report",
@@ -35,7 +35,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 141,
+      "duration_ms": 146,
       "steps": [
         {
           "phase": "given",
@@ -127,7 +127,7 @@
         "diagnostics"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -263,7 +263,7 @@
         "spec/report-schema-validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -352,7 +352,7 @@
         "diagnostics"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -492,7 +492,7 @@
       "module": "tests.integration.test_cli",
       "tags": [],
       "status": "passed",
-      "duration_ms": 130,
+      "duration_ms": 131,
       "steps": [
         {
           "phase": "given",
@@ -1183,7 +1183,7 @@
         "spec/citations-list"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -1482,7 +1482,7 @@
         "spec/report-schema-validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -1608,7 +1608,8 @@
       },
       "module": "tests.integration.test_cli_delta",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 182,
@@ -1772,6 +1773,590 @@
       "pins": null
     },
     {
+      "id": "tests/integration/test_cli_delta.py::test_one_output_flag_writes_only_that_output",
+      "narration": {
+        "text": "With one output flag, `pytest-given delta` writes only that output",
+        "parts": []
+      },
+      "module": "tests.integration.test_cli_delta",
+      "tags": [
+        "delta",
+        "spec/delta-report"
+      ],
+      "status": "passed",
+      "duration_ms": 75,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a before and an after report",
+            "parts": [
+              {
+                "value": "a before and an after "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given delta` compares them with `--html out/d.html` alone",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it exits 0",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it writes the HTML to out/d.html",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it writes neither default output",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "reason": null,
+      "source": {
+        "relpath": "tests/integration/test_cli_delta.py",
+        "line": 99
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/integration/test_cli_delta.py::test_a_delta_json_alone_rerenders_the_html_only",
+      "narration": {
+        "text": "A delta JSON passed alone re-renders its HTML and stays unchanged",
+        "parts": []
+      },
+      "module": "tests.integration.test_cli_delta",
+      "tags": [
+        "delta",
+        "spec/delta-report"
+      ],
+      "status": "passed",
+      "duration_ms": 151,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a delta JSON listing one removed scenario, without its HTML",
+            "parts": [
+              {
+                "value": "a delta JSON listing one removed "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": ", without its HTML"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given delta` is passed that delta JSON alone",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it exits 0",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it writes the delta HTML",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the delta JSON is unchanged",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it names only the HTML it wrote, and counts the listed changes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "reason": null,
+      "source": {
+        "relpath": "tests/integration/test_cli_delta.py",
+        "line": 131
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/integration/test_cli_delta.py::test_version_warnings_go_to_stderr",
+      "narration": {
+        "text": "A delta report of two pytest-given versions warns, naming both",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "delta-report",
+            "display": "delta report",
+            "expression": "pg[\"Delta report\"].l"
+          },
+          {
+            "value": " of two pytest-given versions warns, naming both"
+          }
+        ]
+      },
+      "module": "tests.integration.test_cli_delta",
+      "tags": [
+        "delta",
+        "spec/delta-report"
+      ],
+      "status": "passed",
+      "duration_ms": 80,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a before report written by pytest-given 0.1.0",
+            "parts": [
+              {
+                "value": "a before "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " written by pytest-given 0.1.0"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "an after report written by pytest-given 0.2.0",
+            "parts": [
+              {
+                "value": "an after "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " written by pytest-given 0.2.0"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given delta` compares them",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it still exits 0",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "one warning on stderr names both versions",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "reason": null,
+      "source": {
+        "relpath": "tests/integration/test_cli_delta.py",
+        "line": 162
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/integration/test_cli_delta.py::test_a_before_report_without_a_sha_applies_every_entry_with_one_warning",
+      "narration": {
+        "text": "Without a before commit SHA, a rename log entry applies whatever its rev, with one warning",
+        "parts": [
+          {
+            "value": "Without a before commit SHA, a "
+          },
+          {
+            "term_id": "rename-log",
+            "display": "rename log",
+            "expression": "pg[\"Rename log\"].l"
+          },
+          {
+            "value": " entry applies whatever its rev, with one warning"
+          }
+        ]
+      },
+      "module": "tests.integration.test_cli_delta",
+      "tags": [
+        "delta",
+        "spec/delta-report"
+      ],
+      "status": "passed",
+      "duration_ms": 145,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a rename log entry whose rev is tag v1",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "rename-log",
+                "display": "rename log",
+                "expression": "pg[\"Rename log\"].l"
+              },
+              {
+                "value": " entry whose rev is tag v1"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a before report without a commit SHA, holding the old test",
+            "parts": [
+              {
+                "value": "a before "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " without a commit SHA, holding the old test"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given delta` compares it with an after report of the renamed test",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "one warning says every entry with a rev applies",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the entry pairs the two, so the scenario reads as changed",
+            "parts": [
+              {
+                "value": "the entry pairs the two, so the "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " reads as changed"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "reason": null,
+      "source": {
+        "relpath": "tests/integration/test_cli_delta.py",
+        "line": 491
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/integration/test_cli_delta.py::test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed[False-v1.10]",
+      "narration": {
+        "text": "Each side of a delta report is labelled with the highest git tag on its commit, unless a label is passed",
+        "parts": [
+          {
+            "value": "Each side of a "
+          },
+          {
+            "term_id": "delta-report",
+            "display": "delta report",
+            "expression": "pg[\"Delta report\"].l"
+          },
+          {
+            "value": " is labelled with the highest git tag on its commit, unless a label is passed"
+          }
+        ]
+      },
+      "module": "tests.integration.test_cli_delta",
+      "tags": [
+        "delta",
+        "spec/delta-report"
+      ],
+      "status": "passed",
+      "duration_ms": 204,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a before report of the commit tagged v1, and an after one of the commit tagged v1.9 and v1.10",
+            "parts": [
+              {
+                "value": "a before "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " of the commit tagged v1, and an after one of the commit tagged v1.9 and v1.10"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given delta` compares them {with `--after-label next` / without a label}",
+            "parts": [
+              {
+                "value": "`pytest-given delta` compares them "
+              },
+              {
+                "name": "label_passed",
+                "column_id": "label_passed",
+                "format_spec": "with `--after-label next`|without a label",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the before side is labelled v1",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the after side is labelled {after_label}",
+            "parts": [
+              {
+                "value": "the after side is labelled "
+              },
+              {
+                "name": "after_label",
+                "column_id": "after_label",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "label_passed",
+            "name": "label_passed",
+            "kind": "param"
+          },
+          {
+            "id": "after_label",
+            "name": "after_label",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/integration/test_cli_delta.py::test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed[False-v1.10]",
+            "values": [
+              false,
+              "v1.10"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/integration/test_cli_delta.py::test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed[True-next]",
+            "values": [
+              true,
+              "next"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "reason": null,
+      "source": {
+        "relpath": "tests/integration/test_cli_delta.py",
+        "line": 522
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
       "id": "tests/integration/test_cli_delta.py::test_the_delta_is_titled_by_title_or_else_by_the_after_report[extra_args0-Shop]",
       "narration": {
         "text": "A delta report is titled by `--title`, or else by the title of the after report",
@@ -1796,7 +2381,8 @@
       },
       "module": "tests.integration.test_cli_delta",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 164,
@@ -1910,7 +2496,7 @@
       "reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_delta.py",
-        "line": 497
+        "line": 569
       },
       "story_ids": [],
       "pins": null
@@ -1924,7 +2510,7 @@
       "module": "tests.integration.test_cli_skills",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -2034,7 +2620,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -2216,10 +2802,11 @@
       },
       "module": "tests.integration.test_plugin",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -2301,7 +2888,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 111,
+      "duration_ms": 113,
       "steps": [
         {
           "phase": "given",
@@ -2393,7 +2980,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -2487,7 +3074,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -2562,7 +3149,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -2670,7 +3257,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -2798,7 +3385,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 550,
+      "duration_ms": 554,
       "steps": [
         {
           "phase": "given",
@@ -2925,7 +3512,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -3110,7 +3697,7 @@
         "spec/parameter-table-case-ids"
       ],
       "status": "passed",
-      "duration_ms": 91,
+      "duration_ms": 90,
       "steps": [
         {
           "phase": "given",
@@ -3295,7 +3882,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -3361,7 +3948,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -3470,7 +4057,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -3611,7 +4198,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -3680,7 +4267,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -3799,7 +4386,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -3933,7 +4520,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 72,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -4060,7 +4647,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -4186,7 +4773,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -4320,7 +4907,7 @@
         "spec/definition-refs"
       ],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -4450,7 +5037,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 177,
+      "duration_ms": 187,
       "steps": [
         {
           "phase": "given",
@@ -4522,7 +5109,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -4693,7 +5280,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -4831,7 +5418,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -4975,7 +5562,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -5127,7 +5714,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -5417,7 +6004,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 157,
+      "duration_ms": 162,
       "steps": [
         {
           "phase": "given",
@@ -5637,7 +6224,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 507,
+      "duration_ms": 648,
       "steps": [
         {
           "phase": "given",
@@ -5763,7 +6350,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -5878,7 +6465,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -5979,7 +6566,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -6102,7 +6689,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 111,
+      "duration_ms": 108,
       "steps": [
         {
           "phase": "given",
@@ -6230,7 +6817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 98,
+      "duration_ms": 106,
       "steps": [
         {
           "phase": "given",
@@ -6568,7 +7155,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 221,
+      "duration_ms": 217,
       "steps": [
         {
           "phase": "given",
@@ -6747,7 +7334,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -6834,7 +7421,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -6925,7 +7512,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 98,
+      "duration_ms": 96,
       "steps": [
         {
           "phase": "given",
@@ -7097,7 +7684,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -7181,7 +7768,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -7287,7 +7874,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 173,
+      "duration_ms": 180,
       "steps": [
         {
           "phase": "given",
@@ -7383,7 +7970,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 558,
+      "duration_ms": 575,
       "steps": [
         {
           "phase": "given",
@@ -7463,7 +8050,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -7576,7 +8163,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -7728,7 +8315,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -7801,7 +8388,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -7940,7 +8527,7 @@
         "spec/boolean-phrases"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -8108,7 +8695,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -8250,7 +8837,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 65,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -8382,7 +8969,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 559,
+      "duration_ms": 577,
       "steps": [
         {
           "phase": "given",
@@ -8566,7 +9153,7 @@
         "spec/glossary-sections"
       ],
       "status": "passed",
-      "duration_ms": 602,
+      "duration_ms": 622,
       "steps": [
         {
           "phase": "given",
@@ -8864,7 +9451,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -8968,7 +9555,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -9087,7 +9674,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -9216,7 +9803,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 105,
+      "duration_ms": 108,
       "steps": [
         {
           "phase": "given",
@@ -9445,7 +10032,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -9556,7 +10143,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -9651,7 +10238,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 105,
+      "duration_ms": 102,
       "steps": [
         {
           "phase": "given",
@@ -9739,7 +10326,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 73,
+      "duration_ms": 71,
       "steps": [
         {
           "phase": "given",
@@ -10030,7 +10617,7 @@
         "spec/xdist-reports"
       ],
       "status": "passed",
-      "duration_ms": 759,
+      "duration_ms": 755,
       "steps": [
         {
           "phase": "given",
@@ -11656,7 +12243,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -11874,7 +12461,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -11968,7 +12555,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -12597,7 +13184,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -12697,7 +13284,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -13399,7 +13986,7 @@
         "spec/glossary-sections"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -15062,7 +15649,7 @@
       "module": "tests.unit.capture.test_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -21946,7 +22533,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -23528,7 +24115,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -23996,7 +24583,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -24182,7 +24769,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -24318,7 +24905,7 @@
         "spec/citations-list"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -24850,7 +25437,7 @@
         "spec/narrated-citations"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -25272,7 +25859,7 @@
         "spec/narrated-citations"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -25423,7 +26010,7 @@
         "spec/narrated-citations"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -26102,7 +26689,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -26269,7 +26856,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -26420,7 +27007,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -27154,7 +27741,8 @@
       },
       "module": "tests.unit.delta.test_attachments",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -27266,7 +27854,8 @@
       },
       "module": "tests.unit.delta.test_attachments",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -27390,7 +27979,8 @@
       },
       "module": "tests.unit.delta.test_build",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -27519,7 +28109,8 @@
       },
       "module": "tests.unit.delta.test_build",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -27626,7 +28217,8 @@
       "module": "tests.unit.delta.test_build",
       "tags": [
         "delta",
-        "parametrization"
+        "parametrization",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -27820,7 +28412,8 @@
       },
       "module": "tests.unit.delta.test_build",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -27958,7 +28551,8 @@
       },
       "module": "tests.unit.delta.test_build",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28070,7 +28664,8 @@
       },
       "module": "tests.unit.delta.test_build",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28168,7 +28763,8 @@
       },
       "module": "tests.unit.delta.test_build",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28258,7 +28854,8 @@
       },
       "module": "tests.unit.delta.test_build",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28391,7 +28988,8 @@
       },
       "module": "tests.unit.delta.test_build",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28468,7 +29066,8 @@
       },
       "module": "tests.unit.delta.test_chains",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28541,7 +29140,8 @@
       },
       "module": "tests.unit.delta.test_chains",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28622,7 +29222,8 @@
       },
       "module": "tests.unit.delta.test_chains",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28717,7 +29318,8 @@
       },
       "module": "tests.unit.delta.test_chains",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28824,7 +29426,8 @@
       },
       "module": "tests.unit.delta.test_chains",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -28919,7 +29522,8 @@
       },
       "module": "tests.unit.delta.test_narration",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29003,7 +29607,8 @@
       },
       "module": "tests.unit.delta.test_narration",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29105,7 +29710,8 @@
       },
       "module": "tests.unit.delta.test_narration",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29227,7 +29833,8 @@
       },
       "module": "tests.unit.delta.test_narration",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29359,7 +29966,8 @@
       },
       "module": "tests.unit.delta.test_narration",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29485,7 +30093,8 @@
       },
       "module": "tests.unit.delta.test_renames",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29566,7 +30175,8 @@
       },
       "module": "tests.unit.delta.test_steps",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29680,7 +30290,8 @@
       },
       "module": "tests.unit.delta.test_suggestions",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29761,7 +30372,8 @@
       "module": "tests.unit.delta.test_table",
       "tags": [
         "delta",
-        "parametrization"
+        "parametrization",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29890,7 +30502,8 @@
       "module": "tests.unit.delta.test_table",
       "tags": [
         "delta",
-        "parametrization"
+        "parametrization",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -29964,7 +30577,8 @@
       "module": "tests.unit.delta.test_table",
       "tags": [
         "delta",
-        "parametrization"
+        "parametrization",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -30057,7 +30671,8 @@
       "module": "tests.unit.delta.test_table",
       "tags": [
         "delta",
-        "parametrization"
+        "parametrization",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -30154,7 +30769,8 @@
       },
       "module": "tests.unit.delta.test_terms",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -30265,7 +30881,8 @@
       },
       "module": "tests.unit.delta.test_terms",
       "tags": [
-        "delta"
+        "delta",
+        "spec/delta-report"
       ],
       "status": "passed",
       "duration_ms": 0,
@@ -31594,7 +32211,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -34359,7 +34976,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -39064,7 +39681,7 @@
       "module": "tests.unit.report.test_html_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -39606,7 +40223,7 @@
       "module": "tests.unit.report.test_md_renderer",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -40736,12 +41353,35 @@
       "duration_ms": 0,
       "steps": [
         {
-          "phase": "when",
+          "phase": "given",
           "narration": {
-            "text": "the JSON sink writes a report",
+            "text": "a report with one story",
             "parts": [
               {
-                "value": "the JSON sink writes a "
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " with one story"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the JSON sink writes the report",
+            "parts": [
+              {
+                "value": "the JSON sink writes the "
               },
               {
                 "term_id": "report",
@@ -41451,7 +42091,7 @@
       "module": "tests.unit.report.test_story_view",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",

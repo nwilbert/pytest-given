@@ -32,7 +32,7 @@ def _align(before: list[Step], after: list[Step]) -> tuple[StepDelta, ...]:
 @scenario(
     t'A reworded {pg["Step"].l} reads as modified, an unrelated one as '
     t'removed and added',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_reworded_step_reads_as_modified() -> None:
     with given(t'a before and an after {pg["Step"].l} list of one booking story'):

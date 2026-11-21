@@ -76,7 +76,7 @@ def _swapping(term_id: str, display: str) -> Scenario:
 @scenario(
     t'A removed and an added scenario with nearly the same steps are a '
     t'{pg["Suggested match"].l}, never applied',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_nearly_the_same_steps_are_a_suggested_match_never_applied() -> None:
     with given(

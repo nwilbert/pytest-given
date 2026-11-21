@@ -22,7 +22,7 @@ def _identities(rewrites: Rewrites) -> dict[str, str]:
 @scenario(
     t'A {pg["Rename log"].l} chain ends at the last {pg["Scenario identity"].l} '
     t'present in the after report',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_chain_ends_at_the_last_identity_present_in_after() -> None:
     with given(t'a {pg["Rename log"].l} renaming A to B, and later B to C'):
@@ -37,7 +37,7 @@ def test_a_chain_ends_at_the_last_identity_present_in_after() -> None:
 
 @scenario(
     t'A chain that reaches nothing in the after report rewrites nothing, silently',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_chain_that_reaches_nothing_in_after_rewrites_nothing() -> None:
     with given(t'a {pg["Rename log"].l} renaming A to B'):
@@ -52,7 +52,7 @@ def test_a_chain_that_reaches_nothing_in_after_rewrites_nothing() -> None:
 @scenario(
     t'An entry whose rev predates the range is skipped, so a reused '
     t'{pg["Scenario identity"].l} pairs with its old self',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_an_entry_whose_rev_predates_the_range_is_skipped() -> None:
     with given(t'a {pg["Rename log"].l} entry renaming A to B at rev v1'):
@@ -70,7 +70,7 @@ def test_an_entry_whose_rev_predates_the_range_is_skipped() -> None:
 
 @scenario(
     t'A swap goes through a name neither test has, and a plain swap is a merge',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_swap_goes_through_a_name_neither_test_has() -> None:
     with given(t'a {pg["Rename log"].l} swapping A and B through tmp'):
@@ -92,7 +92,7 @@ def test_a_swap_goes_through_a_name_neither_test_has() -> None:
 
 @scenario(
     t'A cases map from a later release leaves an earlier range alone',
-    tags=['delta'],
+    tags=['delta', 'spec/delta-report'],
 )
 def test_a_cases_map_from_a_later_release_leaves_an_earlier_range_alone() -> None:
     with given(
