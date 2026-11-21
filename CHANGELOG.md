@@ -43,6 +43,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [0.6.0] - 2026-11-21
 
+The [self-report delta](https://nwilbert.github.io/pytest-given/dev/deltas/0.6.0.html) lists the scenarios and glossary terms this release added, removed or changed.
+
 ### Added
 
 - A format spec `{flag:true phrase|false phrase}` words a Boolean in a step while the parameter table keeps the Boolean.
