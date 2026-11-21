@@ -1284,13 +1284,14 @@
 <ul>
 <li><code>metadata.kind</code> (<code>report</code>) and <code>metadata.schema_version</code> in the JSON report, the version bumped with every change to the report's shape.</li>
 <li><code>pytest-given delta BEFORE.json AFTER.json</code> writes a delta report — the added, removed and changed scenarios and glossary terms between two JSON reports — with a <code>given-renames.toml</code> rename log for renamed tests and terms.</li>
-<li>The <code>pytest-given-delta</code> agent skill: building a delta between two commits and recording renames in <code>given-renames.toml</code>.</li>
+<li>The <code>pytest-given-delta</code> agent skill: building a delta between two commits or for a pull request, and recording renames in <code>given-renames.toml</code>.</li>
 <li>A malformed JSON report or delta is refused with the path and reason of each problem.</li>
 <li>JSON Schemas for the report and the delta are published on the documentation site, and every written report and delta names its schema under a top-level <code>$schema</code> key.</li>
 <li><code>pytest-given coverage</code> prints which scenarios cover each story sentence of a JSON report, and exits 1 when a tracked sentence has none.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
+<li>pytest-given's development status is now Beta.</li>
 <li>pytest-given now depends on Pydantic 2.12 or later.</li>
 <li><strong>Breaking.</strong> <code>pytest-given report</code> and <code>pytest-given citations</code> refuse a JSON report of another schema version or with an unknown key, which includes every report written by 0.6.0 or earlier. Regenerate the report under the current pytest-given.</li>
 <li><strong>Breaking.</strong> The JSON report has no top-level <code>coverage</code> section. Read story coverage from <code>pytest-given coverage report.json</code> instead.</li>
