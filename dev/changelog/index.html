@@ -1282,25 +1282,23 @@
 <h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.6.0...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>metadata.kind</code> (<code>report</code>) and <code>metadata.schema_version</code> in the JSON report, the version bumped with every change to the report's shape.</li>
 <li><code>pytest-given delta BEFORE.json AFTER.json</code> writes a delta report — the added, removed and changed scenarios and glossary terms between two JSON reports — with a <code>given-renames.toml</code> rename log for renamed tests and terms.</li>
 <li>The <code>pytest-given-delta</code> agent skill: building a delta between two commits or for a pull request, and recording renames in <code>given-renames.toml</code>.</li>
-<li>A malformed JSON report or delta is refused with the path and reason of each problem.</li>
-<li>JSON Schemas for the report and the delta are published on the documentation site, and every written report and delta names its schema under a top-level <code>$schema</code> key.</li>
 <li><code>pytest-given coverage</code> prints which scenarios cover each story sentence of a JSON report, and exits 1 when a tracked sentence has none.</li>
+<li>JSON Schemas for the report and the delta are published on the documentation site, and every written report and delta names its schema under a top-level <code>$schema</code> key.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
-<li>pytest-given's development status is now Beta.</li>
-<li>pytest-given now depends on Pydantic 2.12 or later.</li>
-<li><strong>Breaking.</strong> <code>pytest-given report</code> and <code>pytest-given citations</code> refuse a JSON report of another schema version or with an unknown key, which includes every report written by 0.6.0 or earlier. Regenerate the report under the current pytest-given.</li>
+<li><strong>Breaking.</strong> <code>pytest-given report</code> and <code>pytest-given citations</code> refuse a JSON report of another schema version, which includes every report written by 0.6.0 or earlier, and name the path and reason of each problem in a malformed one. Regenerate the report under the current pytest-given.</li>
 <li><strong>Breaking.</strong> The JSON report has no top-level <code>coverage</code> section. Read story coverage from <code>pytest-given coverage report.json</code> instead.</li>
 <li><strong>Breaking.</strong> A scenario's <code>skip_reason</code> and <code>xfail_reason</code> in the JSON report are now one <code>reason</code>, which its <code>status</code> says is a skip's or an expected failure's. A script must read <code>.reason</code> instead.</li>
 <li><strong>Breaking.</strong> A story clause's parts in the JSON report are now the narration's literal and term ref parts, so a bare word reads <code>.value</code> instead of <code>.text</code>.</li>
 <li>The HTML report's browser tab and the Markdown report's heading show only the report's title, without "pytest-given".</li>
-<li>The <code>pytest-given-authoring</code> skill asks for attachment content that is the same on every run.</li>
 <li><code>pytest-given report</code> now removes the previous output when its input can't be read, as it already did when rendering failed.</li>
+<li>The <code>pytest-given-authoring</code> skill asks for attachment content that is the same on every run.</li>
 <li>The HTML report's parameter tables are visually tidied.</li>
+<li>pytest-given's development status is now Beta.</li>
+<li>pytest-given now depends on Pydantic 2.12 or later.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
