@@ -3588,7 +3588,7 @@
 - **then** the «attachment» is changed and its line is modified
 - **then** the modified line marks the reworded word removed and added
 
-## ✓ A grouped scenario's «scenario identity» survives its first «case» changing
+## ✓ A grouped scenario's «scenario identity» survives a change to its first «case»
 `tests/unit/delta/test_build.py::test_a_grouped_identity_survives_its_first_case_changing` · delta, spec/delta-report
 
 - **given** a grouped scenario whose first «case» is `t[1]` before and a new `t[0]` after

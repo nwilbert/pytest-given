@@ -108,8 +108,8 @@ def _pairs(delta: DeltaData) -> list[tuple[str, str]]:
 
 
 @scenario(
-    t"A grouped scenario's {pg['Scenario identity'].l} survives its first "
-    t'{pg["Case"].l} changing',
+    t"A grouped scenario's {pg['Scenario identity'].l} survives a change to its "
+    t'first {pg["Case"].l}',
     tags=['delta', 'spec/delta-report'],
 )
 def test_a_grouped_identity_survives_its_first_case_changing() -> None:
