@@ -15,25 +15,23 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
-- `metadata.kind` (`report`) and `metadata.schema_version` in the JSON report, the version bumped with every change to the report's shape.
 - `pytest-given delta BEFORE.json AFTER.json` writes a delta report — the added, removed and changed scenarios and glossary terms between two JSON reports — with a `given-renames.toml` rename log for renamed tests and terms.
 - The `pytest-given-delta` agent skill: building a delta between two commits or for a pull request, and recording renames in `given-renames.toml`.
-- A malformed JSON report or delta is refused with the path and reason of each problem.
-- JSON Schemas for the report and the delta are published on the documentation site, and every written report and delta names its schema under a top-level `$schema` key.
 - `pytest-given coverage` prints which scenarios cover each story sentence of a JSON report, and exits 1 when a tracked sentence has none.
+- JSON Schemas for the report and the delta are published on the documentation site, and every written report and delta names its schema under a top-level `$schema` key.
 
 ### Changed
 
-- pytest-given's development status is now Beta.
-- pytest-given now depends on Pydantic 2.12 or later.
-- **Breaking.** `pytest-given report` and `pytest-given citations` refuse a JSON report of another schema version or with an unknown key, which includes every report written by 0.6.0 or earlier. Regenerate the report under the current pytest-given.
+- **Breaking.** `pytest-given report` and `pytest-given citations` refuse a JSON report of another schema version, which includes every report written by 0.6.0 or earlier, and name the path and reason of each problem in a malformed one. Regenerate the report under the current pytest-given.
 - **Breaking.** The JSON report has no top-level `coverage` section. Read story coverage from `pytest-given coverage report.json` instead.
 - **Breaking.** A scenario's `skip_reason` and `xfail_reason` in the JSON report are now one `reason`, which its `status` says is a skip's or an expected failure's. A script must read `.reason` instead.
 - **Breaking.** A story clause's parts in the JSON report are now the narration's literal and term ref parts, so a bare word reads `.value` instead of `.text`.
 - The HTML report's browser tab and the Markdown report's heading show only the report's title, without "pytest-given".
-- The `pytest-given-authoring` skill asks for attachment content that is the same on every run.
 - `pytest-given report` now removes the previous output when its input can't be read, as it already did when rendering failed.
+- The `pytest-given-authoring` skill asks for attachment content that is the same on every run.
 - The HTML report's parameter tables are visually tidied.
+- pytest-given's development status is now Beta.
+- pytest-given now depends on Pydantic 2.12 or later.
 
 ### Fixed
 
