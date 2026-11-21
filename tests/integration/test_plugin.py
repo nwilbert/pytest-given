@@ -3929,6 +3929,29 @@ def test_given_json_alone_writes_json(pytester: pytest.Pytester) -> None:
     assert json_path.exists()
 
 
+def test_given_diagrams_writes_the_diagrams_page(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(
+        """
+        from pytest_given import Glossary, scenario, sentence, story, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        s = story('Booking', [sentence(guest, search, room)])
+
+        @scenario('A', pins=s[1])
+        def test_a():
+            with when('x'):
+                pass
+        """
+    )
+    result = pytester.runpytest('--given-diagrams=out/stories.html')
+    result.assert_outcomes(passed=1)
+    html = (pytester.path / 'out' / 'stories.html').read_text(encoding='utf-8')
+    assert 'id="booking"' in html
+
+
 @scenario(
     t'An output flag pointed at a source file is refused before the suite runs',
     tags=['validation'],

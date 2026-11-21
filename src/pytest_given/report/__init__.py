@@ -26,6 +26,7 @@ from .order import in_report_order
 from .sinks import (
     DEFAULT_DELTA_HTML_PATH,
     DEFAULT_DELTA_JSON_PATH,
+    DEFAULT_DIAGRAMS_PATH,
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
     MD_SUFFIXES,
@@ -45,6 +46,7 @@ __all__ = [
     'CITATION_GLYPH',
     'DEFAULT_DELTA_HTML_PATH',
     'DEFAULT_DELTA_JSON_PATH',
+    'DEFAULT_DIAGRAMS_PATH',
     'DEFAULT_HTML_PATH',
     'DEFAULT_JSON_PATH',
     'DEFAULT_THEME',

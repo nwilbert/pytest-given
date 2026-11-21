@@ -64,6 +64,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Narrated citation | A **Citation** of a scenario written as a collapsible block, the citation as its summary and the scenario's Markdown narration as its body. |
 | Defining citation | A **Citation** of a term written as a collapsible block, the citation as its summary and the term's definition as its body. |
 | Citation finding | One problem `pytest-given citations check` reports on one **Report link**: its kind (`stale`, `missing`, `failed`, `mistyped`, …), the document location and a message. |
+| Story diagram | A **Story** drawn in Domain Storytelling notation: actors and work objects as icons, each **sentence**'s activities as arrows carrying its number. The diagrams page draws one per story and replays them sentence by sentence. |
 | Theme | The HTML report's colour scheme — `light`, `dark`, or `auto` (follow the viewer's system). |
 
 ## Narration lint

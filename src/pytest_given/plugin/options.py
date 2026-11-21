@@ -17,6 +17,7 @@ import pytest
 from ..lint import parse_lint_config
 from ..model import PytestGivenError, resolve_report_url
 from ..report import (
+    DEFAULT_DIAGRAMS_PATH,
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
     DEFAULT_THEME,
@@ -62,6 +63,16 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             'Write the Markdown report. Bare renders to stdout between '
             '<!-- pytest-given:md:start --> / <!-- pytest-given:md:end --> '
             'markers; =PATH writes a file. Off when absent.'
+        ),
+    )
+    group.addoption(
+        '--given-diagrams',
+        nargs='?',
+        const=str(DEFAULT_DIAGRAMS_PATH),
+        default=None,
+        help=(
+            'Write the story diagrams page. Bare uses the default path; =PATH '
+            'overrides. Off when absent.'
         ),
     )
     group.addoption(
@@ -302,7 +313,7 @@ def _resolve_sinks(
     theme: Theme,
     md_lines: bool,
 ) -> SinkConfig:
-    """The three sink flags, resolved into the pytest-free shape `report/`
+    """The sink flags, resolved into the pytest-free shape `report/`
     reads. CLI-only, so there is no ini precedence to settle here.
 
     `SinkConfig` rejects a path that could not be a report file; the flags are
@@ -311,11 +322,13 @@ def _resolve_sinks(
     md_opt = config.getoption('given_md')
     json_opt = config.getoption('given_json')
     html_opt = config.getoption('given_html')
+    diagrams_opt = config.getoption('given_diagrams')
     try:
         return SinkConfig(
             json_path=Path(json_opt) if json_opt is not None else None,
             html_path=Path(html_opt) if html_opt is not None else None,
             md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
+            diagrams_path=Path(diagrams_opt) if diagrams_opt is not None else None,
             md_to_stdout=md_opt == '-',
             md_lines=md_lines,
             md_source=bool(config.getoption('given_md_source')),
@@ -325,7 +338,7 @@ def _resolve_sinks(
         )
     except PytestGivenError as error:
         raise PytestGivenError(
-            f'{error} A bare --given-json/--given-html/--given-md takes the '
-            'next argument as its path, so write the path with an "=" '
+            f'{error} A bare --given-json/--given-html/--given-md/--given-diagrams '
+            'takes the next argument as its path, so write the path with an "=" '
             '(--given-html=PATH) or put the bare flag last.'
         ) from error

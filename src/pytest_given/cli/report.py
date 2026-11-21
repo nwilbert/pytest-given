@@ -13,6 +13,7 @@ from ..model import (
     resolve_report_url,
 )
 from ..report import (
+    DEFAULT_DIAGRAMS_PATH,
     DEFAULT_HTML_PATH,
     DEFAULT_THEME,
     MD_SUFFIXES,
@@ -87,6 +88,18 @@ def add_report_parser(
         default=None,
         help='Output format. Inferred from -o extension when omitted (default: html).',
     )
+    report_parser.add_argument(
+        '--diagrams',
+        type=Path,
+        nargs='?',
+        const=DEFAULT_DIAGRAMS_PATH,
+        default=None,
+        help=(
+            'Also write the story diagrams page (bare: '
+            f'{DEFAULT_DIAGRAMS_PATH.as_posix()}). The HTML report then links '
+            'each story to its diagram.'
+        ),
+    )
 
 
 def run_report(args: argparse.Namespace) -> int:
@@ -108,9 +121,14 @@ def run_report(args: argparse.Namespace) -> int:
             args.lines,
             resolve_report_url(args.report_url, '--report-url'),
             args.glossary_only,
+            args.diagrams,
         )
         refuse_writing_over_an_input(
-            {'report HTML': config.html_path, 'report Markdown': config.md_path},
+            {
+                'report HTML': config.html_path,
+                'report Markdown': config.md_path,
+                'diagrams page': config.diagrams_path,
+            },
             [json_file],
         )
         report_dict = (
@@ -126,10 +144,13 @@ def run_report(args: argparse.Namespace) -> int:
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 2
+    # Markdown on stdout is the payload, so the status lines keep out of it.
+    status = sys.stdout
     if rendered.md_stdout is not None:
         print(rendered.md_stdout)
+        status = sys.stderr
     for rendered_file in rendered.files:
-        print(f'Report generated: {rendered_file.path}')
+        print(f'Report generated: {rendered_file.path}', file=status)
     return 0
 
 
@@ -154,8 +175,10 @@ def _sink_config(
     lines: bool,
     report_url: ReportUrl | None,
     glossary_only: bool,
+    diagrams: Path | None,
 ) -> SinkConfig:
-    """The one sink this invocation writes.
+    """The one report sink this invocation writes, and the diagrams page
+    beside it when asked for.
 
     Markdown with no `-o` goes to stdout; HTML always needs a file, so it falls
     back to the default path rather than to stdout.
@@ -175,9 +198,16 @@ def _sink_config(
             '--glossary-only leaves citations out, so --report-url has nothing to set.'
         )
     if is_md:
-        return SinkConfig(md_path=output, md_to_stdout=output is None, md_lines=lines)
+        return SinkConfig(
+            md_path=output,
+            md_to_stdout=output is None,
+            md_lines=lines,
+            diagrams_path=diagrams,
+            theme=resolved_theme,
+        )
     return SinkConfig(
         html_path=output or DEFAULT_HTML_PATH,
+        diagrams_path=diagrams,
         source_link_template=source_link_template,
         theme=resolved_theme,
         report_url=report_url,

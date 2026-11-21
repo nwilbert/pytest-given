@@ -8,7 +8,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar, nav_tab, term_disclosure, scenario_disclosure, toggle_all_terms_button, term_tip with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar, nav_tab, term_disclosure, scenario_disclosure, toggle_all_terms_button, term_tip with context -%}
   {{ icon_sprite() }}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
@@ -32,7 +32,7 @@
       <span class="topbar-version">pytest {{ metadata.pytest_version }}</span>
       <span class="topbar-version">pytest-given {{ metadata.plugin_version }}</span>
       <span x-text="formattedTimestamp"></span>
-      {{ theme_toggle() }}
+      {% include '_theme_toggle.html.j2' %}
     </div>
   </header>
 
@@ -166,6 +166,7 @@
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">{{ story.title }}{{ copy_button('story', story.id, 'view=stories&story=' ~ story.id) }}</div>
             <div class="header-context meta-list"><span>{{ story.sentences | length | plural('sentence') }}</span><span>{{ total_scns | plural('scenario') }}</span></div>
+            {% if diagrams_href %}<a class="story-diagram-link" href="{{ diagrams_href }}#{{ story.id }}">Diagram</a>{% endif %}
             <button class="collapse-all-btn" x-show="anySentencesHighlighted" x-cloak
                     @click="clearSentenceHighlights()">Deselect</button>
           </div>

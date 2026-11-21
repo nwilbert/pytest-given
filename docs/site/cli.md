@@ -20,6 +20,7 @@ The CLI takes its settings from flags only, never from your pytest config, and i
 | `--theme=light\|dark\|auto` | `auto` | The theme the report opens in, like `--given-theme`. |
 | `--report-url=URL` | the URL in the JSON file | The URL the citations copied from the report link to, like `--given-report-url`. Render a report this way for each place it is served from. |
 | `--no-lines` | off | Leave the line out of each Markdown scenario anchor, like `--no-given-md-lines`. Render both sides of a diff this way. |
+| `--diagrams[=PATH]` | off | Also write the [story diagrams](guide/domain-storytelling.md#story-diagrams) page. Without a path: `given-report/diagrams.html`. The HTML report then links each story to its diagram. With Markdown on stdout, the line naming the written page goes to stderr. |
 | `--glossary-only` | off | Render an HTML report with only the Glossary tab, for readers who need the vocabulary and not the tests. Scenarios, stories, each term's *Other forms* list and the citation copy menus are left out. The JSON file is not changed. |
 
 `pytest-given report` exits 2 when:

@@ -120,6 +120,17 @@ The Stories tab shows each story as a timeline of its sentences. Each sentence h
 
 Story coverage helps a reader find the scenarios behind a part of the flow, and see the flow behind a scenario. It is not a measure of how completely the suite tests the system: a covered sentence means a step talks about it, not that its behavior is tested. To ask what the scenarios exercise, measure the code coverage of [`-m pytest_given`](../configuration/pytest-options.md#selecting-scenarios).
 
+## Story diagrams
+
+`--given-diagrams` writes one more self-contained HTML page, which draws each story in Domain Storytelling notation. Actors and work objects are icons, and each sentence's activities are arrows labelled with their verb and its number. A work object is drawn again in each sentence that uses it, while an actor is drawn once per story.
+
+- The sidebar switches between stories, and the story's id after `#` in the address opens it directly.
+- The arrow buttons, or the left and right arrow keys, replay the story one sentence at a time.
+- Hovering a sentence highlights all its arrows. Hovering a term shows its definition.
+- The wheel zooms, dragging pans, and *Fit* fits the whole diagram into view.
+
+The layout is computed when the page is written, and it keeps arrows from crossing wherever the story allows. An HTML report written in the same run links each story's header to its diagram. `pytest-given report --diagrams` draws the page from a saved JSON report (see [Standalone CLI](../cli.md#report)).
+
 ## Examples
 
-The hotel-booking and table-glossary [examples](../examples.md) show stories and coverage in use.
+The hotel-booking and table-glossary [examples](../examples.md) show stories and coverage in use. The hotel-booking example also has its [story diagrams](../examples/hotel-booking-diagrams.html){ target=_blank }.

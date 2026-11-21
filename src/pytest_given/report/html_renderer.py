@@ -91,6 +91,7 @@ def render_html_string(
     source_link_template: str | None,
     theme: Theme = DEFAULT_THEME,
     source_root: Path | None = None,
+    diagrams_href: str | None = None,
 ) -> str:
     """Render a report model to a self-contained HTML document.
 
@@ -98,7 +99,8 @@ def render_html_string(
     expansion happens before this point). None disables source linking.
     `source_root` is what `{path}` resolves against (see
     `compile_source_link`). `theme` is the default the page opens in until the
-    viewer picks one.
+    viewer picks one. `diagrams_href` links each story to its diagram on the
+    diagrams page; None leaves the link out.
 
     Returns the document rather than writing it — `sinks` owns the writing.
     """
@@ -107,7 +109,8 @@ def render_html_string(
     param_color_map = build_param_color_map(report.scenarios)
     env = _build_env(report, source_link_template, source_root, param_color_map)
     return env.get_template('report.html.j2').render(
-        **_render_context(report, param_color_map, theme)
+        **_render_context(report, param_color_map, theme),
+        diagrams_href=diagrams_href,
     )
 
 

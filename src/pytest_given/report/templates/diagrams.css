@@ -1,0 +1,90 @@
+/* === Diagrams page ===
+   The report's page shell (topbar, sidebar, story items) from styles.css,
+   plus the diagram itself. The page never scrolls as a whole: the topbar,
+   story switcher and replay controls stay put, and only the canvas pans. */
+body.diagrams .main { overflow: hidden; }
+.diagram-main { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 0; }
+.diagram-story { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.diagram-header { display: flex; align-items: baseline; gap: var(--space-lg); margin-bottom: var(--space-sm); }
+
+.diagram-btn {
+  min-width: 30px;
+  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+.diagram-btn:hover:not(:disabled) { color: var(--color-accent); }
+.diagram-btn:disabled { opacity: 0.4; cursor: default; }
+.diagram-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.diagram-replay,
+.diagram-zoom-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-muted);
+  font-size: var(--font-size-base);
+  font-variant-numeric: tabular-nums;
+}
+.diagram-zoom-bar { flex: none; gap: 6px; }
+.diagram-zoom-level { margin-left: var(--space-xs); }
+
+.diagram-canvas {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+}
+.diagram-canvas.grabbing { cursor: grabbing; }
+.diagram-surface { position: absolute; top: 0; left: 0; will-change: transform; }
+
+.diagram-empty { padding: 48px 24px; text-align: center; color: var(--text-muted); }
+.diagram-empty p { margin: var(--space-xs) 0; }
+.diagram-empty-hint { font-size: var(--font-size-base); }
+.diagram-empty-hint code { font-family: var(--font-mono); background: var(--bg-surface); border-radius: var(--radius-sm); padding: 1px 5px; }
+.diagram-empty-note { color: var(--text-muted); }
+
+/* --- The SVG --- */
+.diagram-hit-area { fill: none; pointer-events: all; }
+.diagram-glyph { fill: none; stroke: var(--text-primary); stroke-width: 2.2; }
+.diagram-doc { fill: var(--bg-surface); }
+.diagram-edge-hit { stroke: transparent; stroke-width: 12; fill: none; pointer-events: stroke; }
+.diagram-edge { stroke: var(--text-secondary); stroke-width: 1.6; fill: none; transition: stroke-width 0.12s ease, filter 0.12s ease; }
+/* A hovered sentence's arrows thicken and glow, so its clauses read as one.
+   A glow rather than a recoloured stroke, which would blend into the number
+   badges; nothing else in the diagram changes. */
+.diagram-sentence.hovered .diagram-edge {
+  stroke-width: 2.4;
+  filter: drop-shadow(0 0 2.5px var(--term-activity-line)) drop-shadow(0 0 1.5px var(--term-activity-line));
+}
+.diagram-arrowhead { fill: var(--text-secondary); }
+.diagram-label { text-anchor: middle; font-size: 14px; font-weight: 600; fill: var(--text-primary); }
+.diagram-sublabel { text-anchor: middle; font-size: 11px; fill: var(--text-muted); }
+.diagram-verb { font-size: 12.5px; fill: var(--text-narration); }
+.diagram-verb.has-def { cursor: help; }
+.diagram-badge { fill: var(--term-activity-line); }
+.diagram-badge-number { text-anchor: middle; font-size: 11px; font-weight: 700; fill: var(--bg-surface); }
+.diagram-sentence { transition: opacity 0.25s ease; }
+.diagram-sentence.faded { opacity: 0.15; }
+
+/* Inverted like the report's term tooltip. */
+.diagram-tip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 320px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--text-primary);
+  color: var(--bg-surface);
+  box-shadow: var(--shadow-tip);
+  font-size: var(--font-size-base);
+  line-height: 1.4;
+  pointer-events: none;
+}
+.diagram-tip-title { font-weight: 700; }
+.diagram-tip-def { margin-top: 2px; opacity: 0.82; }

@@ -1397,6 +1397,8 @@ span.param-highlight {
 }
 .story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+.story-diagram-link { font-size: var(--font-size-sm); color: var(--color-accent); text-decoration: none; }
+.story-diagram-link:hover { text-decoration: underline; }
 
 
 .sentence-timeline { margin-bottom: var(--space-xl); }
@@ -2344,10 +2346,10 @@ ins.delta-words { --words-tint: var(--added-tint-strong); --words-line: var(--ad
       </p>
       <span class="topbar-version">pytest-given 0.6.0</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
-      </div>
+  <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
+  <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
+  <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
+</div>
     </div>
   </header>
 

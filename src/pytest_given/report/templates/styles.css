@@ -1365,6 +1365,8 @@ span.param-highlight {
 }
 .story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+.story-diagram-link { font-size: var(--font-size-sm); color: var(--color-accent); text-decoration: none; }
+.story-diagram-link:hover { text-decoration: underline; }
 
 /* === Sentence timeline === */
 .sentence-timeline { margin-bottom: var(--space-xl); }

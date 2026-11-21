@@ -280,16 +280,6 @@
     </div>
   {%- endmacro -%}
 
-  {#- Text, not an icon: the current state has to be readable without
-      hovering. `aria-pressed` on each segment is the accessible state. -#}
-  {%- macro theme_toggle() -%}
-      <div class="seg-toggle" role="group" aria-label="Theme">
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
-      </div>
-  {%- endmacro -%}
-
   {#- `model` is the Alpine property the box edits: a name from the template,
       never report data. -#}
   {%- macro search_box(model, placeholder) -%}

@@ -18,6 +18,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `pytest-given delta BEFORE.json AFTER.json` writes a delta report — the added, removed and changed scenarios and glossary terms between two JSON reports — with a `given-renames.toml` rename log for renamed tests and terms.
 - The `pytest-given-delta` agent skill: building a delta between two commits or for a pull request, and recording renames in `given-renames.toml`.
 - `pytest-given coverage` prints which scenarios cover each story sentence of a JSON report, and exits 1 when a tracked sentence has none.
+- `--given-diagrams` and `pytest-given report --diagrams` write a story diagrams page that draws each story in Domain Storytelling notation, and the HTML report links each story to its diagram.
 - JSON Schemas for the report and the delta are published on the documentation site, and every written report and delta names its schema under a top-level `$schema` key.
 
 ### Changed

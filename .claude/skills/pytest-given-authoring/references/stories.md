@@ -1,6 +1,6 @@
 # Authoring stories
 
-A domain story models a flow as a sequence of sentences: who does what with what. It works at the actor level, above individual scenarios. The report's Stories tab shows each story as a timeline, with coverage for each sentence computed from the scenarios that implement it.
+A domain story models a flow as a sequence of sentences: who does what with what. It works at the actor level, above individual scenarios. The report's Stories tab shows each story as a timeline, with coverage for each sentence computed from the scenarios that implement it. `--given-diagrams` also draws each story in Domain Storytelling notation, for the domain experts to read back.
 
 ## The method
 

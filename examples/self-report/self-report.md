@@ -4882,6 +4882,14 @@
 - **then** `$schema` is its first key
 - **then** it names the schema the documentation site publishes
 
+## ✓ An HTML «report» written with the diagrams page links each «story» to its «story diagram»
+`tests/unit/report/test_sinks.py::test_an_html_report_links_each_story_to_its_diagram`
+
+- **given** a «report» with one «story»
+- **when** the HTML report and the diagrams page are written to two directories
+- **then** the diagrams page draws the «story diagram»
+- **then** the report links the story to it, relative to the report
+
 ## ✓ A «source link» config value resolves to its template · 6 cases
 `tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template`
 

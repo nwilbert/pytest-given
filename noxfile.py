@@ -424,6 +424,14 @@ _EXAMPLE_REPORTS = (*(example.slug for example in _EXAMPLES), 'self-report')
 # The reports a document cites: `pytest-given citations` refuses one that no
 # document links, so a report the docs only embed stays out.
 _CITED_REPORTS = ('coffeeshop', 'hotel-booking', 'self-report')
+# The reports with stories, which get a diagrams page beside their HTML.
+_DIAGRAM_REPORTS = ('hotel-booking', 'table-glossary', 'self-report')
+
+
+def _diagrams_flag(slug: str, flag: str, directory: Path) -> list[str]:
+    if slug not in _DIAGRAM_REPORTS:
+        return []
+    return [f'{flag}={(directory / f"{slug}-diagrams.html").as_posix()}']
 
 
 def _run_citations(
@@ -498,6 +506,7 @@ def _regenerate_examples(session: nox.Session) -> None:
             f'--given-json=examples/{slug}/{slug}-data.json',
             f'--given-html=examples/{slug}/{slug}.html',
             f'--given-md=examples/{slug}/{slug}.md',
+            *_diagrams_flag(slug, '--given-diagrams', Path('examples', slug)),
             f'--given-title={title}',
             '--given-source-link=github',
             f'--given-report-url={_PAGES_EXAMPLES_URL}/{slug}.html',
@@ -715,6 +724,7 @@ def _build_docs(session: nox.Session, docs_version: str) -> None:
             f'examples/{slug}/{slug}-data.json',
             '-o',
             (_DOCS_SITE / 'examples' / f'{slug}.html').as_posix(),
+            *_diagrams_flag(slug, '--diagrams', _DOCS_SITE / 'examples'),
             '--source-link=github',
             f'--report-url={_examples_url(docs_version)}/{slug}.html',
         )
@@ -903,6 +913,9 @@ def _regenerate_self_report(session: nox.Session) -> None:
         '--given-json=examples/self-report/self-report-data.json',
         '--given-html=examples/self-report/self-report.html',
         '--given-md=examples/self-report/self-report.md',
+        *_diagrams_flag(
+            'self-report', '--given-diagrams', Path('examples', 'self-report')
+        ),
         '--given-title=pytest-given Self-Report',
         '--given-source-link=github',
         f'--given-report-url={_PAGES_EXAMPLES_URL}/self-report.html',

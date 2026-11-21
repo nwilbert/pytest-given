@@ -76,6 +76,7 @@ def test_a_sink_path_that_cannot_be_a_report_file_is_refused(tmp_path) -> None:
         ('json_path', '.json'),
         ('html_path', '.html or .htm'),
         ('md_path', '.md or .markdown'),
+        ('diagrams_path', '.html or .htm'),
     ],
 )
 def test_every_sink_states_the_suffixes_it_accepts(field: str, expected: str) -> None:
@@ -179,6 +180,56 @@ def test_a_written_report_names_its_schema(tmp_path: Path) -> None:
             'https://nwilbert.github.io/pytest-given/latest/schemas/'
             'report-v1.schema.json'
         )
+
+
+@scenario(
+    t'An HTML {pg["Report"].l} written with the diagrams page links each '
+    t'{pg["Story"].l} to its {pg["Story diagram"].l}'
+)
+def test_an_html_report_links_each_story_to_its_diagram(tmp_path: Path) -> None:
+    with given(t'a {pg["Report"].l} with one {pg["Story"].l}'):
+        report_dict = report_to_dict(story_report())
+    with when('the HTML report and the diagrams page are written to two directories'):
+        rendered = sinks.render_sinks(
+            report_dict,
+            SinkConfig(
+                html_path=tmp_path / 'report' / 'index.html',
+                diagrams_path=tmp_path / 'diagrams' / 'stories.html',
+            ),
+        )
+        html, diagrams = (rendered_file.text for rendered_file in rendered.files)
+    with then(t'the diagrams page draws the {pg["Story diagram"].l}'):
+        assert '<section class="diagram-story" id="book"' in diagrams
+    with then('the report links the story to it, relative to the report'):
+        assert 'href="../diagrams/stories.html#book"' in html
+
+
+def test_an_html_report_without_the_diagrams_page_links_no_diagram(
+    tmp_path: Path,
+) -> None:
+    rendered = sinks.render_sinks(
+        report_to_dict(story_report()), SinkConfig(html_path=tmp_path / 'r.html')
+    )
+    assert 'stories.html#' not in rendered.files[0].text
+    assert 'diagrams.html#' not in rendered.files[0].text
+
+
+def test_a_diagrams_page_on_another_drive_gets_no_link(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`os.path.relpath` raises across Windows drives, which CI cannot set up."""
+
+    def refuse(*args: object) -> str:
+        raise ValueError('path is on mount C:, start on mount D:')
+
+    monkeypatch.setattr(sinks.os.path, 'relpath', refuse)
+    rendered = sinks.render_sinks(
+        report_to_dict(story_report()),
+        SinkConfig(
+            html_path=tmp_path / 'r.html', diagrams_path=tmp_path / 'diagrams.html'
+        ),
+    )
+    assert 'diagrams.html#' not in rendered.files[0].text
 
 
 def test_md_source_reads_the_test_files_under_the_source_root(tmp_path: Path) -> None:

@@ -25,7 +25,7 @@ In a [parametrized scenario](guide/parametrized.md), hover a column of the param
 
 ## Stories and Glossary
 
-The Stories view shows each story as a timeline of its sentences, with the scenarios that cover each one. See [Coverage in the report](guide/domain-storytelling.md#coverage-in-the-report).
+The Stories view shows each story as a timeline of its sentences, with the scenarios that cover each one. See [Coverage in the report](guide/domain-storytelling.md#coverage-in-the-report). When the run also writes the [story diagrams](guide/domain-storytelling.md#story-diagrams) page, each story's header links to its diagram.
 
 The Glossary view lists the terms, with a search and a filter for undefined terms. The search also matches a term's [avoided words](guide/glossary.md#avoided-words). Expand a term to see its avoided words, as `Avoid: Customer, Client`, and the stories and scenarios that use it. Select *Show N scenarios using this term* to filter the Scenarios view by it.
 

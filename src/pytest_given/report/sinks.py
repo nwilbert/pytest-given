@@ -1,8 +1,9 @@
 """The sinks a run writes, rendered as a set and written as a set.
 
-A run may be told to write any combination of JSON, HTML and Markdown, and
-they have to agree with each other: a render that raises must not leave this
-run's JSON beside the previous run's HTML, with nothing on either saying so.
+A run may be told to write any combination of JSON, HTML, Markdown and the
+diagrams page, and they have to agree with each other: a render that raises
+must not leave this run's JSON beside the previous run's HTML, with nothing on
+either saying so.
 So rendering and writing are separate steps — `render_sinks` does everything
 that can fail and touches no file, `write_all_or_none` touches files and
 cannot fail on content, and `discard_files` removes a previous run's report
@@ -17,7 +18,11 @@ Pytest-free like the rest of `report/`: the caller resolves its options into a
 `SinkConfig`, which is also what lets `pytest-given report` reach the same code.
 """
 
+# Deferred, since most runs draw no diagram.
+__lazy_modules__ = ['pytest_given.report.diagram']
+
 import json
+import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -30,6 +35,7 @@ from ..model import (
     ReportUrl,
     report_from_dict,
 )
+from .diagram import render_diagrams_html
 from .function_source import read_function_sources
 from .html_renderer import render_html_string, tab_visibility
 from .md_renderer import render_md
@@ -41,6 +47,7 @@ from .theme import DEFAULT_THEME, Theme
 # each spelling their own.
 DEFAULT_JSON_PATH = Path('given-report/report-data.json')
 DEFAULT_HTML_PATH = Path('given-report/report.html')
+DEFAULT_DIAGRAMS_PATH = Path('given-report/diagrams.html')
 DEFAULT_DELTA_JSON_PATH = Path('given-report/delta-data.json')
 DEFAULT_DELTA_HTML_PATH = Path('given-report/delta.html')
 
@@ -67,6 +74,7 @@ class SinkConfig:
     json_path: Path | None = None
     html_path: Path | None = None
     md_path: Path | None = None
+    diagrams_path: Path | None = None
     md_to_stdout: bool = False
     md_lines: bool = True
     md_source: bool = False
@@ -80,6 +88,7 @@ class SinkConfig:
         require_suffix('JSON', self.json_path, ('.json',))
         require_suffix('HTML', self.html_path, ('.html', '.htm'))
         require_suffix('Markdown', self.md_path, MD_SUFFIXES)
+        require_suffix('diagrams', self.diagrams_path, ('.html', '.htm'))
         if self.html_glossary_only and self.html_path is None:
             raise PytestGivenError(
                 'A glossary-only report is HTML, but no HTML path is set.'
@@ -94,7 +103,12 @@ class SinkConfig:
         Markdown bound for stdout has no path to overwrite or discard."""
         return [
             path
-            for path in (self.json_path, self.html_path, self.md_path)
+            for path in (
+                self.json_path,
+                self.html_path,
+                self.md_path,
+                self.diagrams_path,
+            )
             if path is not None
         ]
 
@@ -221,6 +235,7 @@ def render_sinks(
                     source_link_template=config.source_link_template,
                     theme=config.theme,
                     source_root=config.source_root,
+                    diagrams_href=_diagrams_href(config),
                 ),
             )
         )
@@ -235,7 +250,25 @@ def render_sinks(
             md_stdout = md
         if config.md_path is not None:
             files.append(RenderedFile(config.md_path, md))
+    if config.diagrams_path is not None:
+        files.append(
+            RenderedFile(
+                config.diagrams_path, render_diagrams_html(report, config.theme)
+            )
+        )
     return RenderedSinks(files=files, md_stdout=md_stdout)
+
+
+def _diagrams_href(config: SinkConfig) -> str | None:
+    """The diagrams page relative to the HTML report's directory, or None when
+    either is not written or, on Windows, they sit on different drives."""
+    if config.html_path is None or config.diagrams_path is None:
+        return None
+    try:
+        relative = os.path.relpath(config.diagrams_path, config.html_path.parent)
+    except ValueError:
+        return None
+    return Path(relative).as_posix()
 
 
 def require_glossary_terms(report: ReportData) -> None:

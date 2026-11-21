@@ -206,6 +206,32 @@ def test_cli_format_md_to_stdout(tmp_path, capsys) -> None:
     assert '## ✓ Alpha' in capsys.readouterr().out
 
 
+def test_cli_diagrams_keep_their_status_line_off_markdown_stdout(
+    tmp_path: Path, capsys
+) -> None:
+    """Markdown on stdout is the payload a caller pipes on, so the diagrams
+    page's status line goes to stderr."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': _metadata('cli'),
+                'scenarios': [],
+                'stories': [{'id': 'empty', 'title': 'Empty', 'sentences': []}],
+            }
+        )
+    )
+    diagrams_path = tmp_path / 'diagrams.html'
+    rc = main(
+        ['report', str(json_path), '--format', 'md', '--diagrams', str(diagrams_path)]
+    )
+    assert rc == 0
+    assert 'id="empty"' in diagrams_path.read_text(encoding='utf-8')
+    captured = capsys.readouterr()
+    assert captured.out == '# cli\n\n'
+    assert captured.err == f'Report generated: {diagrams_path}\n'
+
+
 def test_cli_md_to_stdout_is_utf8_on_a_codepage_console(tmp_path, monkeypatch) -> None:
     """Python 3.14 writes a pipe in the locale's code page: cp1252 on Windows,
     which has no glyph for a status mark."""

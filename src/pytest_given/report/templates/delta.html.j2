@@ -12,7 +12,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, nav_tab, reason_box, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar, scenario_disclosure, toggle_all_terms_button, term_tip with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, nav_tab, reason_box, render_error, sidebar_resizer, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar, scenario_disclosure, toggle_all_terms_button, term_tip with context -%}
   {%- from '_delta_macros.html.j2' import change_filter, changed_in_filter, term_card, delta_sides, tip_row with context -%}
   {{ icon_sprite() }}
 
@@ -49,7 +49,7 @@
         {%- endfor %}
       </p>
       <span class="topbar-version">pytest-given {{ plugin_version }}</span>
-      {{ theme_toggle() }}
+      {% include '_theme_toggle.html.j2' %}
     </div>
   </header>
 

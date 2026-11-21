@@ -27,11 +27,14 @@ def test_an_entry_point_loads_no_renderer_or_parser_until_used(
 
 
 @pytest.mark.parametrize('entry_point', ['pytest_given.plugin', 'pytest_given.cli'])
-def test_an_entry_point_loads_no_delta_code_until_used(entry_point: str) -> None:
+def test_an_entry_point_loads_no_delta_or_diagram_code_until_used(
+    entry_point: str,
+) -> None:
     code = (
         f'import sys, {entry_point}; '
         'print(sorted(name for name in sys.modules '
-        "if name.startswith(('pytest_given.delta', 'pytest_given.report.delta'))))"
+        "if name.startswith(('pytest_given.delta', 'pytest_given.report.delta', "
+        "'pytest_given.report.diagram'))))"
     )
     loaded = subprocess.run(
         [sys.executable, '-c', code],

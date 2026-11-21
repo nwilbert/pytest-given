@@ -1,0 +1,174 @@
+{%- macro node_icon(placed) %}
+<g transform="translate({{ placed.x | round }},{{ placed.y | round }})" class="diagram-node diagram-node-{{ placed.node.glyph }}"
+   data-label="{{ placed.node.label }}"{% if placed.node.term_id %} data-term-id="{{ placed.node.term_id }}"{% endif %}
+   @mouseenter="showTip($event, $el.dataset.label, $el.dataset.termId)" @mouseleave="tooltip = null">
+  {#- The actor glyph is stroke only, so without this box only its ~2px lines
+      would catch the pointer. -#}
+  <rect x="-40" y="-40" width="80" height="110" class="diagram-hit-area"/>
+  {% if placed.node.glyph == 'actor' %}
+  <circle cx="0" cy="-16" r="9" class="diagram-glyph"/>
+  <path d="M 0 -7 L 0 12 M -14 2 L 14 2 M 0 12 L -11 30 M 0 12 L 11 30" class="diagram-glyph"/>
+  {% else %}
+  <path d="M -16 -22 L 8 -22 L 16 -14 L 16 22 L -16 22 Z" class="diagram-glyph diagram-doc"/>
+  <path d="M 8 -22 L 8 -14 L 16 -14" class="diagram-glyph"/>
+  {% endif %}
+  {% set lines = placed.node.label | label_lines %}
+  <text x="0" y="50" class="diagram-label">
+    {%- for line in lines %}<tspan x="0" dy="{{ 0 if loop.first else 15 }}">{{ line }}</tspan>{% endfor -%}
+  </text>
+  {% if placed.node.sublabel %}<text x="0" y="{{ 66 + (lines | length - 1) * 15 }}" class="diagram-sublabel">{{ placed.node.sublabel }}</text>{% endif %}
+</g>
+{% endmacro -%}
+
+{%- macro edge_label(placed) %}
+{% set cx = placed.label.x %}
+{% set cy = placed.label.y + placed.label.height - 6 %}
+{#- An activity term shows its definition on hover, like the nodes; a bare
+    connective has no term and no tooltip. -#}
+{% set verb_attrs %} class="diagram-verb{{ ' has-def' if placed.edge.term_id else '' }}"{% if placed.edge.term_id %} data-label="{{ placed.edge.label }}" data-term-id="{{ placed.edge.term_id }}" @mouseenter="showTip($event, $el.dataset.label, $el.dataset.termId)" @mouseleave="tooltip = null"{% endif %}{% endset %}
+{% if placed.edge.number is not none %}
+<circle cx="{{ (cx + 11) | round }}" cy="{{ (cy - 5) | round }}" r="11" class="diagram-badge"/>
+<text x="{{ (cx + 11) | round }}" y="{{ (cy - 1) | round }}" class="diagram-badge-number">{{ placed.edge.number }}</text>
+<text x="{{ (cx + 27) | round }}" y="{{ (cy - 1) | round }}"{{ verb_attrs }}>{{ placed.edge.label }}</text>
+{% else %}
+<text x="{{ cx | round }}" y="{{ (cy - 1) | round }}"{{ verb_attrs }}>{{ placed.edge.label }}</text>
+{% endif %}
+{% endmacro -%}
+<!DOCTYPE html>
+<html lang="en" data-theme-default="{{ theme_default }}">
+<head>
+{%- set page_title = title ~ ' — story diagrams' %}
+{% include '_head.html.j2' %}
+</head>
+<body class="diagrams" x-data="diagramsApp()">
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title" title="{{ title }}">{{ title }}</div>
+    <div class="topbar-meta">
+      <span>Story diagrams</span>
+      {% include '_theme_toggle.html.j2' %}
+    </div>
+  </header>
+
+  {% if not views %}
+  <div class="diagram-empty">
+    <p>No stories were recorded for this run.</p>
+    <p class="diagram-empty-hint">Declare stories with <code>story(...)</code> to see them here.</p>
+  </div>
+  {% else %}
+  <div class="view-layout">
+    <div class="sidebar">
+      {% for view in views %}
+      {% set story = view.layout.graph %}
+      <button type="button" class="btn-reset story-sidebar-item" data-story-id="{{ story.story_id }}"
+              :class="{ active: selectedStory === $el.dataset.storyId }"
+              :aria-pressed="selectedStory === $el.dataset.storyId"
+              @click="selectedStory = $el.dataset.storyId">
+        <div class="story-sidebar-title">{{ story.title }}</div>
+        <div class="story-sidebar-meta">{{ view.sentence_count | plural('sentence') }}</div>
+      </button>
+      {% endfor %}
+    </div>
+    <div class="view-main diagram-main">
+      {% for view in views %}
+      {% set story = view.layout.graph %}
+      <section class="diagram-story" id="{{ story.story_id }}" data-story-id="{{ story.story_id }}"
+               x-show="selectedStory === $el.dataset.storyId">
+        <div class="header diagram-header">
+          <div class="header-title">{{ story.title }}</div>
+          {% if view.max_step > 0 %}
+          <div class="diagram-replay">
+            <button type="button" class="diagram-btn" @click="prevStep()" :disabled="step === null" aria-label="Previous sentence">‹</button>
+            <span x-text="step === null ? 'all' : 'step ' + step + ' / ' + maxSteps[selectedStory]"></span>
+            <button type="button" class="diagram-btn" @click="nextStep()" :disabled="step === maxSteps[selectedStory]" aria-label="Next sentence">›</button>
+          </div>
+          {% endif %}
+        </div>
+        {% if view.max_step == 0 %}
+        <p class="diagram-empty-note">This story has no sentences yet.</p>
+        {% else %}
+        <div class="diagram-zoom-bar">
+          <button type="button" class="diagram-btn" @click="zoomOut()" title="Zoom out" aria-label="Zoom out">−</button>
+          <button type="button" class="diagram-btn" @click="zoomIn()" title="Zoom in" aria-label="Zoom in">+</button>
+          <button type="button" class="diagram-btn" @click="fitDiagram()" title="Fit to view">Fit</button>
+          <button type="button" class="diagram-btn" @click="resetZoom()" title="Reset to 100%">100%</button>
+          <span class="diagram-zoom-level" x-text="Math.round(zoom * 100) + '%'"></span>
+        </div>
+        <div class="diagram-canvas" data-canvas="{{ story.story_id }}"
+             :class="{ grabbing: dragging }"
+             @wheel.prevent="onWheel($event)"
+             @pointerdown="onPointerDown($event)"
+             @pointermove="onPointerMove($event)"
+             @pointerup="onPointerUp($event)"
+             @pointercancel="onPointerUp($event)">
+          <div class="diagram-surface" :style="surfaceStyle()">
+            <svg width="{{ view.layout.width | round | int }}" height="{{ view.layout.height | round | int }}"
+                 viewBox="0 0 {{ view.layout.width | round | int }} {{ view.layout.height | round | int }}">
+              <defs>
+                {#- One marker per story: ids are page-wide, and every story
+                    has its own SVG. -#}
+                <marker id="arrow-{{ story.story_id }}" viewBox="0 0 10 10" refX="9" refY="5"
+                        markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" class="diagram-arrowhead"/>
+                </marker>
+              </defs>
+              {#- A group per sentence: its edges and its own work objects, so
+                  replay fades and hover lights the whole sentence at once. -#}
+              {% for sentence in view.layout.graph.edges | map(attribute='sentence_id') | unique %}
+              <g class="diagram-sentence"
+                 :class="{ faded: faded({{ sentence }}), hovered: hoverSentence === {{ sentence }} }"
+                 @mouseenter="hoverSentence = {{ sentence }}" @mouseleave="hoverSentence = null">
+                {% for placed in view.layout.edges if placed.edge.sentence_id == sentence %}
+                {% if placed.loop %}
+                {% set loop_d %}M {{ (placed.x1 - 18) | round }} {{ (placed.y1 - 40) | round }} A 46 46 0 1 1 {{ (placed.x1 + 18) | round }} {{ (placed.y1 - 40) | round }}{% endset %}
+                {#- An invisible wide twin of each arrow: a 1.6px line is too
+                    thin a target for the pointer. -#}
+                <path class="diagram-edge-hit" d="{{ loop_d }}"/>
+                <path class="diagram-edge" marker-end="url(#arrow-{{ story.story_id }})" d="{{ loop_d }}"/>
+                {% else %}
+                <line class="diagram-edge-hit"
+                      x1="{{ placed.x1 | round }}" y1="{{ placed.y1 | round }}"
+                      x2="{{ placed.x2 | round }}" y2="{{ placed.y2 | round }}"/>
+                <line class="diagram-edge"
+                      x1="{{ placed.x1 | round }}" y1="{{ placed.y1 | round }}"
+                      x2="{{ placed.x2 | round }}" y2="{{ placed.y2 | round }}"
+                      marker-end="url(#arrow-{{ story.story_id }})"/>
+                {% endif %}
+                {{ edge_label(placed) }}
+                {% endfor %}
+                {% for placed in view.layout.nodes if placed.node.sentence_id == sentence %}
+                {{ node_icon(placed) }}
+                {% endfor %}
+              </g>
+              {% endfor %}
+              {#- Actors last, so they draw on top and never fade. -#}
+              <g class="diagram-actors">
+                {% for placed in view.layout.nodes if placed.node.glyph == 'actor' %}
+                {{ node_icon(placed) }}
+                {% endfor %}
+              </g>
+            </svg>
+          </div>
+        </div>
+        {% endif %}
+      </section>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="diagram-tip" role="tooltip" x-show="tooltip !== null" x-cloak
+     :style="tooltip && ('left:' + (tooltip.x + 14) + 'px; top:' + (tooltip.y + 14) + 'px')">
+  <div class="diagram-tip-title" x-text="tooltip && tooltip.title"></div>
+  <div class="diagram-tip-def" x-html="tooltip && (tooltip.definition || 'No definition yet.')"></div>
+</div>
+
+<script>
+window.__DIAGRAMS_DATA__ = {{ app_data_js }};
+{{ diagrams_js }}
+</script>
+<script>{{ alpine_js }}</script>
+</body>
+</html>
